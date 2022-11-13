@@ -10,7 +10,7 @@ conn = pymysql.connect(host='localhost',
                        port=8889,
                        user='root',
                        password='root',
-                       db='air_ticket_reservation_system',
+                       db='air_system',
                        charset='utf8mb4',
                        cursorclass=pymysql.cursors.DictCursor)
 
@@ -27,13 +27,13 @@ def login():
     return render_template('login.html')
 
 
-# Define route for customer
+# Define route for customer login
 @app.route('/customer_login')
 def customerlogin():
     return render_template('customer_login.html')
 
 
-# Define route for airline staff
+# Define route for airline staff login
 @app.route('/airlinestaff_login')
 def airlinestaff():
     return render_template('airlinestaff_login.html')
