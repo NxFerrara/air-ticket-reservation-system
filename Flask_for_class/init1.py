@@ -15,9 +15,9 @@ conn = pymysql.connect(host='localhost',
                        cursorclass=pymysql.cursors.DictCursor)
 
 
-# Define a route to hello function
+# Define route for index
 @app.route('/')
-def hello():
+def index():
     return render_template('index.html')
 
 
@@ -72,7 +72,7 @@ def registerAuth():
     cursor = conn.cursor()
     # executes query
     query = 'SELECT * FROM user WHERE username = %s'
-    cursor.execute(query, (username))
+    cursor.execute(query, username)
     # stores the results in a variable
     data = cursor.fetchone()
     # use fetchall() if you are expecting more than 1 data row
@@ -94,7 +94,7 @@ def home():
     username = session['username']
     cursor = conn.cursor();
     query = 'SELECT ts, blog_post FROM blog WHERE username = %s ORDER BY ts DESC'
-    cursor.execute(query, (username))
+    cursor.execute(query, username)
     data1 = cursor.fetchall()
     for each in data1:
         print(each['blog_post'])
