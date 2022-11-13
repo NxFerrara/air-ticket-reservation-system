@@ -29,13 +29,13 @@ def login():
 
 # Define route for customer login
 @app.route('/customer_login')
-def customerlogin():
+def customer_login():
     return render_template('customer_login.html')
 
 
 # Define route for airline staff login
 @app.route('/airlinestaff_login')
-def airlinestaff():
+def airlinestaff_login():
     return render_template('airlinestaff_login.html')
 
 
