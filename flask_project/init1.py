@@ -77,7 +77,7 @@ def airline_staff_login_auth():
     # cursor used to send queries
     cursor = conn.cursor()
     # executes query
-    query = 'SELECT * FROM airline_staff WHERE Username = %s and Password = %s'
+    query = 'SELECT * FROM airlinestaff WHERE Username = %s and Password = %s'
     cursor.execute(query, (username, password))
     # stores the results in a variable
     data = cursor.fetchone()
