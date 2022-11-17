@@ -10,7 +10,7 @@ Steps:
 8. Run init1.py file using "python init1.py" command from the terminal.
   If you used a root password for your mysql database, edit the init1.py file to
   write that password in conn = pymysql.connect(host='localhost',
-		               port = 8889,
+		       port = 8889,
                        user='root',
                        password='root',
                        db='blog',
