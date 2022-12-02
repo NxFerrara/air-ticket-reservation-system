@@ -64,7 +64,7 @@ def customer_login_auth():
     else:
         # returns an error message to the html page
         error = 'Invalid login or username'
-        return render_template('login.html', error=error)
+        return render_template('customer_login.html', error=error)
 
 
 # Authenticates the airline staff login
@@ -92,7 +92,7 @@ def airline_staff_login_auth():
     else:
         # returns an error message to the html page
         error = 'Invalid login or username'
-        return render_template('login.html', error=error)
+        return render_template('airline_staff_login.html', error=error)
 
 
 # Define route for register
