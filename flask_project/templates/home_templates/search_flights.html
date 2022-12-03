@@ -3,9 +3,13 @@
 </head>
 <body>
 <form action="/search_flights_query" method="POST">
-	<input type="text" name = "email" placeholder="email" required/> </br>
-	<input type="password" name = "password" placeholder="password" required/></br>
-	<input type="submit" value = Login />
+	<input type="text" name = "Source City/Airport Name" placeholder="Source City/Airport Name" style="width:200px"
+		   required/>
+	<input type="text" name = "Destination City/Airport Name" placeholder="Destination City/Airport Name"
+		   style="width:200px" required/>
+	<input type="text" name = "Departure Date" placeholder="Departure Date" required/>
+	<input text = "text" name = "Arrival Date" placeholder="Arrival Date"/>
+	<input type="submit" value = Search />
 	{% if error %}
 		<p class="error"><strong>Error:</strong> {{error}}</p>
 	{% endif %}

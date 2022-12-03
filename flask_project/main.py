@@ -189,17 +189,42 @@ def airline_staff_register_auth():
         return render_template('airline_staff_templates/airline_staff_register.html', context=message)
 
 
-# Define route for searching for flights
+# Define route for user to search for flights
 @app.route('/search_flights')
 def search_flights():
-    return None
+    return render_template('home_templates/search_flights.html')
 
 
-# need to edit this app route for customer home page once logged in
+# Define route for querying for flights and results
+@app.route('/search_flights_query', methods=['GET', 'POST'])
+def search_flights_query():
+    # grabs information from the forms
+    source_city = request.form['Source City/Airport Name']
+    destination_city = request.form['Destination City/Airport Name']
+    departure_date = request.form['Departure Date']
+    arrival_date = request.form['Arrival Date']
+
+    # cursor used to send queries
+    cursor = conn.cursor()
+    # executes query
+    query = 'SELECT * FROM flight'
+    cursor.execute(query)
+    # stores the results in a variable
+    data = cursor.fetchall()
+    error = None
+    if data:
+        return render_template('home_templates/search_flights.html')
+    else:
+        error = "No flights found for that search result"
+        return render_template('home_templates/search_flights.html', error=error)
+
+
 @app.route('/customer_home')
 def customer_home():
     email = session['email']
-    cursor = conn.cursor();
+    cursor = conn.cursor()
+
+    # need to edit this query for customer home page once logged in
     query = 'SELECT * FROM purchase WHERE EmailAddress = %s ORDER BY PurchaseDateandTime DESC'
     cursor.execute(query, email)
     data1 = cursor.fetchall()
@@ -209,11 +234,12 @@ def customer_home():
     return render_template('customer_templates/customer_home.html', email=email, posts=data1)
 
 
-# need to edit this app route for airline staff home page once logged in
 @app.route('/airline_staff_home')
 def airline_staff_home():
     username = session['username']
-    cursor = conn.cursor();
+    cursor = conn.cursor()
+
+    # need to edit this query for airline staff home page once logged in
     query = 'SELECT * FROM ticket WHERE AirlineName = %s'
     cursor.execute(query, username)
     data1 = cursor.fetchall()
@@ -246,7 +272,7 @@ if __name__ == "__main__":
 # @app.route('/post', methods=['GET', 'POST'])
 # def post():
 #     username = session['username']
-#     cursor = conn.cursor();
+#     cursor = conn.cursor()
 #     blog = request.form['blog']
 #     query = 'INSERT INTO blog (blog_post, username) VALUES(%s, %s)'
 #     cursor.execute(query, (blog, username))
