@@ -139,7 +139,7 @@ def customer_register_auth():
     data = cursor.fetchone()
     # use fetchall() if you are expecting more than 1 data row
     error = None
-    message = None
+    context = None
     if data:
         # If the previous query returns data, then user exists
         error = "This user already exists"
@@ -175,6 +175,7 @@ def airline_staff_register_auth():
     data = cursor.fetchone()
     # use fetchall() if you are expecting more than 1 data row
     error = None
+    context = None
     if data:
         # If the previous query returns data, then user exists
         error = "This staff member already exists"
@@ -188,6 +189,13 @@ def airline_staff_register_auth():
         return render_template('airline_staff_templates/airline_staff_register.html', context=message)
 
 
+# Define route for searching for flights
+@app.route('/search_flights')
+def search_flights():
+    return None
+
+
+# need to edit this app route for customer home page once logged in
 @app.route('/customer_home')
 def customer_home():
     email = session['email']
@@ -201,6 +209,7 @@ def customer_home():
     return render_template('customer_templates/customer_home.html', email=email, posts=data1)
 
 
+# need to edit this app route for airline staff home page once logged in
 @app.route('/airline_staff_home')
 def airline_staff_home():
     username = session['username']
@@ -212,18 +221,6 @@ def airline_staff_home():
         print(each['TicketIDNumber'])
     cursor.close()
     return render_template('airline_staff_templates/airline_staff_home.html', username=username, posts=data1)
-
-
-@app.route('/post', methods=['GET', 'POST'])
-def post():
-    username = session['username']
-    cursor = conn.cursor();
-    blog = request.form['blog']
-    query = 'INSERT INTO blog (blog_post, username) VALUES(%s, %s)'
-    cursor.execute(query, (blog, username))
-    conn.commit()
-    cursor.close()
-    return redirect(url_for('home'))
 
 
 @app.route('/customer_logout')
@@ -244,3 +241,15 @@ app.secret_key = 'some key that you will never guess'
 # for changes to go through, TURN OFF FOR PRODUCTION
 if __name__ == "__main__":
     app.run('127.0.0.1', 5000, debug=True)
+
+
+# @app.route('/post', methods=['GET', 'POST'])
+# def post():
+#     username = session['username']
+#     cursor = conn.cursor();
+#     blog = request.form['blog']
+#     query = 'INSERT INTO blog (blog_post, username) VALUES(%s, %s)'
+#     cursor.execute(query, (blog, username))
+#     conn.commit()
+#     cursor.close()
+#     return redirect(url_for('home'))
