@@ -6,24 +6,27 @@
 	<h1>Welcome {{email}}</h1>
 </form>
 
-<style type="text/css">
-	table, th, td{
-		border: 1px solid black;
-	}
-</style>
-
-<table>
-	<th>Time</th>
-	<th>Post</th>
-
-{% for line in posts %}
-	<tr>
-		<td>{{line['ts']}}</td>
-		<td>{{line['blog_post']}}</td>
-	</tr>
-{% endfor %}
-</table>
-
+	<style type="text/css">
+		table, th, td {
+			border: 1px solid black;
+		}
+	</style>
+	<table>
+		<tr>
+			{% for header in headings %}
+			<th>{{ header }}</th>
+			{% endfor %}
+		</tr>
+		{% for row in data %}
+		<tr>
+			{% for key in row.keys() %}
+			<td>{{ row[key] }}</td>
+			{% endfor %}
+		</tr>
+		{% endfor %}
+	</table>
+	<br>
+<a href="/search_flights">Search Flights</a>
 <a href="/customer_logout">Logout</a>
 
 </body>
