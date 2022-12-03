@@ -17,7 +17,6 @@ Steps:
                        charset='utf8mb4',
                        cursorclass=pymysql.cursors.DictCursor) line.
 
-
 9. Now create another tab in your browser, type "127.0.0.1:5000" in the address bar.
 You should be able to see a web page with login and register links.
 10. Now play with it. Look changes in the database tables.
