@@ -18,25 +18,25 @@ conn = pymysql.connect(host='localhost',
 # Define route for index
 @app.route('/')
 def index():
-    return render_template('index.html')
+    return render_template('home_templates/index.html')
 
 
 # Define route for login
 @app.route('/login')
 def login():
-    return render_template('login.html')
+    return render_template('home_templates/login.html')
 
 
 # Define route for customer login
 @app.route('/customer_login')
 def customer_login():
-    return render_template('customer_login.html')
+    return render_template('customer_templates/customer_login.html')
 
 
 # Define route for airline staff login
 @app.route('/airline_staff_login')
 def airline_staff_login():
-    return render_template('airline_staff_login.html')
+    return render_template('airline_staff_templates/airline_staff_login.html')
 
 
 # Authenticates the customer login
@@ -64,7 +64,7 @@ def customer_login_auth():
     else:
         # returns an error message to the html page
         error = 'Invalid login or username'
-        return render_template('customer_login.html', error=error)
+        return render_template('customer_templates/customer_login.html', error=error)
 
 
 # Authenticates the airline staff login
@@ -92,53 +92,67 @@ def airline_staff_login_auth():
     else:
         # returns an error message to the html page
         error = 'Invalid login or username'
-        return render_template('airline_staff_login.html', error=error)
+        return render_template('airline_staff_templates/airline_staff_login.html', error=error)
 
 
 # Define route for register
 @app.route('/register')
 def register():
-    return render_template('register.html')
+    return render_template('home_templates/register.html')
 
 
 # Define route for customer register
 @app.route('/customer_register')
 def customer_register():
-    return render_template('customer_register.html')
+    return render_template('customer_templates/customer_register.html')
 
 
 # Define route for airline staff register
 @app.route('/airline_staff_register')
 def airline_staff_register():
-    return render_template('airline_staff_register.html')
+    return render_template('airline_staff_templates/airline_staff_register.html')
 
 
 # Authenticates the customer register
 @app.route('/customer_register_auth', methods=['GET', 'POST'])
 def customer_register_auth():
     # grabs information from the forms
+    name = request.form['name']
     email = request.form['email']
     password = request.form['password']
+    building_number = request.form['building_number']
+    street = request.form['street']
+    city = request.form['city']
+    state = request.form['state']
+    phone_number = request.form['phone_number']
+    passport_number = request.form['passport_number']
+    passport_expiration = request.form['passport_expiration']
+    passport_country = request.form['passport_country']
+    date_of_birth = request.form['date_of_birth']
 
     # cursor used to send queries
     cursor = conn.cursor()
     # executes query
-    query = 'SELECT * FROM purchase WHERE EmailAddress = %s ORDER BY PurchaseDateandTime DESC'
+    query = 'SELECT * FROM customer WHERE EmailAddress = %s'
     cursor.execute(query, email)
     # stores the results in a variable
     data = cursor.fetchone()
     # use fetchall() if you are expecting more than 1 data row
     error = None
+    message = None
     if data:
         # If the previous query returns data, then user exists
         error = "This user already exists"
-        return render_template('register.html', error=error)
+        return render_template('customer_templates/customer_register.html', error=error)
     else:
-        ins = 'INSERT INTO user VALUES(%s, %s)'
-        cursor.execute(ins, (email, password))
+        ins = 'INSERT INTO customer VALUES(%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)'
+        cursor.execute(ins, (name, email, password, building_number, street, city, state,
+                             phone_number, passport_number, passport_expiration, passport_country,
+                             date_of_birth))
         conn.commit()
         cursor.close()
-        return render_template('index.html')
+        message = "User successfully registered!"
+        return render_template('customer_templates/customer_register.html', context=message)
 
 
 # Authenticates the airline staff register
@@ -147,11 +161,15 @@ def airline_staff_register_auth():
     # grabs information from the forms
     username = request.form['username']
     password = request.form['password']
+    first_name = request.form['first_name']
+    last_name = request.form['last_name']
+    date_of_birth = request.form['date_of_birth']
+    airline_name = request.form['airline_name']
 
     # cursor used to send queries
     cursor = conn.cursor()
     # executes query
-    query = 'SELECT * FROM ticket WHERE AirlineName = %s'
+    query = 'SELECT * FROM airlinestaff WHERE Username = %s'
     cursor.execute(query, username)
     # stores the results in a variable
     data = cursor.fetchone()
@@ -159,14 +177,15 @@ def airline_staff_register_auth():
     error = None
     if data:
         # If the previous query returns data, then user exists
-        error = "This user already exists"
-        return render_template('register.html', error=error)
+        error = "This staff member already exists"
+        return render_template('airline_staff_templates/airline_staff_register.html', error=error)
     else:
-        ins = 'INSERT INTO user VALUES(%s, %s)'
-        cursor.execute(ins, (username, password))
+        ins = 'INSERT INTO airlinestaff VALUES(%s, %s, %s, %s, %s, %s)'
+        cursor.execute(ins, (username, password, first_name, last_name, date_of_birth, airline_name))
         conn.commit()
         cursor.close()
-        return render_template('index.html')
+        message = "Staff member successfully registered!"
+        return render_template('airline_staff_templates/airline_staff_register.html', context=message)
 
 
 @app.route('/customer_home')
@@ -179,7 +198,7 @@ def customer_home():
     for each in data1:
         print(each['TicketIDNumber'])
     cursor.close()
-    return render_template('customer_home.html', email=email, posts=data1)
+    return render_template('customer_templates/customer_home.html', email=email, posts=data1)
 
 
 @app.route('/airline_staff_home')
@@ -192,7 +211,7 @@ def airline_staff_home():
     for each in data1:
         print(each['TicketIDNumber'])
     cursor.close()
-    return render_template('airline_staff_home.html', username=username, posts=data1)
+    return render_template('airline_staff_templates/airline_staff_home.html', username=username, posts=data1)
 
 
 @app.route('/post', methods=['GET', 'POST'])
