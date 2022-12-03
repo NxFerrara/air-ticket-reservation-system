@@ -18,6 +18,14 @@ conn = pymysql.connect(host='localhost',
 # Define route for index
 @app.route('/')
 def index():
+    # cursor used to send queries
+    cursor = conn.cursor()
+    # executes query
+    query = 'SELECT AirlineName, FlightNumber, DepartureDateandTime, ArrivalDateandTime, Status FROM flight'
+    cursor.execute(query)
+    # stores the results in a variable
+    data = cursor.fetchall()
+    cursor.close()
     return render_template('home_templates/index.html')
 
 
