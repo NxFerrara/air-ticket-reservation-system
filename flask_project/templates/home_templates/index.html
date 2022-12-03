@@ -18,11 +18,18 @@
 		}
 	</style>
 	<table>
-		<th>Airline Name</th>
-		<th>Flight Number</th>
-		<th>Departure Date</th>
-		<th>Arrival Date</th>
-		<th>Status</th>
+		<tr>
+			{% for header in headings %}
+			<th>{{ header }}</th>
+			{% endfor %}
+		</tr>
+		{% for row in data %}
+		<tr>
+			{% for key in row.keys() %}
+			<td>{{ row[key] }}</td>
+			{% endfor %}
+		</tr>
+		{% endfor %}
 
 <!--	{% for line in posts %}-->
 <!--		<tr>-->

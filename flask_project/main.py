@@ -7,9 +7,9 @@ app = Flask(__name__)
 
 # Configure MySQL
 conn = pymysql.connect(host='localhost',
-                       port=8889,
+                       port=8889,  # CHANGED
                        user='root',
-                       password='root',
+                       password='root',  # CHANGED
                        db='air_system',
                        charset='utf8mb4',
                        cursorclass=pymysql.cursors.DictCursor)
@@ -26,7 +26,8 @@ def index():
     # stores the results in a variable
     data = cursor.fetchall()
     cursor.close()
-    return render_template('home_templates/index.html')
+    headings = ("Airline Name","Flight Number","Departure Date", "Arrival Date", "Status")  # CHANGED
+    return render_template('home_templates/index.html', headings=headings, data=data)  # CHANGED
 
 
 # Define route for login
@@ -215,13 +216,21 @@ def search_flights_query():
     # cursor used to send queries
     cursor = conn.cursor()
     # executes query
-    query = 'SELECT * FROM flight'
-    cursor.execute(query)
+    query = 'SELECT AirlineName, FlightNumber, DepartureAirportName, ' \
+            'ArrivalAirportName, DepartureDateandTime, ArrivalDateandTime,' \
+            'BasePrice, Status FROM flight WHERE ' \
+            'DepartureAirportName = %s AND ' \
+            'ArrivalAirportName = %s AND ' \
+            'DepartureDateandTime = %s AND ' \
+            'ArrivalDateandTime = %s'
+    cursor.execute(query, (source_city, destination_city, departure_date, arrival_date))
     # stores the results in a variable
     data = cursor.fetchall()
     error = None
     if data:
-        return render_template('home_templates/search_flights.html')
+        headings = ("Airline Name", "Flight Number", "Departure Airport",
+                    "Arrival Airport", "Departure Date", "Arrival Date", "Price", "Status")
+        return render_template('home_templates/search_flights.html', headings=headings, data=data)
     else:
         error = "No flights found for that search result"
         return render_template('home_templates/search_flights.html', error=error)
