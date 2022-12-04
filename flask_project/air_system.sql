@@ -1,11 +1,11 @@
 -- phpMyAdmin SQL Dump
--- version 5.2.0
+-- version 5.1.1
 -- https://www.phpmyadmin.net/
 --
--- Host: 127.0.0.1
--- Generation Time: Nov 05, 2022 at 10:12 PM
--- Server version: 10.4.24-MariaDB
--- PHP Version: 8.1.6
+-- Host: localhost:8889
+-- Generation Time: Dec 04, 2022 at 08:31 PM
+-- Server version: 5.7.34
+-- PHP Version: 7.4.21
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -36,6 +36,8 @@ CREATE TABLE `airline` (
 --
 
 INSERT INTO `airline` (`AirlineName`) VALUES
+('American Airlines'),
+('Delta'),
 ('Jet Blue');
 
 -- --------------------------------------------------------
@@ -58,7 +60,8 @@ CREATE TABLE `airlinestaff` (
 --
 
 INSERT INTO `airlinestaff` (`Username`, `Password`, `FirstName`, `LastName`, `DateofBirth`, `AirlineName`) VALUES
-('jd123', '1234567', 'Sally', 'Smith', '1980-11-11', 'Jet Blue');
+('jd123', '1234567', 'Sally', 'Smith', '1980-11-11', 'Jet Blue'),
+('nwill123', 'ilovechips', 'Nick', 'Williams', '2001-10-03', 'Jet Blue');
 
 -- --------------------------------------------------------
 
@@ -81,10 +84,10 @@ CREATE TABLE `airplane` (
 -- Dumping data for table `airplane`
 --
 
-INSERT INTO `airplane` (`IDNumber`,`ManufacturingCompany`,`Age`,`AirlineName`,`NumberofEconomyClassSeats`,`NumberofBusinessClassSeats`,`NumberofFirstClassSeats`) VALUES
-(1, 'Boeing', 1, 'Jet Blue',50,20,10),
-(2, 'Boeing', 3, 'Jet Blue',70,20,10),
-(3, 'Boeing', 4, 'Jet Blue',60,40,20);
+INSERT INTO `airplane` (`IDNumber`, `NumberofSeats`, `ManufacturingCompany`, `Age`, `AirlineName`, `NumberofEconomyClassSeats`, `NumberofBusinessClassSeats`, `NumberofFirstClassSeats`) VALUES
+(1, 0, 'Boeing', 1, 'Jet Blue', 50, 20, 10),
+(2, 0, 'Boeing', 3, 'Jet Blue', 70, 20, 10),
+(3, 0, 'Boeing', 4, 'Jet Blue', 60, 40, 20);
 
 -- --------------------------------------------------------
 
@@ -133,9 +136,12 @@ CREATE TABLE `customer` (
 --
 
 INSERT INTO `customer` (`Name`, `EmailAddress`, `Password`, `BuildingNumber`, `Street`, `City`, `State`, `PhoneNumber`, `PassportNumber`, `PassportExpiration`, `PassportCountry`, `DateofBirth`) VALUES
+('Johnny Liu', 'batman@gmail.com', '1234', 145, 'Elm Street', 'New York', 'NY', '9241233478', 391238, '2027-01-08', 'USA', '2001-10-03'),
 ('Jason Rodriguez', 'jasonrodriguez@gmail.com', 'iwanttotravel', 298, 'Century Avenue', 'Pudong', 'Shanghai', '2168881234', 9281394, '2024-02-19', 'China', '1969-04-17'),
 ('John Doe', 'johndoe@gmail.com', 'ilovedatabases', 123, 'Maple Street', 'Los Angeles', 'CA', '7182911230', 3004786, '2022-12-21', 'USA', '1979-11-04'),
-('Mary Jane', 'maryjane@gmail.com', 'ilikehamburgers', 652, 'Oak Street', 'New York', 'NY', '9172309482', 2391039, '2023-03-12', 'USA', '1989-06-15');
+('Mary Jane', 'maryjane@gmail.com', 'ilikehamburgers', 652, 'Oak Street', 'New York', 'NY', '9172309482', 2391039, '2023-03-12', 'USA', '1989-06-15'),
+('Max Chen', 'spiderman@gmail.com', '1234567', 301, 'Elk Street', 'Brooklyn', 'NY', '9281920394', 3928192, '2025-10-15', 'USA', '1956-02-10'),
+('Sarah Thompson', 'sthompson@gmail.com', 'ilovefish', 341, 'Pine Street', 'Bronx', 'NY', '7182910394', 983712, '2028-10-18', 'USA', '2010-01-05');
 
 -- --------------------------------------------------------
 
@@ -267,21 +273,21 @@ CREATE TABLE `ticket` (
 -- Dumping data for table `ticket`
 --
 
-INSERT INTO `ticket` (`TicketIDNumber`, `FlightNumber`, `DepartureDateandTime`, `AirlineName`,`Class`) VALUES
-('1248', '1', '2008-11-11 13:30:00', 'Jet Blue','Economy'),
-('1356', '1', '2008-11-11 13:30:00', 'Jet Blue','Economy'),
-('2198', '2', '2008-11-12 20:30:00', 'Jet Blue','Business'),
-('2417', '2', '2008-11-12 20:30:00', 'Jet Blue','Business'),
-('3182', '3', '2008-12-11 01:00:00', 'Jet Blue','Business'),
-('3976', '3', '2008-12-11 01:00:00', 'Jet Blue','Economy'),
-('4019', '4', '2009-01-20 04:00:00', 'Jet Blue','Economy'),
-('4192', '4', '2009-01-20 04:00:00', 'Jet Blue','Economy'),
-('5108', '5', '2009-04-22 09:00:00', 'Jet Blue','First'),
-('5768', '5', '2009-04-22 09:00:00', 'Jet Blue','First'),
-('6123', '6', '2009-08-30 12:00:00', 'Jet Blue','First'),
-('6527', '6', '2009-08-30 12:00:00', 'Jet Blue','First'),
-('7129', '7', '2023-08-30 13:30:00', 'Jet Blue','Economy'),
-('7891', '7', '2023-08-30 13:30:00', 'Jet Blue','Business');
+INSERT INTO `ticket` (`TicketIDNumber`, `FlightNumber`, `DepartureDateandTime`, `AirlineName`, `Class`) VALUES
+('1248', '1', '2008-11-11 13:30:00', 'Jet Blue', 'Economy'),
+('1356', '1', '2008-11-11 13:30:00', 'Jet Blue', 'Economy'),
+('2198', '2', '2008-11-12 20:30:00', 'Jet Blue', 'Business'),
+('2417', '2', '2008-11-12 20:30:00', 'Jet Blue', 'Business'),
+('3182', '3', '2008-12-11 01:00:00', 'Jet Blue', 'Business'),
+('3976', '3', '2008-12-11 01:00:00', 'Jet Blue', 'Economy'),
+('4019', '4', '2009-01-20 04:00:00', 'Jet Blue', 'Economy'),
+('4192', '4', '2009-01-20 04:00:00', 'Jet Blue', 'Economy'),
+('5108', '5', '2009-04-22 09:00:00', 'Jet Blue', 'First'),
+('5768', '5', '2009-04-22 09:00:00', 'Jet Blue', 'First'),
+('6123', '6', '2009-08-30 12:00:00', 'Jet Blue', 'First'),
+('6527', '6', '2009-08-30 12:00:00', 'Jet Blue', 'First'),
+('7129', '7', '2023-08-30 13:30:00', 'Jet Blue', 'Economy'),
+('7891', '7', '2023-08-30 13:30:00', 'Jet Blue', 'Business');
 
 --
 -- Indexes for dumped tables
