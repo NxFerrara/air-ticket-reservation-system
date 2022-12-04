@@ -1,9 +1,9 @@
 -- phpMyAdmin SQL Dump
--- version 5.1.1
+-- version 5.1.0
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost:8889
--- Generation Time: Dec 04, 2022 at 08:31 PM
+-- Generation Time: Dec 04, 2022 at 09:51 PM
 -- Server version: 5.7.34
 -- PHP Version: 7.4.21
 
@@ -85,9 +85,15 @@ CREATE TABLE `airplane` (
 --
 
 INSERT INTO `airplane` (`IDNumber`, `NumberofSeats`, `ManufacturingCompany`, `Age`, `AirlineName`, `NumberofEconomyClassSeats`, `NumberofBusinessClassSeats`, `NumberofFirstClassSeats`) VALUES
-(1, 0, 'Boeing', 1, 'Jet Blue', 50, 20, 10),
-(2, 0, 'Boeing', 3, 'Jet Blue', 70, 20, 10),
-(3, 0, 'Boeing', 4, 'Jet Blue', 60, 40, 20);
+(1, 80, 'Boeing', 2, 'American Airlines', 60, 10, 10),
+(1, 80, 'Boeing', 5, 'Delta', 50, 10, 20),
+(1, 80, 'Boeing', 1, 'Jet Blue', 50, 20, 10),
+(2, 100, 'Boeing', 1, 'American Airlines', 70, 20, 10),
+(2, 125, 'Boeing', 1, 'Delta', 100, 20, 5),
+(2, 100, 'Boeing', 3, 'Jet Blue', 70, 20, 10),
+(3, 165, 'Boeing', 3, 'American Airlines', 120, 30, 15),
+(3, 110, 'Boeing', 2, 'Delta', 80, 15, 15),
+(3, 120, 'Boeing', 4, 'Jet Blue', 60, 40, 20);
 
 -- --------------------------------------------------------
 
@@ -167,12 +173,20 @@ CREATE TABLE `flight` (
 
 INSERT INTO `flight` (`FlightNumber`, `DepartureDateandTime`, `ArrivalDateandTime`, `BasePrice`, `Status`, `DepartureAirportName`, `ArrivalAirportName`, `IDNumber`, `AirlineName`) VALUES
 ('1', '2008-11-11 13:30:00', '2008-11-11 17:00:00', 100, 'On-time', 'JFK', 'PVG', 1, 'Jet Blue'),
+('10', '2023-02-17 10:30:00', '2023-02-17 15:00:00', 100, 'On-time', 'JFK', 'PVG', 2, 'American Airlines'),
+('11', '2023-02-19 04:30:00', '2023-02-19 08:00:00', 120, 'On-time', 'PVG', 'JFK', 1, 'American Airlines'),
+('12', '2023-02-24 20:30:00', '2023-02-25 01:00:00', 90, 'Delayed', 'JFK', 'PVG', 3, 'American Airlines'),
+('13', '2023-02-25 22:30:00', '2023-02-26 03:00:00', 70, 'Delayed', 'JFK', 'PVG', 2, 'Delta'),
+('14', '2023-02-25 22:30:00', '2023-02-26 03:00:00', 90, 'Delayed', 'PVG', 'JFK', 1, 'Delta'),
+('15', '2023-02-22 14:30:00', '2023-02-22 19:00:00', 180, 'On-time', 'PVG', 'JFK', 3, 'Delta'),
 ('2', '2008-11-12 20:30:00', '2008-11-13 01:00:00', 200, 'Delayed', 'JFK', 'PVG', 3, 'Jet Blue'),
 ('3', '2008-12-11 01:00:00', '2008-12-11 05:30:00', 120, 'On-time', 'JFK', 'PVG', 1, 'Jet Blue'),
 ('4', '2009-01-20 04:00:00', '2009-01-20 09:30:00', 320, 'Delayed', 'JFK', 'PVG', 2, 'Jet Blue'),
 ('5', '2009-04-22 09:00:00', '2009-04-22 12:30:00', 90, 'On-time', 'JFK', 'PVG', 3, 'Jet Blue'),
 ('6', '2009-08-30 12:00:00', '2009-08-30 17:30:00', 180, 'Delayed', 'JFK', 'PVG', 2, 'Jet Blue'),
-('7', '2023-08-30 13:30:00', '2023-08-30 19:00:00', 220, 'Delayed', 'JFK', 'PVG', 1, 'Jet Blue');
+('7', '2023-08-30 13:30:00', '2023-08-30 19:00:00', 220, 'Delayed', 'JFK', 'PVG', 1, 'Jet Blue'),
+('8', '2023-01-22 14:30:00', '2023-01-22 20:00:00', 150, 'On-time', 'JFK', 'PVG', 3, 'Delta'),
+('9', '2023-02-14 20:30:00', '2023-02-15 01:00:00', 80, 'Delayed', 'PVG', 'JFK', 2, 'Delta');
 
 -- --------------------------------------------------------
 
@@ -287,7 +301,57 @@ INSERT INTO `ticket` (`TicketIDNumber`, `FlightNumber`, `DepartureDateandTime`, 
 ('6123', '6', '2009-08-30 12:00:00', 'Jet Blue', 'First'),
 ('6527', '6', '2009-08-30 12:00:00', 'Jet Blue', 'First'),
 ('7129', '7', '2023-08-30 13:30:00', 'Jet Blue', 'Economy'),
-('7891', '7', '2023-08-30 13:30:00', 'Jet Blue', 'Business');
+('7891', '7', '2023-08-30 13:30:00', 'Jet Blue', 'Business'),
+('7892', '8', '2023-01-22 14:30:00', 'Delta', 'Economy'),
+('7893', '8', '2023-01-22 14:30:00', 'Delta', 'Economy'),
+('7894', '8', '2023-01-22 14:30:00', 'Delta', 'Economy'),
+('7895', '8', '2023-01-22 14:30:00', 'Delta', 'Economy'),
+('7896', '8', '2023-01-22 14:30:00', 'Delta', 'Economy'),
+('7897', '8', '2023-01-22 14:30:00', 'Delta', 'Economy'),
+('7898', '8', '2023-01-22 14:30:00', 'Delta', 'Economy'),
+('7899', '8', '2023-01-22 14:30:00', 'Delta', 'Economy'),
+('7900', '8', '2023-01-22 14:30:00', 'Delta', 'Economy'),
+('7901', '8', '2023-01-22 14:30:00', 'Delta', 'Economy'),
+('7902', '8', '2023-01-22 14:30:00', 'Delta', 'Economy'),
+('7903', '8', '2023-01-22 14:30:00', 'Delta', 'Economy'),
+('7904', '8', '2023-01-22 14:30:00', 'Delta', 'Economy'),
+('7905', '8', '2023-01-22 14:30:00', 'Delta', 'Economy'),
+('7906', '8', '2023-01-22 14:30:00', 'Delta', 'Economy'),
+('7907', '8', '2023-01-22 14:30:00', 'Delta', 'Economy'),
+('7908', '8', '2023-01-22 14:30:00', 'Delta', 'Economy'),
+('7909', '8', '2023-01-22 14:30:00', 'Delta', 'Economy'),
+('7910', '8', '2023-01-22 14:30:00', 'Delta', 'Economy'),
+('7911', '8', '2023-01-22 14:30:00', 'Delta', 'Economy'),
+('7912', '8', '2023-01-22 14:30:00', 'Delta', 'Economy'),
+('7913', '8', '2023-01-22 14:30:00', 'Delta', 'Business'),
+('7914', '8', '2023-01-22 14:30:00', 'Delta', 'First'),
+('7915', '9', '2023-02-14 20:30:00', 'Delta', 'Economy'),
+('7916', '9', '2023-02-14 20:30:00', 'Delta', 'Business'),
+('7917', '9', '2023-02-14 20:30:00', 'Delta', 'First'),
+('7918', '9', '2023-02-14 20:30:00', 'Delta', 'First'),
+('7919', '9', '2023-02-14 20:30:00', 'Delta', 'FIrst'),
+('7920', '9', '2023-02-14 20:30:00', 'Delta', 'First'),
+('7921', '10', '2023-02-17 10:30:00', 'American Airlines', 'Economy'),
+('7922', '10', '2023-02-17 10:30:00', 'American Airlines', 'Business'),
+('7923', '10', '2023-02-17 10:30:00', 'American Airlines', 'Business'),
+('7924', '11', '2023-02-19 04:30:00', 'American Airlines', 'Economy'),
+('7925', '11', '2023-02-19 04:30:00', 'American Airlines', 'Economy'),
+('7926', '11', '2023-02-19 04:30:00', 'American Airlines', 'Economy'),
+('7927', '11', '2023-02-19 04:30:00', 'American Airlines', 'Economy'),
+('7928', '11', '2023-02-19 04:30:00', 'American Airlines', 'First'),
+('7929', '11', '2023-02-19 04:30:00', 'American Airlines', 'First'),
+('7930', '12', '2023-02-24 20:30:00', 'American Airlines', 'Economy'),
+('7931', '12', '2023-02-24 20:30:00', 'American Airlines', 'Economy'),
+('7932', '12', '2023-02-24 20:30:00', 'American Airlines', 'Economy'),
+('7933', '12', '2023-02-24 20:30:00', 'American Airlines', 'Business'),
+('7934', '12', '2023-02-24 20:30:00', 'American Airlines', 'First'),
+('7935', '13', '2023-02-25 22:30:00', 'Delta', 'Business'),
+('7936', '13', '2023-02-25 22:30:00', 'Delta', 'Business'),
+('7937', '13', '2023-02-25 22:30:00', 'Delta', 'First'),
+('7938', '14', '2023-02-25 22:30:00', 'Delta', 'Economy'),
+('7939', '14', '2023-02-25 22:30:00', 'Delta', 'Business'),
+('7940', '14', '2023-02-25 22:30:00', 'Delta', 'First'),
+('7941', '15', '2023-02-22 14:30:00', 'Delta', 'Economy');
 
 --
 -- Indexes for dumped tables
