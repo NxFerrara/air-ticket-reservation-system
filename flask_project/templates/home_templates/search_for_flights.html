@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+</head>
+
+<body>
+<div style="display:flex;">
+	<form action="/search_one_way">
+		<input type="submit" value="One Way Flights">
+	</form>
+
+	<form action="/search_round_trip">
+		<input type="submit" value="Round Trip Flights">
+	</form>
+</div>
+<br>
+{% if is_customer %}
+	<a href="/customer_home">Go back</a>
+{% endif %}
+{% if is_airline_staff %}
+	<a href="/airline_staff_home">Go back</a>
+{% endif %}
+{% if not is_customer and not is_airline_staff %}
+	<a href="/">Go back</a>
+{% endif %}
+</body>
+
+</html>

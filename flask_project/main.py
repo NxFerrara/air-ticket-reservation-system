@@ -203,7 +203,21 @@ def airline_staff_login_auth():
 # Define route for user to search for flights
 @app.route('/search_flights')
 def search_flights():
-    return render_template('home_templates/search_flights.html', is_customer=session.get('is_customer'),
+    return render_template('home_templates/search_for_flights.html', is_customer=session.get('is_customer'),
+                           is_airline_staff=session.get('is_airline_staff'))
+
+
+# Define route for user to search for flights
+@app.route('/search_one_way')
+def search_one_way():
+    return render_template('home_templates/search_one_way.html', is_customer=session.get('is_customer'),
+                           is_airline_staff=session.get('is_airline_staff'))
+
+
+# Define route for user to search for flights
+@app.route('/search_round_trip')
+def search_round_trip():
+    return render_template('home_templates/search_round_trip.html', is_customer=session.get('is_customer'),
                            is_airline_staff=session.get('is_airline_staff'))
 
 
@@ -214,30 +228,46 @@ def search_flights_query():
     source_city = request.form['Source City/Airport Name']
     destination_city = request.form['Destination City/Airport Name']
     departure_date_and_time = request.form['Departure Date and Time']
-    trip_type = request.form["Trip Type"]
+    return_date_and_time = request.form['Return Date and Time']
 
-    # cursor used to send queries
-    cursor = conn.cursor()
-    # executes query
-    query = 'SELECT AirlineName, FlightNumber, DepartureAirportName, ' \
-            'ArrivalAirportName, DepartureDateandTime, ArrivalDateandTime ' \
-            'FROM flight WHERE ' \
-            'DepartureAirportName = %s AND ' \
-            'ArrivalAirportName = %s AND ' \
-            'DepartureDateandTime = %s AND ' \
-            'DepartureDateAndTime >= DATE(NOW())'
-    cursor.execute(query, (source_city, destination_city, departure_date_and_time))
-    # stores the results in a variable
-    data = cursor.fetchall()
+    if return_date_and_time:
+        # cursor used to send queries
+        cursor = conn.cursor()
+        # executes query
+        query = 'SELECT AirlineName, DepartureAirportName, ' \
+                'ArrivalAirportName, DepartureDateandTime ' \
+                'FROM flight WHERE ' \
+                'AirlineName = %s AND ' \
+                'DepartureAirportName = %s AND ' \
+                'ArrivalAirportName = %s AND ' \
+                'DepartureDateandTime = %s AND ' \
+                'DepartureDateAndTime >= DATE(NOW())'
+        cursor.execute(query, (source_city, destination_city, departure_date_and_time, return_date_and_time))
+        # stores the results in a variable
+        data = cursor.fetchall()
+    else:
+        # cursor used to send queries
+        cursor = conn.cursor()
+        # executes query
+        query = 'SELECT AirlineName, FlightNumber, DepartureAirportName, ' \
+                'ArrivalAirportName, DepartureDateandTime, ArrivalDateandTime ' \
+                'FROM flight WHERE ' \
+                'DepartureAirportName = %s AND ' \
+                'ArrivalAirportName = %s AND ' \
+                'DepartureDateandTime = %s AND ' \
+                'DepartureDateAndTime >= DATE(NOW())'
+        cursor.execute(query, (source_city, destination_city, departure_date_and_time))
+        # stores the results in a variable
+        data = cursor.fetchall()
     error = None
     if data:
         headings = ("Airline Name", "Flight Number", "Departure Airport",
                     "Arrival Airport", "Departure Date and Time", "Arrival Date and Time")
-        return render_template('home_templates/search_flights.html', is_customer=session.get('is_customer'),
+        return render_template('home_templates/search_for_flights.html', is_customer=session.get('is_customer'),
                                is_airline_staff=session.get('is_airline_staff'), headings=headings, data=data)
     else:
         error = "No future flights found for that search result"
-        return render_template('home_templates/search_flights.html', is_customer=session.get('is_customer'),
+        return render_template('home_templates/search_for_flights.html', is_customer=session.get('is_customer'),
                                is_airline_staff=session.get('is_airline_staff'), error=error)
 
 

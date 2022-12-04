@@ -1,0 +1,47 @@
+<html>
+<head>
+</head>
+<body>
+<form action="/search_flights_query" method="POST">
+	<input type="text" name = "Source City/Airport Name" placeholder="Source City/Airport Name" style="width:200px"
+		   required/>
+	<input type="text" name = "Destination City/Airport Name" placeholder="Destination City/Airport Name"
+		   style="width:200px" required/>
+	<input type="text" name = "Departure Date and Time" placeholder="Departure Date and Time"
+		   style="width:200px" required/>
+	<input type="text" name = "Return Date and Time" placeholder="Return Date and Time"
+		   style="width:200px" required/>
+	<input type="submit" value = Search />
+	{% if error %}
+		<p class="error"><strong>Error:</strong> {{error}}</p>
+	{% endif %}
+</form>
+
+<style type="text/css">
+	table, th, td {
+		border: 1px solid black;
+	}
+</style>
+{% if data %}
+<table>
+	<tr>
+		{% for header in headings %}
+		<th>{{ header }}</th>
+		{% endfor %}
+	</tr>
+	{% for row in data %}
+	<tr>
+		{% for key in row.keys() %}
+		<td>{{ row[key] }}</td>
+		{% endfor %}
+	</tr>
+	{% endfor %}
+</table>
+<br>
+{% endif %}
+<a href="/search_flights">Go back</a>
+
+</body>
+
+
+</html>

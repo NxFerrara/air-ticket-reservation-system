@@ -9,10 +9,6 @@
 		   style="width:200px" required/>
 	<input type="text" name = "Departure Date and Time" placeholder="Departure Date and Time"
 		   style="width:200px" required/>
-	<select name="Trip Type" id="Trip Type">
-		<option value="One Way">One Way</option>
-		<option value="Round Trip">Round Trip</option>
-	</select>
 	<input type="submit" value = Search />
 	{% if error %}
 		<p class="error"><strong>Error:</strong> {{error}}</p>
@@ -41,16 +37,7 @@
 </table>
 <br>
 {% endif %}
-
-{% if is_customer %}
-	<a href="/customer_home">Go back</a>
-{% endif %}
-{% if is_airline_staff %}
-	<a href="/airline_staff_home">Go back</a>
-{% endif %}
-{% if not is_customer and not is_airline_staff %}
-	<a href="/">Go back</a>
-{% endif %}
+<a href="/search_flights">Go back</a>
 
 </body>
 
