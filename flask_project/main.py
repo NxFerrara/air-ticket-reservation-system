@@ -1,15 +1,16 @@
 # Import Flask Library
 from flask import Flask, render_template, request, session, url_for, redirect
 import pymysql.cursors
+import hashlib
 
 # Initialize the app from Flask
 app = Flask(__name__)
 
 # Configure MySQL
 conn = pymysql.connect(host='localhost',
-                       port=8889,  # change this every time if you are a Windows user
+                       #port=8889,  # change this every time if you are a Windows user
                        user='root',
-                       password='root',  # change this every time if you are Windows user
+                       password='',  # change this every time if you are Windows user
                        db='air_system',
                        charset='utf8mb4',
                        cursorclass=pymysql.cursors.DictCursor)
@@ -81,7 +82,7 @@ def customer_register_auth():
         return render_template('customer_templates/customer_register.html', error=error)
     else:
         ins = 'INSERT INTO customer VALUES(%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)'
-        cursor.execute(ins, (name, email, password, building_number, street, city, state,
+        cursor.execute(ins, (name, email, md5(password), building_number, street, city, state,
                              phone_number, passport_number, passport_expiration, passport_country,
                              date_of_birth))
         conn.commit()
@@ -117,7 +118,7 @@ def airline_staff_register_auth():
         return render_template('airline_staff_templates/airline_staff_register.html', error=error)
     else:
         ins = 'INSERT INTO airlinestaff VALUES(%s, %s, %s, %s, %s, %s)'
-        cursor.execute(ins, (username, password, first_name, last_name, date_of_birth, airline_name))
+        cursor.execute(ins, (username, md5(password), first_name, last_name, date_of_birth, airline_name))
         conn.commit()
         cursor.close()
         message = "Staff member successfully registered!"
@@ -153,7 +154,7 @@ def customer_login_auth():
     cursor = conn.cursor()
     # executes query
     query = 'SELECT * FROM customer WHERE EmailAddress = %s and Password = %s'
-    cursor.execute(query, (email, password))
+    cursor.execute(query, (email, md5(password)))
     # stores the results in a variable
     data = cursor.fetchone()
     # use fetchall() if you are expecting more than 1 data row
@@ -182,7 +183,7 @@ def airline_staff_login_auth():
     cursor = conn.cursor()
     # executes query
     query = 'SELECT * FROM airlinestaff WHERE Username = %s and Password = %s'
-    cursor.execute(query, (username, password))
+    cursor.execute(query, (username, md5(password)))
     # stores the results in a variable
     data = cursor.fetchone()
     # use fetchall() if you are expecting more than 1 data row
@@ -285,6 +286,9 @@ def airline_staff_logout():
     session.pop('is_airline_staff')
     return redirect('/')
 
+def md5(password):
+    result = hashlib.md5(password.encode())
+    return result.hexdigest()
 
 app.secret_key = 'some key that you will never guess'
 # Run the app on localhost port 5000
