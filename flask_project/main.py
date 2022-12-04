@@ -7,9 +7,9 @@ app = Flask(__name__)
 
 # Configure MySQL
 conn = pymysql.connect(host='localhost',
-                       port=8889,  # change this every time if you are a windows user
+                       port=8889,  # change this every time if you are a Windows user
                        user='root',
-                       password='root',  # change this every time if you are windows user
+                       password='root',  # change this every time if you are Windows user
                        db='air_system',
                        charset='utf8mb4',
                        cursorclass=pymysql.cursors.DictCursor)
@@ -26,8 +26,8 @@ def index():
     # stores the results in a variable
     data = cursor.fetchall()
     cursor.close()
-    headings = ("Airline Name", "Flight Number", "Departure Date and Time", "Arrival Date and Time", "Status")  # CHANGED
-    return render_template('home_templates/index.html', headings=headings, data=data)  # CHANGED
+    headings = ("Airline Name", "Flight Number", "Departure Date and Time", "Arrival Date and Time", "Status")
+    return render_template('home_templates/index.html', headings=headings, data=data)
 
 
 # Define route for register
@@ -214,29 +214,29 @@ def search_flights_query():
     source_city = request.form['Source City/Airport Name']
     destination_city = request.form['Destination City/Airport Name']
     departure_date_and_time = request.form['Departure Date and Time']
-    arrival_date_and_time = request.form['Arrival Date and Time']
+    trip_type = request.form["Trip Type"]
 
     # cursor used to send queries
     cursor = conn.cursor()
     # executes query
     query = 'SELECT AirlineName, FlightNumber, DepartureAirportName, ' \
-            'ArrivalAirportName, DepartureDateandTime, ArrivalDateandTime, ' \
-            'BasePrice, Status FROM flight WHERE ' \
+            'ArrivalAirportName, DepartureDateandTime, ArrivalDateandTime ' \
+            'FROM flight WHERE ' \
             'DepartureAirportName = %s AND ' \
             'ArrivalAirportName = %s AND ' \
             'DepartureDateandTime = %s AND ' \
-            'ArrivalDateandTime = %s'
-    cursor.execute(query, (source_city, destination_city, departure_date_and_time, arrival_date_and_time))
+            'DepartureDateAndTime >= DATE(NOW())'
+    cursor.execute(query, (source_city, destination_city, departure_date_and_time))
     # stores the results in a variable
     data = cursor.fetchall()
     error = None
     if data:
         headings = ("Airline Name", "Flight Number", "Departure Airport",
-                    "Arrival Airport", "Departure Date", "Arrival Date", "Price", "Status")
+                    "Arrival Airport", "Departure Date and Time", "Arrival Date and Time")
         return render_template('home_templates/search_flights.html', is_customer=session.get('is_customer'),
                                is_airline_staff=session.get('is_airline_staff'), headings=headings, data=data)
     else:
-        error = "No flights found for that search result"
+        error = "No future flights found for that search result"
         return render_template('home_templates/search_flights.html', is_customer=session.get('is_customer'),
                                is_airline_staff=session.get('is_airline_staff'), error=error)
 

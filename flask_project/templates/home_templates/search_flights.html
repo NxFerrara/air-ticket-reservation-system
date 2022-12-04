@@ -9,7 +9,10 @@
 		   style="width:200px" required/>
 	<input type="text" name = "Departure Date and Time" placeholder="Departure Date and Time"
 		   style="width:200px" required/>
-	<input text = "text" name = "Arrival Date and Time" placeholder="Arrival Date and Time" style="width:200px"/>
+	<select name="Trip Type" id="Trip Type">
+		<option value="One Way">One Way</option>
+		<option value="Round Trip">Round Trip</option>
+	</select>
 	<input type="submit" value = Search />
 	{% if error %}
 		<p class="error"><strong>Error:</strong> {{error}}</p>
