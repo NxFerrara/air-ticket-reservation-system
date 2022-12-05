@@ -3,8 +3,14 @@
 </head>
 <body>
 <form action="/exec_insert_new_flight" method="POST">
-	<input type="text" name = "DepartureDateandTime" placeholder="Departure Date and Time" required/></br>
-	<input type="text" name = "ArrivalDateandTime" placeholder="Arrival Date and Time" required/></br>
+	<label for="DepartureDateandTime">Departure Date and Time:</label>
+	</br>
+  	<input type="datetime-local" id="DepartureDateandTime" name="DepartureDateandTime">
+	</br>
+	<label for="ArrivalDateandTime">Arrival Date and Time:</label>
+	</br>
+  	<input type="datetime-local" id="ArrivalDateandTime" name="ArrivalDateandTime">
+	</br>
 	<input type="text" name = "BasePrice" placeholder="Base Price" required/></br>
 	<input type="text" name = "DepartureAirportName" placeholder="Departure Airport Name" required/></br>
 	<input type="text" name = "ArrivalAirportName" placeholder="Arrival Airport Name" required/></br>

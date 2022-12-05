@@ -202,22 +202,26 @@ def airline_staff_login_auth():
         error = 'Invalid login or username'
         return render_template('airline_staff_templates/airline_staff_login.html', error=error)
 
+
 @app.route('/insert_new_flight')
 def insert_new_flight():
     return render_template('airline_staff_templates/airline_staff_insert.html')
 
+
 @app.route('/exec_insert_new_flight', methods=['GET', 'POST'])
 def exec_insert_new_flight():
-    airlineName = session['airline_name']
     if session.get('is_airline_staff'):
+        airlineName = session['airline_name']
         # grabs information from the forms
         DepartureDateandTime = request.form['DepartureDateandTime']
+        DepartureDateandTime = datetime.datetime.strptime(DepartureDateandTime, "%Y-%m-%dT%H:%M").strftime(
+            '%Y-%m-%d %H:%M:%S')
         ArrivalDateandTime = request.form['ArrivalDateandTime']
+        ArrivalDateandTime = DepartureDateandTime = datetime.datetime.strptime(ArrivalDateandTime, "%Y-%m-%dT%H:%M").strftime('%Y-%m-%d %H:%M:%S')
         BasePrice = request.form['BasePrice']
         DepartureAirportName = request.form['DepartureAirportName']
         ArrivalAirportName = request.form['ArrivalAirportName']
         IDNumber = request.form['IDNumber']
-
         Status = 'On-time'  # By default
         AirlineName = session['airline_name']  # By default
 
@@ -244,6 +248,19 @@ def exec_insert_new_flight():
         cursor.execute(query, (IDNumber, DepartureDateandTime, AirlineName))
         # stores the results in a variable
         data = cursor.fetchone()
+        # Checking the departure and arrival airports exist and also the airplane
+        query = 'SELECT * FROM airport WHERE AirportName = %s'
+        cursor.execute(query, DepartureAirportName)
+        # stores the results in a variable
+        is_departure_airport = cursor.fetchone()
+        query = 'SELECT * FROM airport WHERE AirportName = %s'
+        cursor.execute(query, ArrivalAirportName)
+        # stores the results in a variable
+        is_arrival_airport = cursor.fetchone()
+        query = 'SELECT * FROM airplane WHERE IDNumber = %s AND AirlineName = %s'
+        cursor.execute(query, (IDNumber, airlineName))
+        # stores the results in a variable
+        is_airplane = cursor.fetchone()
         # use fetchall() if you are expecting more than 1 data row
         error = None
         context = None
@@ -252,6 +269,15 @@ def exec_insert_new_flight():
             error = "This flight already exists!"
             return render_template('airline_staff_templates/airline_staff_insert.html', error=error)
         else:
+            if not is_departure_airport:
+                error = "The {} Airport doesn't exist!".format(DepartureAirportName)
+                return render_template('airline_staff_templates/airline_staff_insert.html', error=error)
+            if not is_arrival_airport:
+                error = "The {} Airport doesn't exist!".format(ArrivalAirportName)
+                return render_template('airline_staff_templates/airline_staff_insert.html', error=error)
+            if not is_airplane:
+                error = "The airplane with ID number {} doesn't exist!".format(IDNumber)
+                return render_template('airline_staff_templates/airline_staff_insert.html', error=error)
             ins = 'INSERT INTO flight VALUES(%s, %s, %s, %s, %s, %s, %s, %s, %s)'
             cursor.execute(ins, (str(FlightNumber), DepartureDateandTime, ArrivalDateandTime, BasePrice, Status, DepartureAirportName,
             ArrivalAirportName, IDNumber, AirlineName))
@@ -264,6 +290,7 @@ def exec_insert_new_flight():
     else:
         return redirect('/')
 
+
 # Define route for airline staff to search for flights
 @app.route('/search_flights_airline_staff')
 def search_flights_airline_staff():
@@ -273,6 +300,7 @@ def search_flights_airline_staff():
         return render_template('customer_templates/customer_home.html')
     else:
         return redirect('/')
+
 
 @app.route('/search_flights_airline_staff_query', methods=['GET', 'POST'])
 def search_flights_airline_staff_query():
@@ -322,6 +350,7 @@ def search_flights_airline_staff_query():
     else:
         return redirect('/')
 
+
 @app.route('/view_flight_customers/<flightData>')
 def view_flight_customers(flightData):
     if session.get('is_airline_staff'):
@@ -358,6 +387,7 @@ def view_flight_customers(flightData):
 def search_flights():
     return render_template('home_templates/search_for_flights.html', is_customer=session.get('is_customer'),
                            is_airline_staff=session.get('is_airline_staff'))
+
 
 # Define route for user to search for flights
 @app.route('/search_one_way')
