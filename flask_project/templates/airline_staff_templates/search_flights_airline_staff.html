@@ -44,6 +44,8 @@
 			<u style="text-decoration-color:blue">Customers</u></td>
 		<td onclick="window.location.href=`{{ url_for('change_flight_status', flightData=row) }}`;">
 			<u style="text-decoration-color:blue">Change Status</u></td>
+        <td onclick="window.location.href=`{{ url_for('view_ratings', flightData=row) }}`;">
+            <u style="text-decoration-color:blue">Ratings</u></td>
 	</tr>
 	{% endfor %}
 </table>

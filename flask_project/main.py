@@ -244,9 +244,9 @@ def exec_insert_new_flight():
         departure_is_after = DepartureDateandTime > datetime.datetime.today()
         arrival_is_after = ArrivalDateandTime > DepartureDateandTime
         # Query all of the future flights
-        futureFlightsQuery = 'SELECT AirlineName, FlightNumber, DepartureAirportName, ArrivalAirportName, '\
-                             'DepartureDateandTime, ArrivalDateandTime, BasePrice, Status FROM flight '\
-                             'WHERE AirlineName = %s AND DepartureDateandTime >= DATE(NOW()) AND '\
+        futureFlightsQuery = 'SELECT AirlineName, FlightNumber, DepartureAirportName, ArrivalAirportName, ' \
+                             'DepartureDateandTime, ArrivalDateandTime, BasePrice, Status FROM flight ' \
+                             'WHERE AirlineName = %s AND DepartureDateandTime >= DATE(NOW()) AND ' \
                              'DepartureDateandTime <= DATE(NOW() + INTERVAL 30 DAY);'
         headings = ("Airline Name", "Flight Number", "Departure Airport", "Arrival Airport",
                     "Departure Date and Time", "Arrival Date and Time", "Base Price", "Status")
@@ -343,7 +343,8 @@ def exec_insert_new_flight():
                                        headings=headings, data=futureFlights)
             else:
                 ins = 'INSERT INTO flight VALUES(%s, %s, %s, %s, %s, %s, %s, %s, %s)'
-                cursor.execute(ins, (str(FlightNumber), DepartureDateandTime, ArrivalDateandTime, BasePrice, Status, DepartureAirportName,
+                cursor.execute(ins, (
+                str(FlightNumber), DepartureDateandTime, ArrivalDateandTime, BasePrice, Status, DepartureAirportName,
                 ArrivalAirportName, IDNumber, AirlineName))
                 conn.commit()
                 cursor.execute(futureFlightsQuery)
@@ -414,7 +415,8 @@ def search_flights_airline_staff_query():
                     'ArrivalAirportName = %s AND ' \
                     'DepartureDateandTime >= %s AND ' \
                     'DepartureDateAndTime <= %s'
-            cursor.execute(query, (airline_name, source_city, destination_city, start_departure_date_and_time, end_departure_date_and_time))
+            cursor.execute(query, (
+            airline_name, source_city, destination_city, start_departure_date_and_time, end_departure_date_and_time))
         else:
             # executes query
             query = 'SELECT AirlineName, FlightNumber, DepartureAirportName, ' \
@@ -429,7 +431,8 @@ def search_flights_airline_staff_query():
         if data:
             headings = ("Airline Name", "Flight Number", "Departure Airport",
                         "Arrival Airport", "Departure Date and Time", "Arrival Date and Time", "Base Price", "Status")
-            return render_template('airline_staff_templates/search_flights_airline_staff.html', headings=headings, data=data)
+            return render_template('airline_staff_templates/search_flights_airline_staff.html', headings=headings,
+                                   data=data)
         else:
             error = "No flights found for that search result"
             return render_template('airline_staff_templates/search_flights_airline_staff.html', error=error)
@@ -490,13 +493,13 @@ def exec_change_flight_status(flightData):
         departureDateandTime = flightData['DepartureDateandTime']
         oldStatus = flightData['Status']
         if changedStatus != oldStatus:
-            update = 'UPDATE flight SET Status = %s WHERE FlightNumber = %s AND '\
+            update = 'UPDATE flight SET Status = %s WHERE FlightNumber = %s AND ' \
                      'DepartureDateandTime = %s AND AirlineName = %s;'
             cursor = conn.cursor()
             cursor.execute(update, (changedStatus, flightNumber, departureDateandTime, airline_name))
             conn.commit()
             cursor.close()
-            message = "The {} Flight {} departing on {} "\
+            message = "The {} Flight {} departing on {} " \
                       "has successfully changed status from {} to {}".format(airline_name, flightNumber,
                                                                              departureDateandTime, oldStatus,
                                                                              changedStatus)
@@ -510,23 +513,56 @@ def exec_change_flight_status(flightData):
     else:
         return redirect('/')
 
-# Define route for user to search for flights
-@app.route('/search_flights')
-def search_flights():
-    return render_template('home_templates/search_for_flights.html', is_customer=session.get('is_customer'),
-                           is_airline_staff=session.get('is_airline_staff'))
+
+@app.route('/view_ratings/<flightData>')
+def view_ratings(flightData):
+    if session.get('is_airline_staff'):
+        flightData = eval(flightData)
+        flight_heading = ("Airline Name", "Flight Number", "Departure Airport",
+                        "Arrival Airport", "Departure Date and Time", "Arrival Date and Time", "Base Price", "Status")
+        avg_rating_query = 'SELECT AVG(Rating) AS avg_rating FROM Flight Natural Join Rate WHERE ' \
+                           'Flight.AirlineName = %s AND ' \
+                           'Flight.FlightNumber = %s AND ' \
+                           'Flight.DepartureDateandTime = %s'
+        rating_query = 'SELECT Rating, Comment FROM Flight Natural Join Rate WHERE ' \
+                       'Flight.AirlineName = %s AND ' \
+                       'Flight.FlightNumber = %s AND ' \
+                       'Flight.DepartureDateandTime = %s'
+        # cursor used to send queries
+        cursor = conn.cursor()
+        cursor.execute(rating_query, (flightData['AirlineName'], flightData['FlightNumber'],
+                                      flightData['DepartureDateandTime'].strftime('%Y-%m-%d %H:%M:%S')))
+        rating_data = cursor.fetchall()
+        cursor.execute(avg_rating_query, (flightData['AirlineName'], flightData['FlightNumber'],
+                                          flightData['DepartureDateandTime'].strftime('%Y-%m-%d %H:%M:%S')))
+        avg_rating_data = cursor.fetchone()
+        if rating_data:
+            avg_rating_data = int(avg_rating_data['avg_rating'] * 10) / 10
+            headings = ('Rating','Comment')
+            return render_template('airline_staff_templates/airline_staff_view_rating.html',
+                                   headings=headings,
+                                   data=rating_data,avg_rating = avg_rating_data,flight_headings =flight_heading, flight_data = flightData)
+        else:
+            message = "No ratings found for that flight"
+            return render_template('airline_staff_templates/airline_staff_view_rating.html', message=message, flight_headings =flight_heading, flight_data = flightData)
+    elif session.get('is_customer'):
+        return render_template('customer_templates/customer_home.html')
+    else:
+        return redirect('/')
 
 
 @app.route('/insert_new_airplane', methods=['GET', 'POST'])
 def insert_new_airplane():
     cursor = conn.cursor()
     # executes query
-    query = 'SELECT IDNumber,NumberofSeats,ManufacturingCompany, Age, NumberofEconomyClassSeats, NumberofBusinessClassSeats, NumberofFirstClassSeats  FROM airplane WHERE AirlineName = "{}"'.format(session['airline_name'])
+    query = 'SELECT IDNumber,NumberofSeats,ManufacturingCompany, Age, NumberofEconomyClassSeats, NumberofBusinessClassSeats, NumberofFirstClassSeats  FROM airplane WHERE AirlineName = "{}"'.format(
+        session['airline_name'])
     cursor.execute(query)
     # stores the results in a variable
     data = cursor.fetchall()
     cursor.close()
-    headings = ("ID Number","Number of Seats", "Manufacturing Company", "Age", "Number of Economy Class Seats", "Number of Business Class Seats", "Number of First Class Seats")
+    headings = ("ID Number", "Number of Seats", "Manufacturing Company", "Age", "Number of Economy Class Seats",
+                "Number of Business Class Seats", "Number of First Class Seats")
     return render_template('airline_staff_templates/insert_new_airplane.html', headings=headings, data=data)
 
 
@@ -540,7 +576,7 @@ def exec_insert_new_airplane():
         NumberofEconomyClassSeats = request.form['NumberofEconomyClassSeats']
         NumberofBusinessClassSeats = request.form['NumberofBusinessClassSeats']
         NumberofFirstClassSeats = request.form['NumberofFirstClassSeats']
-        NumberofSeats = int(NumberofFirstClassSeats)+int(NumberofBusinessClassSeats)+int(NumberofEconomyClassSeats)
+        NumberofSeats = int(NumberofFirstClassSeats) + int(NumberofBusinessClassSeats) + int(NumberofEconomyClassSeats)
 
         cursor = conn.cursor()
         query = 'SELECT * FROM airplane WHERE IDNumber = %s AND AirlineName = %s'
@@ -557,7 +593,8 @@ def exec_insert_new_airplane():
             data = cursor.fetchall()
             headings = ("ID Number", "Number of Seats", "Manufacturing Company", "Age", "Number of Economy Class Seats",
                         "Number of Business Class Seats", "Number of First Class Seats")
-            return render_template('airline_staff_templates/insert_new_airplane.html', headings=headings, data=data,error=error)
+            return render_template('airline_staff_templates/insert_new_airplane.html', headings=headings, data=data,
+                                   error=error)
         else:
             ins = 'INSERT INTO airplane VALUES(%s, %s, %s, %s, %s, %s, %s, %s)'
             cursor.execute(ins, (IDNumber, NumberofSeats, ManufacturingCompany, Age, AirlineName,
@@ -573,11 +610,13 @@ def exec_insert_new_airplane():
                         "Number of Business Class Seats", "Number of First Class Seats")
             cursor.close()
             message = "New airplane successfully added!"
-            return render_template('airline_staff_templates/insert_new_airplane.html', headings=headings, data=data, context=message)
+            return render_template('airline_staff_templates/insert_new_airplane.html', headings=headings, data=data,
+                                   context=message)
     elif session.get('is_customer'):
         return render_template('customer_templates/customer_home.html')
     else:
         return render_template('home_templates/index.html')
+
 
 @app.route('/insert_new_airport')
 def insert_new_airport():
@@ -588,8 +627,9 @@ def insert_new_airport():
     # stores the results in a variable
     data = cursor.fetchall()
     cursor.close()
-    headings = ("Airport Name","City", "Country", "AirportType")
+    headings = ("Airport Name", "City", "Country", "AirportType")
     return render_template('airline_staff_templates/insert_new_airport.html', headings=headings, data=data)
+
 
 @app.route('/exec_insert_new_airport', methods=['GET', 'POST'])
 def exec_insert_new_airport():
@@ -608,7 +648,8 @@ def exec_insert_new_airport():
             cursor.execute(query)
             data = cursor.fetchall()
             headings = ("Airport Name", "City", "Country", "AirportType")
-            return render_template('airline_staff_templates/insert_new_airport.html', headings=headings, data=data,error=error)
+            return render_template('airline_staff_templates/insert_new_airport.html', headings=headings, data=data,
+                                   error=error)
         else:
             ins = 'INSERT INTO airport VALUES(%s, %s, %s, %s)'
             cursor.execute(ins, (AirportName, City, Country, AirportType))
@@ -619,11 +660,19 @@ def exec_insert_new_airport():
             headings = ("Airport Name", "City", "Country", "AirportType")
             cursor.close()
             message = "New airport successfully added!"
-            return render_template('airline_staff_templates/insert_new_airport.html', headings=headings, data=data, context=message)
+            return render_template('airline_staff_templates/insert_new_airport.html', headings=headings, data=data,
+                                   context=message)
     elif session.get('is_customer'):
         return render_template('customer_templates/customer_home.html')
     else:
         return render_template('home_templates/index.html')
+
+
+# Define route for user to search for flights
+@app.route('/search_flights')
+def search_flights():
+    return render_template('home_templates/search_for_flights.html', is_customer=session.get('is_customer'),
+                           is_airline_staff=session.get('is_airline_staff'))
 
 
 @app.route('/search_one_way')
