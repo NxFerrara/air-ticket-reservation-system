@@ -510,19 +510,14 @@ def exec_change_flight_status(flightData):
     else:
         return redirect('/')
 
-# Define route for user to search for flights
-@app.route('/search_flights')
-def search_flights():
-    return render_template('home_templates/search_for_flights.html', is_customer=session.get('is_customer'),
-                           is_airline_staff=session.get('is_airline_staff'))
-
 
 @app.route('/insert_new_airplane', methods=['GET', 'POST'])
 def insert_new_airplane():
     cursor = conn.cursor()
     # executes query
-    query = 'SELECT IDNumber,NumberofSeats,ManufacturingCompany, Age, NumberofEconomyClassSeats, NumberofBusinessClassSeats, NumberofFirstClassSeats  FROM airplane WHERE AirlineName = "{}"'.format(session['airline_name'])
-    cursor.execute(query)
+    query = 'SELECT IDNumber,NumberofSeats,ManufacturingCompany, Age, NumberofEconomyClassSeats, ' \
+            'NumberofBusinessClassSeats, NumberofFirstClassSeats  FROM airplane WHERE AirlineName = %s'
+    cursor.execute(query, (session['airline_name'],))
     # stores the results in a variable
     data = cursor.fetchall()
     cursor.close()
@@ -550,9 +545,9 @@ def exec_insert_new_airplane():
             # If the previous query returns data, then user exists
             error = "This airplane already exists!"
             # executes query
-            query = 'SELECT IDNumber,NumberofSeats,ManufacturingCompany, Age, NumberofEconomyClassSeats, NumberofBusinessClassSeats, NumberofFirstClassSeats  FROM airplane WHERE AirlineName = "{}"'.format(
-                session['airline_name'])
-            cursor.execute(query)
+            query = 'SELECT IDNumber,NumberofSeats,ManufacturingCompany, Age, NumberofEconomyClassSeats, ' \
+                    'NumberofBusinessClassSeats, NumberofFirstClassSeats  FROM airplane WHERE AirlineName = %s'
+            cursor.execute(query, (session['airline_name'],))
             # stores the results in a variable
             data = cursor.fetchall()
             headings = ("ID Number", "Number of Seats", "Manufacturing Company", "Age", "Number of Economy Class Seats",
@@ -564,9 +559,9 @@ def exec_insert_new_airplane():
                                  NumberofEconomyClassSeats, NumberofBusinessClassSeats, NumberofFirstClassSeats))
             conn.commit()
             # executes query
-            query = 'SELECT IDNumber,NumberofSeats,ManufacturingCompany, Age, NumberofEconomyClassSeats, NumberofBusinessClassSeats, NumberofFirstClassSeats FROM airplane WHERE AirlineName = "{}"'.format(
-                session['airline_name'])
-            cursor.execute(query)
+            query = 'SELECT IDNumber, NumberofSeats, ManufacturingCompany, Age, NumberofEconomyClassSeats, ' \
+                    'NumberofBusinessClassSeats, NumberofFirstClassSeats FROM airplane WHERE AirlineName = %s'
+            cursor.execute(query, (session['airline_name'],))
             # stores the results in a variable
             data = cursor.fetchall()
             headings = ("ID Number", "Number of Seats", "Manufacturing Company", "Age", "Number of Economy Class Seats",
@@ -577,7 +572,7 @@ def exec_insert_new_airplane():
     elif session.get('is_customer'):
         return render_template('customer_templates/customer_home.html')
     else:
-        return render_template('home_templates/index.html')
+        return redirect('/')
 
 @app.route('/insert_new_airport')
 def insert_new_airport():
@@ -623,7 +618,56 @@ def exec_insert_new_airport():
     elif session.get('is_customer'):
         return render_template('customer_templates/customer_home.html')
     else:
-        return render_template('home_templates/index.html')
+        return redirect('/')
+
+
+@app.route('/ticket_stats')
+def ticket_stats():
+    if session.get('is_airline_staff'):
+        airline_name = session['airline_name']
+        lastMonthQuery = "SELECT SUM(sold_price) as revenue FROM purchase NATURAL JOIN ticket WHERE " \
+                         "AirlineName = %s AND PurchaseDateandTime >= DATE(NOW() - INTERVAL 1 MONTH);"
+        lastYearQuery = "SELECT SUM(sold_price) as revenue FROM purchase NATURAL JOIN ticket WHERE " \
+                        "AirlineName = %s AND PurchaseDateandTime >= DATE(NOW() - INTERVAL 1 YEAR);"
+        cursor = conn.cursor()
+        # executes query
+        cursor.execute(lastMonthQuery, (airline_name,))
+        # stores the results in a variable
+        lastMonthResults = cursor.fetchone()
+        # executes query
+        cursor.execute(lastYearQuery, (airline_name,))
+        # stores the results in a variable
+        lastYearResults = cursor.fetchone()
+        cursor.close()
+        lastMonthRevenue = lastMonthResults['revenue']
+        lastYearRevenue = lastYearResults['revenue']
+        lastMonthRevenue = "$0.00" if not lastMonthRevenue else "$"+str(int(lastMonthRevenue*100)/100)
+        lastYearRevenue = "$0.00" if not lastYearRevenue else "$"+str(int(lastYearRevenue*100)/100)
+        return render_template('airline_staff_templates/ticket_stats.html', lastMonthRevenue=lastMonthRevenue,
+                               lastYearRevenue=lastYearRevenue)
+    elif session.get('is_customer'):
+        return render_template('customer_templates/customer_home.html')
+    else:
+        return redirect('/')
+
+
+@app.route('/exec_ticket_stats/<revenueData>', methods=['GET', 'POST'])
+def exec_ticket_stats(revenueData):
+    if session.get('is_airline_staff'):
+        lastMonthRevenue, lastYearRevenue = eval(revenueData)
+        return render_template('airline_staff_templates/ticket_stats.html', lastMonthRevenue=lastMonthRevenue,
+                               lastYearRevenue=lastYearRevenue)
+    elif session.get('is_customer'):
+        return render_template('customer_templates/customer_home.html')
+    else:
+        return redirect('/')
+
+
+# Define route for user to search for flights
+@app.route('/search_flights')
+def search_flights():
+    return render_template('home_templates/search_for_flights.html', is_customer=session.get('is_customer'),
+                           is_airline_staff=session.get('is_airline_staff'))
 
 
 @app.route('/search_one_way')
