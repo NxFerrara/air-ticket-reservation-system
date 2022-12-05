@@ -205,8 +205,25 @@ def airline_staff_login_auth():
 
 @app.route('/insert_new_flight')
 def insert_new_flight():
-    return render_template('airline_staff_templates/airline_staff_insert.html')
-
+    if session.get('is_airline_staff'):
+        airlineName = session['airline_name']
+        # cursor used to send queries
+        cursor = conn.cursor()
+        query = 'SELECT AirlineName, FlightNumber, DepartureAirportName, ArrivalAirportName, ' \
+                'DepartureDateandTime, ArrivalDateandTime, BasePrice, Status FROM flight ' \
+                'WHERE AirlineName = "{}" AND DepartureDateandTime >= DATE(NOW()) AND ' \
+                'DepartureDateandTime <= DATE(NOW() + INTERVAL 30 DAY);'.format(airlineName)
+        cursor.execute(query)
+        # stores the results in a variable
+        data = cursor.fetchall()
+        cursor.close()
+        headings = ("Airline Name", "Flight Number", "Departure Airport", "Arrival Airport",
+                    "Departure Date and Time", "Arrival Date and Time", "Base Price", "Status")
+        return render_template('airline_staff_templates/airline_staff_insert.html', headings=headings, data=data)
+    elif session.get('is_customer'):
+        return render_template('customer_templates/customer_home.html')
+    else:
+        return redirect('/')
 
 @app.route('/exec_insert_new_flight', methods=['GET', 'POST'])
 def exec_insert_new_flight():
@@ -262,29 +279,61 @@ def exec_insert_new_flight():
         # stores the results in a variable
         is_airplane = cursor.fetchone()
         # use fetchall() if you are expecting more than 1 data row
+        # Query all of the future flights
+        query = 'SELECT AirlineName, FlightNumber, DepartureAirportName, ArrivalAirportName, ' \
+                'DepartureDateandTime, ArrivalDateandTime, BasePrice, Status FROM flight ' \
+                'WHERE AirlineName = "{}" AND DepartureDateandTime >= DATE(NOW()) AND ' \
+                'DepartureDateandTime <= DATE(NOW() + INTERVAL 30 DAY);'.format(airlineName)
+        headings = ("Airline Name", "Flight Number", "Departure Airport", "Arrival Airport",
+                    "Departure Date and Time", "Arrival Date and Time", "Base Price", "Status")
         error = None
         context = None
         if data:
+            cursor.execute(query)
+            # stores the results in a variable
+            futureFlights = cursor.fetchall()
+            cursor.close()
             # If the previous query returns data, then user exists
             error = "This flight already exists!"
-            return render_template('airline_staff_templates/airline_staff_insert.html', error=error)
+            return render_template('airline_staff_templates/airline_staff_insert.html', error=error,
+                                   headings=headings, data=futureFlights)
         else:
             if not is_departure_airport:
+                cursor.execute(query)
+                # stores the results in a variable
+                futureFlights = cursor.fetchall()
+                cursor.close()
                 error = "The {} Airport doesn't exist!".format(DepartureAirportName)
-                return render_template('airline_staff_templates/airline_staff_insert.html', error=error)
-            if not is_arrival_airport:
+                return render_template('airline_staff_templates/airline_staff_insert.html', error=error,
+                                       headings=headings, data=futureFlights)
+            elif not is_arrival_airport:
+                cursor.execute(query)
+                # stores the results in a variable
+                futureFlights = cursor.fetchall()
+                cursor.close()
                 error = "The {} Airport doesn't exist!".format(ArrivalAirportName)
-                return render_template('airline_staff_templates/airline_staff_insert.html', error=error)
-            if not is_airplane:
+                return render_template('airline_staff_templates/airline_staff_insert.html', error=error,
+                                       headings=headings, data=futureFlights)
+            elif not is_airplane:
+                cursor.execute(query)
+                # stores the results in a variable
+                futureFlights = cursor.fetchall()
+                cursor.close()
                 error = "The airplane with ID number {} doesn't exist!".format(IDNumber)
-                return render_template('airline_staff_templates/airline_staff_insert.html', error=error)
-            ins = 'INSERT INTO flight VALUES(%s, %s, %s, %s, %s, %s, %s, %s, %s)'
-            cursor.execute(ins, (str(FlightNumber), DepartureDateandTime, ArrivalDateandTime, BasePrice, Status, DepartureAirportName,
-            ArrivalAirportName, IDNumber, AirlineName))
-            conn.commit()
-            cursor.close()
-            message = "New flight successfully added!"
-            return render_template('airline_staff_templates/airline_staff_insert.html', context=message)
+                return render_template('airline_staff_templates/airline_staff_insert.html', error=error,
+                                       headings=headings, data=futureFlights)
+            else:
+                ins = 'INSERT INTO flight VALUES(%s, %s, %s, %s, %s, %s, %s, %s, %s)'
+                cursor.execute(ins, (str(FlightNumber), DepartureDateandTime, ArrivalDateandTime, BasePrice, Status, DepartureAirportName,
+                ArrivalAirportName, IDNumber, AirlineName))
+                conn.commit()
+                cursor.execute(query)
+                # stores the results in a variable
+                futureFlights = cursor.fetchall()
+                cursor.close()
+                message = "New flight successfully added!"
+                return render_template('airline_staff_templates/airline_staff_insert.html', context=message,
+                                       headings=headings, data=flightData)
     elif session.get('is_customer'):
         return render_template('customer_templates/customer_home.html')
     else:
@@ -514,21 +563,28 @@ def customer_home():
 
 @app.route('/airline_staff_home')
 def airline_staff_home():
-    username = session['username']
-    airlineName = session['airline_name']
-    # cursor used to send queries
-    cursor = conn.cursor()
-    # executes query
-    query = 'SELECT AirlineName, FlightNumber, DepartureDateandTime, ArrivalDateandTime, Status FROM flight ' \
-            'WHERE AirlineName = "{}" AND DepartureDateandTime >= DATE(NOW()) AND ' \
-            'DepartureDateandTime <= DATE(NOW() + INTERVAL 30 DAY);'.format(airlineName)
-    cursor.execute(query)
-    # stores the results in a variable
-    data = cursor.fetchall()
-    cursor.close()
-    headings = ("Airline Name", "Flight Number", "Departure Date and Time", "Arrival Date and Time", "Status")
-    return render_template('airline_staff_templates/airline_staff_home.html', username=username, headings=headings,
-                           data=data)
+    if session.get('is_airline_staff'):
+        username = session['username']
+        airlineName = session['airline_name']
+        # cursor used to send queries
+        cursor = conn.cursor()
+        # executes query
+        query = 'SELECT AirlineName, FlightNumber, DepartureAirportName, ArrivalAirportName, ' \
+                'DepartureDateandTime, ArrivalDateandTime, BasePrice, Status FROM flight ' \
+                'WHERE AirlineName = "{}" AND DepartureDateandTime >= DATE(NOW()) AND ' \
+                'DepartureDateandTime <= DATE(NOW() + INTERVAL 30 DAY);'.format(airlineName)
+        cursor.execute(query)
+        # stores the results in a variable
+        data = cursor.fetchall()
+        cursor.close()
+        headings = ("Airline Name", "Flight Number", "Departure Airport", "Arrival Airport",
+                    "Departure Date and Time", "Arrival Date and Time", "Base Price", "Status")
+        return render_template('airline_staff_templates/airline_staff_home.html', username=username, headings=headings,
+                               data=data)
+    elif session.get('is_customer'):
+        return render_template('customer_templates/customer_home.html')
+    else:
+        return redirect('/')
 
 
 @app.route('/customer_logout')

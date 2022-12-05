@@ -2,6 +2,31 @@
 <head>
 </head>
 <body>
+{% if data %}
+<style type="text/css">
+	table, th, td {
+		border: 1px solid black;
+	}
+</style>
+<table>
+	<tr>
+		{% for header in headings %}
+		<th>{{ header }}</th>
+		{% endfor %}
+	</tr>
+	{% for row in data %}
+	<tr>
+		{% for key in row.keys() %}
+		<td>{{ row[key] }}</td>
+		{% endfor %}
+	</tr>
+	{% endfor %}
+</table>
+<br>
+{% endif %}
+{% if not data %}
+	<p class="error">There are currently no future Flights</p>
+{% endif %}
 <form action="/exec_insert_new_flight" method="POST">
 	<label for="DepartureDateandTime">Departure Date and Time:</label>
 	</br>
