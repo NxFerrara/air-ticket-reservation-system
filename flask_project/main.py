@@ -208,9 +208,11 @@ def search_flights():
     return render_template('home_templates/search_for_flights.html', is_customer=session.get('is_customer'),
                            is_airline_staff=session.get('is_airline_staff'))
 
+
 @app.route('/insert_new_flight', methods=['GET', 'POST'])
 def insert_new_flight():
     return render_template('airline_staff_templates/airline_staff_insert.html')
+
 
 @app.route('/exec_insert_new_flight', methods=['GET', 'POST'])
 def exec_insert_new_flight():
@@ -241,7 +243,7 @@ def exec_insert_new_flight():
         if maxFlightNumber == -1:
             FlightNumber = 1
         else:
-            FlightNumber = maxFlightNumber+1
+            FlightNumber = maxFlightNumber + 1
 
         # This query checks to make sure one airplane isn't flying multiple flights at
         # the same time within the same airline
@@ -258,8 +260,9 @@ def exec_insert_new_flight():
             return render_template('airline_staff_templates/airline_staff_insert.html', error=error)
         else:
             ins = 'INSERT INTO flight VALUES(%s, %s, %s, %s, %s, %s, %s, %s, %s)'
-            cursor.execute(ins, (str(FlightNumber), DepartureDateandTime, ArrivalDateandTime, BasePrice, Status, DepartureAirportName,
-            ArrivalAirportName, IDNumber, AirlineName))
+            cursor.execute(ins, (
+                str(FlightNumber), DepartureDateandTime, ArrivalDateandTime, BasePrice, Status, DepartureAirportName,
+                ArrivalAirportName, IDNumber, AirlineName))
             conn.commit()
             cursor.close()
             message = "New flight successfully added!"
@@ -270,7 +273,69 @@ def exec_insert_new_flight():
         return render_template('home_templates/index.html')
 
 
-# Define route for user to search for flights
+@app.route('/insert_new_airplane', methods=['GET', 'POST'])
+def insert_new_airplane():
+    cursor = conn.cursor()
+    # executes query
+    query = 'SELECT IDNumber,NumberofSeats,ManufacturingCompany, Age, NumberofEconomyClassSeats, NumberofBusinessClassSeats, NumberofFirstClassSeats  FROM airplane WHERE AirlineName = "{}"'.format(session['airline_name'])
+    cursor.execute(query)
+    # stores the results in a variable
+    data = cursor.fetchall()
+    cursor.close()
+    headings = ("ID Number","Number of Seats", "Manufacturing Company", "Age", "Number of Economy Class Seats", "Number of Business Class Seats", "Number of First Class Seats")
+    return render_template('airline_staff_templates/insert_new_airplane.html', headings=headings, data=data)
+
+
+@app.route('/exec_insert_new_airplane', methods=['GET', 'POST'])
+def exec_insert_new_airplane():
+    if session.get('is_airline_staff'):
+        IDNumber = request.form['IDNumber']
+        ManufacturingCompany = request.form['ManufacturingCompany']
+        Age = request.form['Age']
+        AirlineName = session['airline_name']
+        NumberofEconomyClassSeats = request.form['NumberofEconomyClassSeats']
+        NumberofBusinessClassSeats = request.form['NumberofBusinessClassSeats']
+        NumberofFirstClassSeats = request.form['NumberofFirstClassSeats']
+        NumberofSeats = int(NumberofFirstClassSeats)+int(NumberofBusinessClassSeats)+int(NumberofEconomyClassSeats)
+
+        cursor = conn.cursor()
+        query = 'SELECT * FROM airplane WHERE IDNumber = %s AND AirlineName = %s'
+        cursor.execute(query, (IDNumber, AirlineName))
+        data = cursor.fetchone()
+        if data:
+            # If the previous query returns data, then user exists
+            error = "This airplane already exists!"
+            # executes query
+            query = 'SELECT IDNumber,NumberofSeats,ManufacturingCompany, Age, NumberofEconomyClassSeats, NumberofBusinessClassSeats, NumberofFirstClassSeats  FROM airplane WHERE AirlineName = "{}"'.format(
+                session['airline_name'])
+            cursor.execute(query)
+            # stores the results in a variable
+            data = cursor.fetchall()
+            headings = ("ID Number", "Number of Seats", "Manufacturing Company", "Age", "Number of Economy Class Seats",
+                        "Number of Business Class Seats", "Number of First Class Seats")
+            return render_template('airline_staff_templates/insert_new_airplane.html', headings=headings, data=data,error=error)
+        else:
+            ins = 'INSERT INTO airplane VALUES(%s, %s, %s, %s, %s, %s, %s, %s)'
+            cursor.execute(ins, (IDNumber, NumberofSeats, ManufacturingCompany, Age, AirlineName,
+                                 NumberofEconomyClassSeats, NumberofBusinessClassSeats, NumberofFirstClassSeats))
+            conn.commit()
+            # executes query
+            query = 'SELECT IDNumber,NumberofSeats,ManufacturingCompany, Age, NumberofEconomyClassSeats, NumberofBusinessClassSeats, NumberofFirstClassSeats FROM airplane WHERE AirlineName = "{}"'.format(
+                session['airline_name'])
+            cursor.execute(query)
+            # stores the results in a variable
+            data = cursor.fetchall()
+            headings = ("ID Number", "Number of Seats", "Manufacturing Company", "Age", "Number of Economy Class Seats",
+                        "Number of Business Class Seats", "Number of First Class Seats")
+            cursor.close()
+            message = "New airplane successfully added!"
+            return render_template('airline_staff_templates/insert_new_airplane.html', headings=headings, data=data, context=message)
+    elif session.get('is_customer'):
+        return render_template('customer_templates/customer_home.html')
+    else:
+        return render_template('home_templates/index.html')
+
+
 @app.route('/search_one_way')
 def search_one_way():
     return render_template('home_templates/search_one_way.html', is_customer=session.get('is_customer'),

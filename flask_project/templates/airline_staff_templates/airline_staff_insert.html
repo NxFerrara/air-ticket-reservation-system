@@ -5,10 +5,10 @@
 <form action="/exec_insert_new_flight" method="POST">
 	<input type="text" name = "DepartureDateandTime" placeholder="Departure Date and Time" required/></br>
 	<input type="text" name = "ArrivalDateandTime" placeholder="Arrival Date and Time" required/></br>
-	<input type="text" name = "BasePrice" placeholder="Base Price" required/></br>
+	<input type="number" name = "BasePrice" placeholder="Base Price" required/></br>
 	<input type="text" name = "DepartureAirportName" placeholder="Departure Airport Name" required/></br>
 	<input type="text" name = "ArrivalAirportName" placeholder="Arrival Airport Name" required/></br>
-	<input type="text" name = "IDNumber" placeholder="ID Number" required/></br>
+	<input type="number" name = "IDNumber" placeholder="ID Number" required/></br>
 	<input type="submit" value = Insert />
 	{% if error %}
 		<p class="error"><strong>Error:</strong> {{error}}</p>
