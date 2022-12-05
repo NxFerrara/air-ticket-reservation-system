@@ -8,7 +8,7 @@ app = Flask(__name__)
 
 # Configure MySQL
 conn = pymysql.connect(host='localhost',
-                       # port=8889,  # change this every time if you are a Windows user
+                       port=3306,  # change this every time if you are a Windows user
                        user='root',
                        password='',  # change this every time if you are Windows user
                        db='air_system',
@@ -194,6 +194,7 @@ def airline_staff_login_auth():
         # session is a built in
         session['username'] = username
         session['is_airline_staff'] = True
+        session['airline_name'] = data['AirlineName']
         return redirect(url_for('airline_staff_home'))
     else:
         # returns an error message to the html page
@@ -218,11 +219,12 @@ def exec_insert_new_flight():
         DepartureDateandTime = request.form['DepartureDateandTime']
         ArrivalDateandTime = request.form['ArrivalDateandTime']
         BasePrice = request.form['BasePrice']
-        Status = request.form['Status']
         DepartureAirportName = request.form['DepartureAirportName']
         ArrivalAirportName = request.form['ArrivalAirportName']
         IDNumber = request.form['IDNumber']
-        AirlineName = request.form['AirlineName']
+
+        Status = 'On-time'  # By default
+        AirlineName = session['airline_name']  # By default
 
         # cursor used to send queries
         cursor = conn.cursor()
@@ -374,10 +376,13 @@ def customer_home():
 @app.route('/airline_staff_home')
 def airline_staff_home():
     username = session['username']
+    airlineName = session['airline_name']
     # cursor used to send queries
     cursor = conn.cursor()
     # executes query
-    query = 'SELECT AirlineName, FlightNumber, DepartureDateandTime, ArrivalDateandTime, Status FROM flight'
+    query = 'SELECT AirlineName, FlightNumber, DepartureDateandTime, ArrivalDateandTime, Status FROM flight ' \
+            'WHERE AirlineName = "{}" AND DepartureDateandTime >= DATE(NOW()) AND ' \
+            'DepartureDateandTime <= DATE(NOW() + INTERVAL 30 DAY);'.format(airlineName)
     cursor.execute(query)
     # stores the results in a variable
     data = cursor.fetchall()
