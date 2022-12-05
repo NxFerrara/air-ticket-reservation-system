@@ -211,9 +211,9 @@ def insert_new_flight():
         cursor = conn.cursor()
         query = 'SELECT AirlineName, FlightNumber, DepartureAirportName, ArrivalAirportName, ' \
                 'DepartureDateandTime, ArrivalDateandTime, BasePrice, Status FROM flight ' \
-                'WHERE AirlineName = "{}" AND DepartureDateandTime >= DATE(NOW()) AND ' \
-                'DepartureDateandTime <= DATE(NOW() + INTERVAL 30 DAY);'.format(airlineName)
-        cursor.execute(query)
+                'WHERE AirlineName = %s AND DepartureDateandTime >= DATE(NOW()) AND ' \
+                'DepartureDateandTime <= DATE(NOW() + INTERVAL 30 DAY);'
+        cursor.execute(query, (airlineName,))
         # stores the results in a variable
         data = cursor.fetchall()
         cursor.close()
@@ -243,16 +243,16 @@ def exec_insert_new_flight():
         departure_is_after = DepartureDateandTime > datetime.datetime.today()
         arrival_is_after = ArrivalDateandTime > DepartureDateandTime
         # Query all of the future flights
-        futureFlightsQuery = 'SELECT AirlineName, FlightNumber, DepartureAirportName, ArrivalAirportName, ' \
-                'DepartureDateandTime, ArrivalDateandTime, BasePrice, Status FROM flight ' \
-                'WHERE AirlineName = "{}" AND DepartureDateandTime >= DATE(NOW()) AND ' \
-                'DepartureDateandTime <= DATE(NOW() + INTERVAL 30 DAY);'.format(airlineName)
+        futureFlightsQuery = 'SELECT AirlineName, FlightNumber, DepartureAirportName, ArrivalAirportName, '\
+                             'DepartureDateandTime, ArrivalDateandTime, BasePrice, Status FROM flight '\
+                             'WHERE AirlineName = %s AND DepartureDateandTime >= DATE(NOW()) AND '\
+                             'DepartureDateandTime <= DATE(NOW() + INTERVAL 30 DAY);'
         headings = ("Airline Name", "Flight Number", "Departure Airport", "Arrival Airport",
                     "Departure Date and Time", "Arrival Date and Time", "Base Price", "Status")
         # cursor used to send queries
         cursor = conn.cursor()
         if not departure_is_after:
-            cursor.execute(futureFlightsQuery)
+            cursor.execute(futureFlightsQuery, (airlineName,))
             # stores the results in a variable
             futureFlights = cursor.fetchall()
             cursor.close()
@@ -260,7 +260,7 @@ def exec_insert_new_flight():
             return render_template('airline_staff_templates/airline_staff_insert.html', error=error,
                                    headings=headings, data=futureFlights)
         if not arrival_is_after:
-            cursor.execute(futureFlightsQuery)
+            cursor.execute(futureFlightsQuery, (airlineName,))
             # stores the results in a variable
             futureFlights = cursor.fetchall()
             cursor.close()
@@ -292,11 +292,11 @@ def exec_insert_new_flight():
         data = cursor.fetchone()
         # Checking the departure and arrival airports exist and also the airplane
         query = 'SELECT * FROM airport WHERE AirportName = %s'
-        cursor.execute(query, DepartureAirportName)
+        cursor.execute(query, (DepartureAirportName,))
         # stores the results in a variable
         is_departure_airport = cursor.fetchone()
         query = 'SELECT * FROM airport WHERE AirportName = %s'
-        cursor.execute(query, ArrivalAirportName)
+        cursor.execute(query, (ArrivalAirportName,))
         # stores the results in a variable
         is_arrival_airport = cursor.fetchone()
         query = 'SELECT * FROM airplane WHERE IDNumber = %s AND AirlineName = %s'
@@ -307,7 +307,7 @@ def exec_insert_new_flight():
         error = None
         context = None
         if data:
-            cursor.execute(futureFlightsQuery)
+            cursor.execute(futureFlightsQuery, (airlineName,))
             # stores the results in a variable
             futureFlights = cursor.fetchall()
             cursor.close()
@@ -317,7 +317,7 @@ def exec_insert_new_flight():
                                    headings=headings, data=futureFlights)
         else:
             if not is_departure_airport:
-                cursor.execute(futureFlightsQuery)
+                cursor.execute(futureFlightsQuery, (airlineName,))
                 # stores the results in a variable
                 futureFlights = cursor.fetchall()
                 cursor.close()
@@ -325,7 +325,7 @@ def exec_insert_new_flight():
                 return render_template('airline_staff_templates/airline_staff_insert.html', error=error,
                                        headings=headings, data=futureFlights)
             elif not is_arrival_airport:
-                cursor.execute(futureFlightsQuery)
+                cursor.execute(futureFlightsQuery, (airlineName,))
                 # stores the results in a variable
                 futureFlights = cursor.fetchall()
                 cursor.close()
@@ -333,7 +333,7 @@ def exec_insert_new_flight():
                 return render_template('airline_staff_templates/airline_staff_insert.html', error=error,
                                        headings=headings, data=futureFlights)
             elif not is_airplane:
-                cursor.execute(futureFlightsQuery)
+                cursor.execute(futureFlightsQuery, (airlineName,))
                 # stores the results in a variable
                 futureFlights = cursor.fetchall()
                 cursor.close()
@@ -388,11 +388,11 @@ def search_flights_airline_staff_query():
         cursor = conn.cursor()
         # Checking the departure and arrival airports exist
         query = 'SELECT * FROM airport WHERE AirportName = %s'
-        cursor.execute(query, source_city)
+        cursor.execute(query, (source_city,))
         # stores the results in a variable
         is_departure_airport = cursor.fetchone()
         query = 'SELECT * FROM airport WHERE AirportName = %s'
-        cursor.execute(query, destination_city)
+        cursor.execute(query, (destination_city,))
         # stores the results in a variable
         is_arrival_airport = cursor.fetchone()
         # cursor used to send queries
@@ -445,14 +445,13 @@ def view_flight_customers(flightData):
         query = 'SELECT DISTINCT Name FROM Purchase Natural Join Customer, Ticket WHERE ' \
                 'Ticket.TicketIDNumber = Purchase.TicketIDNumber AND Ticket.TicketIDNumber ' \
                 'IN(SELECT TicketIDNumber FROM Flight Natural Join Ticket WHERE ' \
-                'Flight.AirlineName = "{}" AND ' \
-                'Flight.FlightNumber = "{}" AND ' \
-                'Flight.DepartureDateandTime = "{}")'.format(flightData['AirlineName'],
-                                                             flightData['FlightNumber'],
-                                                             flightData['DepartureDateandTime'].strftime('%Y-%m-%d %H:%M:%S'))
+                'Flight.AirlineName = %s AND ' \
+                'Flight.FlightNumber = %s AND ' \
+                'Flight.DepartureDateandTime = %s)'
         # cursor used to send queries
         cursor = conn.cursor()
-        cursor.execute(query)
+        cursor.execute(query, (flightData['AirlineName'], flightData['FlightNumber'],
+                               flightData['DepartureDateandTime'].strftime('%Y-%m-%d %H:%M:%S')))
         data = cursor.fetchall()
         message = None
         if data:
@@ -490,11 +489,10 @@ def exec_change_flight_status(flightData):
         departureDateandTime = flightData['DepartureDateandTime']
         oldStatus = flightData['Status']
         if changedStatus != oldStatus:
-            update = 'UPDATE flight SET Status="{}" WHERE FlightNumber = "{}" AND '\
-                     'DepartureDateandTime = "{}" AND AirlineName = "{}";'.format(changedStatus, flightNumber,
-                                                                                  departureDateandTime, airline_name)
+            update = 'UPDATE flight SET Status = %s WHERE FlightNumber = %s AND '\
+                     'DepartureDateandTime = %s AND AirlineName = %s;'
             cursor = conn.cursor()
-            cursor.execute(update)
+            cursor.execute(update, (changedStatus, flightNumber, departureDateandTime, airline_name))
             conn.commit()
             cursor.close()
             message = "The {} Flight {} departing on {} "\
@@ -631,9 +629,9 @@ def airline_staff_home():
         # executes query
         query = 'SELECT AirlineName, FlightNumber, DepartureAirportName, ArrivalAirportName, ' \
                 'DepartureDateandTime, ArrivalDateandTime, BasePrice, Status FROM flight ' \
-                'WHERE AirlineName = "{}" AND DepartureDateandTime >= DATE(NOW()) AND ' \
-                'DepartureDateandTime <= DATE(NOW() + INTERVAL 30 DAY);'.format(airlineName)
-        cursor.execute(query)
+                'WHERE AirlineName = %s AND DepartureDateandTime >= DATE(NOW()) AND ' \
+                'DepartureDateandTime <= DATE(NOW() + INTERVAL 30 DAY);'
+        cursor.execute(query, (airlineName,))
         # stores the results in a variable
         data = cursor.fetchall()
         cursor.close()
