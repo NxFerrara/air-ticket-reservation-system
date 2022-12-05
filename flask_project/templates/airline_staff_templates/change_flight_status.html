@@ -1,9 +1,49 @@
-
 <html>
 <head>
-
 </head>
 <body>
+<form action="{{ url_for('exec_change_flight_status', flightData=flightData) }}" method="POST">
+    <label for="Status">Change Status:</label>
+        <select id="Status" name="Status">
+			<option value="On-time">On-Time</option>
+			<option value="Delayed">Delayed</option>
+			<option value="Canceled">Canceled</option>
+        </select>
+	<input type="submit" value = Submit />
+	{% if error %}
+		<p class="error"><strong>Error:</strong> {{error}}</p>
+	{% endif %}
+</form>
+
+<style type="text/css">
+	table, th, td {
+		border: 1px solid black;
+	}
+</style>
+{% if data %}
+<table>
+	<tr>
+		{% for header in headings %}
+		<th>{{ header }}</th>
+		{% endfor %}
+	</tr>
+	{% for row in data %}
+	<tr>
+		{% for key in row.keys() %}
+		<td>{{ row[key] }}</td>
+		{% endfor %}
+		<td onclick="window.location.href=`{{ url_for('view_flight_customers', flightData=row) }}`;">
+			<u style="text-decoration-color:blue">Customers</u></td>
+		<td onclick="window.location.href=`{{ url_for('change_flight_status', flightData=row) }}`;">
+			<u style="text-decoration-color:blue">Change Status</u></td>
+	</tr>
+	{% endfor %}
+</table>
+<br>
+{% endif %}
+<a href="/search_flights_airline_staff">Go back</a>
 
 </body>
+
+
 </html>

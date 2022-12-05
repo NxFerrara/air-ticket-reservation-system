@@ -388,7 +388,7 @@ def search_flights_airline_staff_query():
         if has_end_date:
             # executes query
             query = 'SELECT AirlineName, FlightNumber, DepartureAirportName, ' \
-                    'ArrivalAirportName, DepartureDateandTime, ArrivalDateandTime ' \
+                    'ArrivalAirportName, DepartureDateandTime, ArrivalDateandTime, BasePrice, Status ' \
                     'FROM flight WHERE ' \
                     'AirlineName = %s AND ' \
                     'DepartureAirportName = %s AND ' \
@@ -399,7 +399,7 @@ def search_flights_airline_staff_query():
         else:
             # executes query
             query = 'SELECT AirlineName, FlightNumber, DepartureAirportName, ' \
-                    'ArrivalAirportName, DepartureDateandTime, ArrivalDateandTime ' \
+                    'ArrivalAirportName, DepartureDateandTime, ArrivalDateandTime, BasePrice, Status ' \
                     'FROM flight WHERE ' \
                     'AirlineName = %s AND ' \
                     'DepartureAirportName = %s AND ' \
@@ -409,7 +409,7 @@ def search_flights_airline_staff_query():
         data = cursor.fetchall()
         if data:
             headings = ("Airline Name", "Flight Number", "Departure Airport",
-                        "Arrival Airport", "Departure Date and Time", "Arrival Date and Time", "View Customers")
+                        "Arrival Airport", "Departure Date and Time", "Arrival Date and Time", "Base Price", "Status")
             return render_template('airline_staff_templates/search_flights_airline_staff.html', headings=headings, data=data)
         else:
             error = "No flights found for that search result"
@@ -450,6 +450,48 @@ def view_flight_customers(flightData):
     else:
         return redirect('/')
 
+
+@app.route('/change_flight_status/<flightData>')
+def change_flight_status(flightData):
+    if session.get('is_airline_staff'):
+        flightData = eval(flightData)
+        return render_template('airline_staff_templates/change_flight_status.html', flightData=flightData)
+    elif session.get('is_customer'):
+        return render_template('customer_templates/customer_home.html')
+    else:
+        return redirect('/')
+
+
+@app.route('/exec_change_flight_status/<flightData>', methods=['GET', 'POST'])
+def exec_change_flight_status(flightData):
+    if session.get('is_airline_staff'):
+        airline_name = session['airline_name']
+        changedStatus = request.form['Status']
+        flightData = eval(flightData)
+        flightNumber = flightData['FlightNumber']
+        departureDateandTime = flightData['DepartureDateandTime']
+        oldStatus = flightData['Status']
+        if changedStatus != oldStatus:
+            update = 'UPDATE flight SET Status="{}" WHERE FlightNumber = "{}" AND '\
+                     'DepartureDateandTime = "{}" AND AirlineName = "{}";'.format(changedStatus, flightNumber,
+                                                                                  departureDateandTime, airline_name)
+            cursor = conn.cursor()
+            cursor.execute(update)
+            conn.commit()
+            cursor.close()
+            message = "The {} Flight {} departing on {} "\
+                      "has successfully changed status from {} to {}".format(airline_name, flightNumber,
+                                                                             departureDateandTime, oldStatus,
+                                                                             changedStatus)
+        else:
+            message = "The {} Flight {} departing on {} already has the status {}".format(airline_name, flightNumber,
+                                                                                          departureDateandTime,
+                                                                                          changedStatus)
+        return render_template('airline_staff_templates/search_flights_airline_staff.html', message=message)
+    elif session.get('is_customer'):
+        return render_template('customer_templates/customer_home.html')
+    else:
+        return redirect('/')
 
 # Define route for user to search for flights
 @app.route('/search_flights')

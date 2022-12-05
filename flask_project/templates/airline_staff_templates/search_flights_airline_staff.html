@@ -42,10 +42,15 @@
 		{% endfor %}
 		<td onclick="window.location.href=`{{ url_for('view_flight_customers', flightData=row) }}`;">
 			<u style="text-decoration-color:blue">Customers</u></td>
+		<td onclick="window.location.href=`{{ url_for('change_flight_status', flightData=row) }}`;">
+			<u style="text-decoration-color:blue">Change Status</u></td>
 	</tr>
 	{% endfor %}
 </table>
 <br>
+{% endif %}
+{% if message %}
+	<p class="message"><strong>Message:</strong> {{message}}</p>
 {% endif %}
 <a href="/airline_staff_home">Go back</a>
 
