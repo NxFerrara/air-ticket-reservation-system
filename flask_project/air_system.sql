@@ -1,9 +1,9 @@
 -- phpMyAdmin SQL Dump
--- version 5.1.0
+-- version 5.1.1
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost:8889
--- Generation Time: Dec 04, 2022 at 09:51 PM
+-- Generation Time: Dec 04, 2022 at 08:31 PM
 -- Server version: 5.7.34
 -- PHP Version: 7.4.21
 
@@ -60,8 +60,8 @@ CREATE TABLE `airlinestaff` (
 --
 
 INSERT INTO `airlinestaff` (`Username`, `Password`, `FirstName`, `LastName`, `DateofBirth`, `AirlineName`) VALUES
-('jd123', '1234567', 'Sally', 'Smith', '1980-11-11', 'Jet Blue'),
-('nwill123', 'ilovechips', 'Nick', 'Williams', '2001-10-03', 'Jet Blue');
+('jd123', 'fcea920f7412b5da7be0cf42b8c93759', 'Sally', 'Smith', '1980-11-11', 'Jet Blue'),
+('nwill123', 'c1e2f7b616ebf5db28453a876dc0fc68', 'Nick', 'Williams', '2001-10-03', 'Jet Blue');
 
 -- --------------------------------------------------------
 
@@ -142,12 +142,12 @@ CREATE TABLE `customer` (
 --
 
 INSERT INTO `customer` (`Name`, `EmailAddress`, `Password`, `BuildingNumber`, `Street`, `City`, `State`, `PhoneNumber`, `PassportNumber`, `PassportExpiration`, `PassportCountry`, `DateofBirth`) VALUES
-('Johnny Liu', 'batman@gmail.com', '1234', 145, 'Elm Street', 'New York', 'NY', '9241233478', 391238, '2027-01-08', 'USA', '2001-10-03'),
-('Jason Rodriguez', 'jasonrodriguez@gmail.com', 'iwanttotravel', 298, 'Century Avenue', 'Pudong', 'Shanghai', '2168881234', 9281394, '2024-02-19', 'China', '1969-04-17'),
-('John Doe', 'johndoe@gmail.com', 'ilovedatabases', 123, 'Maple Street', 'Los Angeles', 'CA', '7182911230', 3004786, '2022-12-21', 'USA', '1979-11-04'),
-('Mary Jane', 'maryjane@gmail.com', 'ilikehamburgers', 652, 'Oak Street', 'New York', 'NY', '9172309482', 2391039, '2023-03-12', 'USA', '1989-06-15'),
-('Max Chen', 'spiderman@gmail.com', '1234567', 301, 'Elk Street', 'Brooklyn', 'NY', '9281920394', 3928192, '2025-10-15', 'USA', '1956-02-10'),
-('Sarah Thompson', 'sthompson@gmail.com', 'ilovefish', 341, 'Pine Street', 'Bronx', 'NY', '7182910394', 983712, '2028-10-18', 'USA', '2010-01-05');
+('Johnny Liu', 'batman@gmail.com', '81dc9bdb52d04dc20036dbd8313ed055', 145, 'Elm Street', 'New York', 'NY', '9241233478', 391238, '2027-01-08', 'USA', '2001-10-03'),
+('Jason Rodriguez', 'jasonrodriguez@gmail.com', '5d181b91eab426fbbc1949f5b70fba07', 298, 'Century Avenue', 'Pudong', 'Shanghai', '2168881234', 9281394, '2024-02-19', 'China', '1969-04-17'),
+('John Doe', 'johndoe@gmail.com', 'b61a92ef148a4a50a8861a1b3d88bff9', 123, 'Maple Street', 'Los Angeles', 'CA', '7182911230', 3004786, '2022-12-21', 'USA', '1979-11-04'),
+('Mary Jane', 'maryjane@gmail.com', '746f5f493292d03a2469b858cbb17ffa', 652, 'Oak Street', 'New York', 'NY', '9172309482', 2391039, '2023-03-12', 'USA', '1989-06-15'),
+('Max Chen', 'spiderman@gmail.com', 'fcea920f7412b5da7be0cf42b8c93759', 301, 'Elk Street', 'Brooklyn', 'NY', '9281920394', 3928192, '2025-10-15', 'USA', '1956-02-10'),
+('Sarah Thompson', 'sthompson@gmail.com', '4e07f073ccc5007f64dc82499997a68b', 341, 'Pine Street', 'Bronx', 'NY', '7182910394', 983712, '2028-10-18', 'USA', '2010-01-05');
 
 -- --------------------------------------------------------
 
@@ -187,7 +187,6 @@ INSERT INTO `flight` (`FlightNumber`, `DepartureDateandTime`, `ArrivalDateandTim
 ('7', '2023-08-30 13:30:00', '2023-08-30 19:00:00', 220, 'Delayed', 'JFK', 'PVG', 1, 'Jet Blue'),
 ('8', '2023-01-22 14:30:00', '2023-01-22 20:00:00', 150, 'On-time', 'JFK', 'PVG', 3, 'Delta'),
 ('9', '2023-02-14 20:30:00', '2023-02-15 01:00:00', 80, 'Delayed', 'PVG', 'JFK', 2, 'Delta');
-
 -- --------------------------------------------------------
 
 --
@@ -352,7 +351,6 @@ INSERT INTO `ticket` (`TicketIDNumber`, `FlightNumber`, `DepartureDateandTime`, 
 ('7939', '14', '2023-02-25 22:30:00', 'Delta', 'Business'),
 ('7940', '14', '2023-02-25 22:30:00', 'Delta', 'First'),
 ('7941', '15', '2023-02-22 14:30:00', 'Delta', 'Economy');
-
 --
 -- Indexes for dumped tables
 --

@@ -2,7 +2,7 @@
 <head>
 </head>
 <body>
-<form action="/search_flights_query" method="POST">
+<form action="/search_one_way_query" method="POST">
 	<input type="text" name = "Source City/Airport Name" placeholder="Source City/Airport Name" style="width:200px"
 		   required/>
 	<input type="text" name = "Destination City/Airport Name" placeholder="Destination City/Airport Name"
@@ -32,6 +32,8 @@
 		{% for key in row.keys() %}
 		<td>{{ row[key] }}</td>
 		{% endfor %}
+		<td onclick="window.location.href=`{{ url_for('purchase_ticket', row_data=row) }}`;">
+			<u style="text-decoration-color:blue">Purchase</u></td>
 	</tr>
 	{% endfor %}
 </table>

@@ -1,6 +1,7 @@
 # Import Flask Library
 from flask import Flask, render_template, request, session, url_for, redirect
 import pymysql.cursors
+import hashlib
 
 # Initialize the app from Flask
 app = Flask(__name__)
@@ -153,7 +154,7 @@ def customer_login_auth():
     cursor = conn.cursor()
     # executes query
     query = 'SELECT * FROM customer WHERE EmailAddress = %s and Password = %s'
-    cursor.execute(query, (email, password))
+    cursor.execute(query, (email, md5(password)))
     # stores the results in a variable
     data = cursor.fetchone()
     # use fetchall() if you are expecting more than 1 data row
@@ -182,7 +183,7 @@ def airline_staff_login_auth():
     cursor = conn.cursor()
     # executes query
     query = 'SELECT * FROM airlinestaff WHERE Username = %s and Password = %s'
-    cursor.execute(query, (username, password))
+    cursor.execute(query, (username, md5(password)))
     # stores the results in a variable
     data = cursor.fetchone()
     # use fetchall() if you are expecting more than 1 data row
@@ -221,54 +222,78 @@ def search_round_trip():
                            is_airline_staff=session.get('is_airline_staff'))
 
 
-# Define route for querying for flights and results
-@app.route('/search_flights_query', methods=['GET', 'POST'])
-def search_flights_query():
+# Define route for querying for one way flights
+@app.route('/search_one_way_query', methods=['GET', 'POST'])
+def search_one_way_query():
+    # grabs information from the forms
+    source_city = request.form['Source City/Airport Name']
+    destination_city = request.form['Destination City/Airport Name']
+    departure_date_and_time = request.form['Departure Date and Time']
+
+    # cursor used to send queries
+    cursor = conn.cursor()
+    # executes query
+    query = 'SELECT AirlineName, FlightNumber, DepartureAirportName, ' \
+            'ArrivalAirportName, DepartureDateandTime, ArrivalDateandTime ' \
+            'FROM flight WHERE ' \
+            'DepartureAirportName = %s AND ' \
+            'ArrivalAirportName = %s AND ' \
+            'DepartureDateandTime = %s AND ' \
+            'DepartureDateAndTime >= DATE(NOW())'
+    cursor.execute(query, (source_city, destination_city, departure_date_and_time))
+    # stores the results in a variable
+    data = cursor.fetchall()
+    error = None
+    if data:
+        headings = ("Airline Name", "Flight Number", "Departure Airport",
+                    "Arrival Airport", "Departure Date and Time", "Arrival Date and Time", "Purchase")
+        return render_template('home_templates/search_one_way.html', is_customer=session.get('is_customer'),
+                               is_airline_staff=session.get('is_airline_staff'), headings=headings, data=data)
+    else:
+        error = "No future one way flights found for that search result"
+        return render_template('home_templates/search_one_way.html', is_customer=session.get('is_customer'),
+                               is_airline_staff=session.get('is_airline_staff'), error=error)
+
+
+# Define route for querying for round trip flights
+@app.route('/search_round_trip_query', methods=['GET', 'POST'])
+def search_round_trip_query():
     # grabs information from the forms
     source_city = request.form['Source City/Airport Name']
     destination_city = request.form['Destination City/Airport Name']
     departure_date_and_time = request.form['Departure Date and Time']
     return_date_and_time = request.form['Return Date and Time']
 
-    if return_date_and_time:
-        # cursor used to send queries
-        cursor = conn.cursor()
-        # executes query
-        query = 'SELECT AirlineName, DepartureAirportName, ' \
-                'ArrivalAirportName, DepartureDateandTime ' \
-                'FROM flight WHERE ' \
-                'AirlineName = %s AND ' \
-                'DepartureAirportName = %s AND ' \
-                'ArrivalAirportName = %s AND ' \
-                'DepartureDateandTime = %s AND ' \
-                'DepartureDateAndTime >= DATE(NOW())'
-        cursor.execute(query, (source_city, destination_city, departure_date_and_time, return_date_and_time))
-        # stores the results in a variable
-        data = cursor.fetchall()
-    else:
-        # cursor used to send queries
-        cursor = conn.cursor()
-        # executes query
-        query = 'SELECT AirlineName, FlightNumber, DepartureAirportName, ' \
-                'ArrivalAirportName, DepartureDateandTime, ArrivalDateandTime ' \
-                'FROM flight WHERE ' \
-                'DepartureAirportName = %s AND ' \
-                'ArrivalAirportName = %s AND ' \
-                'DepartureDateandTime = %s AND ' \
-                'DepartureDateAndTime >= DATE(NOW())'
-        cursor.execute(query, (source_city, destination_city, departure_date_and_time))
-        # stores the results in a variable
-        data = cursor.fetchall()
+    # cursor used to send queries
+    cursor = conn.cursor()
+    # executes query
+    query = 'SELECT AirlineName, FlightNumber, DepartureAirportName, ' \
+            'ArrivalAirportName, DepartureDateandTime, ArrivalDateandTime ' \
+            'FROM flight WHERE ' \
+            'DepartureAirportName = %s AND ' \
+            'ArrivalAirportName = %s AND ' \
+            'DepartureDateandTime = %s AND ' \
+            'DepartureDateAndTime >= DATE(NOW())'
+    cursor.execute(query, (source_city, destination_city, departure_date_and_time))
+    data1 = cursor.fetchall()
+    cursor.execute(query, (destination_city, source_city, return_date_and_time))
+    data2 = cursor.fetchall()
     error = None
-    if data:
+    if data1 and data2:
         headings = ("Airline Name", "Flight Number", "Departure Airport",
                     "Arrival Airport", "Departure Date and Time", "Arrival Date and Time")
-        return render_template('home_templates/search_for_flights.html', is_customer=session.get('is_customer'),
-                               is_airline_staff=session.get('is_airline_staff'), headings=headings, data=data)
+        return render_template('home_templates/search_round_trip.html', is_customer=session.get('is_customer'),
+                               is_airline_staff=session.get('is_airline_staff'), headings=headings,
+                               data1=data1, data2=data2)
     else:
-        error = "No future flights found for that search result"
-        return render_template('home_templates/search_for_flights.html', is_customer=session.get('is_customer'),
+        error = "No future round trip flights found for that search result"
+        return render_template('home_templates/search_round_trip.html', is_customer=session.get('is_customer'),
                                is_airline_staff=session.get('is_airline_staff'), error=error)
+
+
+@app.route('/purchase_ticket/<row_data>')
+def purchase_ticket(row_data):
+    return render_template('customer_templates/purchase_ticket.html')
 
 
 @app.route('/customer_home')
@@ -455,6 +480,11 @@ def airline_staff_logout():
     session.pop('username')
     session.pop('is_airline_staff')
     return redirect('/')
+
+
+def md5(password):
+    result = hashlib.md5(password.encode())
+    return result.hexdigest()
 
 
 app.secret_key = 'some key that you will never guess'
