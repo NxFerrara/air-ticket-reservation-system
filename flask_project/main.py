@@ -8,9 +8,9 @@ app = Flask(__name__)
 
 # Configure MySQL
 conn = pymysql.connect(host='localhost',
-                       port=8889,  # change this every time if you are a Windows user
+                       # port=8889,  # change this every time if you are a Windows user
                        user='root',
-                       password='root',  # change this every time if you are Windows user
+                       password='',  # change this every time if you are Windows user
                        db='air_system',
                        charset='utf8mb4',
                        cursorclass=pymysql.cursors.DictCursor)
@@ -82,7 +82,7 @@ def customer_register_auth():
         return render_template('customer_templates/customer_register.html', error=error)
     else:
         ins = 'INSERT INTO customer VALUES(%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)'
-        cursor.execute(ins, (name, email, password, building_number, street, city, state,
+        cursor.execute(ins, (name, email, md5(password), building_number, street, city, state,
                              phone_number, passport_number, passport_expiration, passport_country,
                              date_of_birth))
         conn.commit()
@@ -118,7 +118,7 @@ def airline_staff_register_auth():
         return render_template('airline_staff_templates/airline_staff_register.html', error=error)
     else:
         ins = 'INSERT INTO airlinestaff VALUES(%s, %s, %s, %s, %s, %s)'
-        cursor.execute(ins, (username, password, first_name, last_name, date_of_birth, airline_name))
+        cursor.execute(ins, (username, md5(password), first_name, last_name, date_of_birth, airline_name))
         conn.commit()
         cursor.close()
         message = "Staff member successfully registered!"
@@ -206,6 +206,66 @@ def airline_staff_login_auth():
 def search_flights():
     return render_template('home_templates/search_for_flights.html', is_customer=session.get('is_customer'),
                            is_airline_staff=session.get('is_airline_staff'))
+
+@app.route('/insert_new_flight', methods=['GET', 'POST'])
+def insert_new_flight():
+    return render_template('airline_staff_templates/airline_staff_insert.html')
+
+@app.route('/exec_insert_new_flight', methods=['GET', 'POST'])
+def exec_insert_new_flight():
+    if session.get('is_airline_staff'):
+        # grabs information from the forms
+        DepartureDateandTime = request.form['DepartureDateandTime']
+        ArrivalDateandTime = request.form['ArrivalDateandTime']
+        BasePrice = request.form['BasePrice']
+        Status = request.form['Status']
+        DepartureAirportName = request.form['DepartureAirportName']
+        ArrivalAirportName = request.form['ArrivalAirportName']
+        IDNumber = request.form['IDNumber']
+        AirlineName = request.form['AirlineName']
+
+        # cursor used to send queries
+        cursor = conn.cursor()
+        # executes query
+        query = 'SELECT FlightNumber FROM flight WHERE DepartureDateandTime = %s AND AirlineName = %s'
+        cursor.execute(query, (DepartureDateandTime, AirlineName))
+        # stores the results in a variable
+        flightData = cursor.fetchall()
+        maxFlightNumber = -1
+        for item in flightData:
+            value = item['FlightNumber']
+            if int(value) > maxFlightNumber:
+                maxFlightNumber = int(value)
+        if maxFlightNumber == -1:
+            FlightNumber = 1
+        else:
+            FlightNumber = maxFlightNumber+1
+
+        # This query checks to make sure one airplane isn't flying multiple flights at
+        # the same time within the same airline
+        query = 'SELECT * FROM flight WHERE IDNumber = %s AND DepartureDateandTime = %s AND AirlineName = %s'
+        cursor.execute(query, (IDNumber, DepartureDateandTime, AirlineName))
+        # stores the results in a variable
+        data = cursor.fetchone()
+        # use fetchall() if you are expecting more than 1 data row
+        error = None
+        context = None
+        if data:
+            # If the previous query returns data, then user exists
+            error = "This flight already exists!"
+            return render_template('airline_staff_templates/airline_staff_insert.html', error=error)
+        else:
+            ins = 'INSERT INTO flight VALUES(%s, %s, %s, %s, %s, %s, %s, %s, %s)'
+            cursor.execute(ins, (str(FlightNumber), DepartureDateandTime, ArrivalDateandTime, BasePrice, Status, DepartureAirportName,
+            ArrivalAirportName, IDNumber, AirlineName))
+            conn.commit()
+            cursor.close()
+            message = "New flight successfully added!"
+            return render_template('airline_staff_templates/airline_staff_insert.html', context=message)
+    elif session.get('is_customer'):
+        return render_template('customer_templates/customer_home.html')
+    else:
+        return render_template('home_templates/index.html')
 
 
 # Define route for user to search for flights
