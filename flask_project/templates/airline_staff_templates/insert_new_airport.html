@@ -29,7 +29,11 @@
 	<input type="text" name = "AirportName" placeholder="Airport Name" required/></br>
 	<input type="text" name = "City" placeholder="City" required/></br>
 	<input type="text" name = "Country" placeholder="Country" required/></br>
-	<input type="text" name = "AirportType" placeholder="Airport Type" required/></br>
+	<label for="AirportType">Change Status:</label>
+        <select id="AirportType" name="AirportType">
+			<option value="International">On-Time</option>
+			<option value="Domestic">Delayed</option>
+        </select>bmit" value = Add />
 	<input type="submit" value = Add />
 	{% if error %}
 		<p class="error"><strong>Error:</strong> {{error}}</p>
