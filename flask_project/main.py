@@ -305,17 +305,38 @@ def search_flights_airline_staff():
 @app.route('/search_flights_airline_staff_query', methods=['GET', 'POST'])
 def search_flights_airline_staff_query():
     if session.get('is_airline_staff'):
+        airline_name = session['airline_name']
         # grabs information from the forms
         source_city = request.form['Source City/Airport Name']
         destination_city = request.form['Destination City/Airport Name']
-        start_departure_date_and_time = request.form['Start Departure Date and Time']
-        end_departure_date_and_time = request.form['End Departure Date and Time']
-
-        airline_name = session['airline_name']
-
-        # cursor used to send queries
-        cursor = conn.cursor()
+        start_departure_date_and_time = request.form['StartDepartureDateandTime']
+        start_departure_date_and_time = datetime.datetime.strptime(start_departure_date_and_time,
+                                                                   "%Y-%m-%dT%H:%M").strftime('%Y-%m-%d %H:%M:%S')
+        end_departure_date_and_time = request.form['EndDepartureDateandTime']
+        has_end_date = False
         if end_departure_date_and_time != "":
+            has_end_date = True
+            end_departure_date_and_time = datetime.datetime.strptime(end_departure_date_and_time,
+                                                                     "%Y-%m-%dT%H:%M").strftime('%Y-%m-%d %H:%M:%S')
+        cursor = conn.cursor()
+        # Checking the departure and arrival airports exist
+        query = 'SELECT * FROM airport WHERE AirportName = %s'
+        cursor.execute(query, source_city)
+        # stores the results in a variable
+        is_departure_airport = cursor.fetchone()
+        query = 'SELECT * FROM airport WHERE AirportName = %s'
+        cursor.execute(query, destination_city)
+        # stores the results in a variable
+        is_arrival_airport = cursor.fetchone()
+        # cursor used to send queries
+        error = None
+        if not is_departure_airport:
+            error = "The {} Airport doesn't exist!".format(source_city)
+            return render_template('airline_staff_templates/search_flights_airline_staff.html', error=error)
+        if not is_arrival_airport:
+            error = "The {} Airport doesn't exist!".format(destination_city)
+            return render_template('airline_staff_templates/search_flights_airline_staff.html', error=error)
+        if has_end_date:
             # executes query
             query = 'SELECT AirlineName, FlightNumber, DepartureAirportName, ' \
                     'ArrivalAirportName, DepartureDateandTime, ArrivalDateandTime ' \
@@ -337,7 +358,6 @@ def search_flights_airline_staff_query():
                     'DepartureDateandTime >= %s'
             cursor.execute(query, (airline_name, source_city, destination_city, start_departure_date_and_time))
         data = cursor.fetchall()
-        error = None
         if data:
             headings = ("Airline Name", "Flight Number", "Departure Airport",
                         "Arrival Airport", "Departure Date and Time", "Arrival Date and Time", "View Customers")

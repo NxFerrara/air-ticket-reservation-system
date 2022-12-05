@@ -5,12 +5,18 @@
 <form action="/search_flights_airline_staff_query" method="POST">
 	<input type="text" name = "Source City/Airport Name" placeholder="Source City/Airport Name" style="width:200px"
 		   required/>
+	</br>
 	<input type="text" name = "Destination City/Airport Name" placeholder="Destination City/Airport Name"
 		   style="width:200px" required/>
-	<input type="text" name = "Start Departure Date and Time" placeholder="Start Departure Date and Time"
-		   style="width:200px" required/>
-    <input type="text" name = "End Departure Date and Time" placeholder="End Departure Date and Time"
-		   style="width:200px"/>
+	</br>
+	<label for="StartDepartureDateandTime">Start Departure Date and Time:</label>
+	</br>
+  	<input type="datetime-local" id="StartDepartureDateandTime" name="StartDepartureDateandTime" required>
+	</br>
+	<label for="EndDepartureDateandTime">End Departure Date and Time:</label>
+	</br>
+  	<input type="datetime-local" id="EndDepartureDateandTime" name="EndDepartureDateandTime">
+	</br>
 	<input type="submit" value = Search />
 	{% if error %}
 		<p class="error"><strong>Error:</strong> {{error}}</p>
