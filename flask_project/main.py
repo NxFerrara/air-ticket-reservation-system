@@ -344,7 +344,7 @@ def insert_new_airport():
     # stores the results in a variable
     data = cursor.fetchall()
     cursor.close()
-    headings = ("Airport Name","City", "Country", "Age", "AirportType")
+    headings = ("Airport Name","City", "Country", "AirportType")
     return render_template('airline_staff_templates/insert_new_airport.html', headings=headings, data=data)
 
 @app.route('/exec_insert_new_airport', methods=['GET', 'POST'])
