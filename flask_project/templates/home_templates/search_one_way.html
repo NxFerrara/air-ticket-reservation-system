@@ -32,6 +32,8 @@
 		{% for key in row.keys() %}
 		<td>{{ row[key] }}</td>
 		{% endfor %}
+		<td onclick="window.location.href=`{{ url_for('purchase_ticket', row_data=row) }}`;">
+			<u style="text-decoration-color:blue">Purchase</u></td>
 	</tr>
 	{% endfor %}
 </table>

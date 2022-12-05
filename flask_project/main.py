@@ -246,7 +246,7 @@ def search_one_way_query():
     error = None
     if data:
         headings = ("Airline Name", "Flight Number", "Departure Airport",
-                    "Arrival Airport", "Departure Date and Time", "Arrival Date and Time")
+                    "Arrival Airport", "Departure Date and Time", "Arrival Date and Time", "Purchase")
         return render_template('home_templates/search_one_way.html', is_customer=session.get('is_customer'),
                                is_airline_staff=session.get('is_airline_staff'), headings=headings, data=data)
     else:
@@ -289,6 +289,11 @@ def search_round_trip_query():
         error = "No future round trip flights found for that search result"
         return render_template('home_templates/search_round_trip.html', is_customer=session.get('is_customer'),
                                is_airline_staff=session.get('is_airline_staff'), error=error)
+
+
+@app.route('/purchase_ticket/<row_data>')
+def purchase_ticket(row_data):
+    return render_template('customer_templates/purchase_ticket.html')
 
 
 @app.route('/customer_home')
