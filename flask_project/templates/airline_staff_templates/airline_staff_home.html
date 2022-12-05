@@ -5,7 +5,7 @@
 <form action="/post" method="POST">
 	<h1>Welcome {{username}}</h1>
 </form>
-
+	{% if data %}
 	<style type="text/css">
 		table, th, td {
 			border: 1px solid black;
@@ -26,7 +26,11 @@
 		{% endfor %}
 	</table>
 	<br>
-<a href="/search_flights">Search Flights</a>
+	{% endif %}
+	{% if not data %}
+		<p class="error">There are currently no future Flights</p>
+	{% endif %}
+<a href="/search_flights_airline_staff">Search Flights</a>
 <a href="/insert_new_flight">Insert New Flight</a>
 <a href="/insert_new_airplane">Insert New Airplane</a>
 <a href="/insert_new_airport"> Add New Airport</a>

@@ -2,13 +2,44 @@
 <head>
 </head>
 <body>
+{% if data %}
+<style type="text/css">
+	table, th, td {
+		border: 1px solid black;
+	}
+</style>
+<table>
+	<tr>
+		{% for header in headings %}
+		<th>{{ header }}</th>
+		{% endfor %}
+	</tr>
+	{% for row in data %}
+	<tr>
+		{% for key in row.keys() %}
+		<td>{{ row[key] }}</td>
+		{% endfor %}
+	</tr>
+	{% endfor %}
+</table>
+<br>
+{% endif %}
+{% if not data %}
+	<p class="error">There are currently no future Flights</p>
+{% endif %}
 <form action="/exec_insert_new_flight" method="POST">
-	<input type="text" name = "DepartureDateandTime" placeholder="Departure Date and Time" required/></br>
-	<input type="text" name = "ArrivalDateandTime" placeholder="Arrival Date and Time" required/></br>
-	<input type="number" name = "BasePrice" placeholder="Base Price" required/></br>
+	<label for="DepartureDateandTime">Departure Date and Time:</label>
+	</br>
+  	<input type="datetime-local" id="DepartureDateandTime" name="DepartureDateandTime" required>
+	</br>
+	<label for="ArrivalDateandTime">Arrival Date and Time:</label>
+	</br>
+  	<input type="datetime-local" id="ArrivalDateandTime" name="ArrivalDateandTime" required>
+	</br>
+	<input type="text" name = "BasePrice" placeholder="Base Price" required/></br>
 	<input type="text" name = "DepartureAirportName" placeholder="Departure Airport Name" required/></br>
 	<input type="text" name = "ArrivalAirportName" placeholder="Arrival Airport Name" required/></br>
-	<input type="number" name = "IDNumber" placeholder="ID Number" required/></br>
+	<input type="text" name = "IDNumber" placeholder="ID Number" required/></br>
 	<input type="submit" value = Insert />
 	{% if error %}
 		<p class="error"><strong>Error:</strong> {{error}}</p>
