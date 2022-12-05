@@ -231,19 +231,44 @@ def exec_insert_new_flight():
         airlineName = session['airline_name']
         # grabs information from the forms
         DepartureDateandTime = request.form['DepartureDateandTime']
-        DepartureDateandTime = datetime.datetime.strptime(DepartureDateandTime, "%Y-%m-%dT%H:%M").strftime(
-            '%Y-%m-%d %H:%M:%S')
         ArrivalDateandTime = request.form['ArrivalDateandTime']
-        ArrivalDateandTime = DepartureDateandTime = datetime.datetime.strptime(ArrivalDateandTime, "%Y-%m-%dT%H:%M").strftime('%Y-%m-%d %H:%M:%S')
         BasePrice = request.form['BasePrice']
         DepartureAirportName = request.form['DepartureAirportName']
         ArrivalAirportName = request.form['ArrivalAirportName']
         IDNumber = request.form['IDNumber']
         Status = 'On-time'  # By default
         AirlineName = session['airline_name']  # By default
-
+        DepartureDateandTime = datetime.datetime.strptime(DepartureDateandTime, "%Y-%m-%dT%H:%M")
+        ArrivalDateandTime = datetime.datetime.strptime(ArrivalDateandTime, "%Y-%m-%dT%H:%M")
+        departure_is_after = DepartureDateandTime > datetime.datetime.today()
+        arrival_is_after = ArrivalDateandTime > DepartureDateandTime
+        # Query all of the future flights
+        futureFlightsQuery = 'SELECT AirlineName, FlightNumber, DepartureAirportName, ArrivalAirportName, ' \
+                'DepartureDateandTime, ArrivalDateandTime, BasePrice, Status FROM flight ' \
+                'WHERE AirlineName = "{}" AND DepartureDateandTime >= DATE(NOW()) AND ' \
+                'DepartureDateandTime <= DATE(NOW() + INTERVAL 30 DAY);'.format(airlineName)
+        headings = ("Airline Name", "Flight Number", "Departure Airport", "Arrival Airport",
+                    "Departure Date and Time", "Arrival Date and Time", "Base Price", "Status")
         # cursor used to send queries
         cursor = conn.cursor()
+        if not departure_is_after:
+            cursor.execute(futureFlightsQuery)
+            # stores the results in a variable
+            futureFlights = cursor.fetchall()
+            cursor.close()
+            error = "The Departure Date and Time must be after the current Date and Time"
+            return render_template('airline_staff_templates/airline_staff_insert.html', error=error,
+                                   headings=headings, data=futureFlights)
+        if not arrival_is_after:
+            cursor.execute(futureFlightsQuery)
+            # stores the results in a variable
+            futureFlights = cursor.fetchall()
+            cursor.close()
+            error = "The Arrival Date and Time must be after the Departure Date and Time"
+            return render_template('airline_staff_templates/airline_staff_insert.html', error=error,
+                                   headings=headings, data=futureFlights)
+        ArrivalDateandTime = ArrivalDateandTime.strftime('%Y-%m-%d %H:%M:%S')
+        DepartureDateandTime = DepartureDateandTime.strftime('%Y-%m-%d %H:%M:%S')
         # executes query
         query = 'SELECT FlightNumber FROM flight WHERE DepartureDateandTime = %s AND AirlineName = %s'
         cursor.execute(query, (DepartureDateandTime, AirlineName))
@@ -279,17 +304,10 @@ def exec_insert_new_flight():
         # stores the results in a variable
         is_airplane = cursor.fetchone()
         # use fetchall() if you are expecting more than 1 data row
-        # Query all of the future flights
-        query = 'SELECT AirlineName, FlightNumber, DepartureAirportName, ArrivalAirportName, ' \
-                'DepartureDateandTime, ArrivalDateandTime, BasePrice, Status FROM flight ' \
-                'WHERE AirlineName = "{}" AND DepartureDateandTime >= DATE(NOW()) AND ' \
-                'DepartureDateandTime <= DATE(NOW() + INTERVAL 30 DAY);'.format(airlineName)
-        headings = ("Airline Name", "Flight Number", "Departure Airport", "Arrival Airport",
-                    "Departure Date and Time", "Arrival Date and Time", "Base Price", "Status")
         error = None
         context = None
         if data:
-            cursor.execute(query)
+            cursor.execute(futureFlightsQuery)
             # stores the results in a variable
             futureFlights = cursor.fetchall()
             cursor.close()
@@ -299,7 +317,7 @@ def exec_insert_new_flight():
                                    headings=headings, data=futureFlights)
         else:
             if not is_departure_airport:
-                cursor.execute(query)
+                cursor.execute(futureFlightsQuery)
                 # stores the results in a variable
                 futureFlights = cursor.fetchall()
                 cursor.close()
@@ -307,7 +325,7 @@ def exec_insert_new_flight():
                 return render_template('airline_staff_templates/airline_staff_insert.html', error=error,
                                        headings=headings, data=futureFlights)
             elif not is_arrival_airport:
-                cursor.execute(query)
+                cursor.execute(futureFlightsQuery)
                 # stores the results in a variable
                 futureFlights = cursor.fetchall()
                 cursor.close()
@@ -315,7 +333,7 @@ def exec_insert_new_flight():
                 return render_template('airline_staff_templates/airline_staff_insert.html', error=error,
                                        headings=headings, data=futureFlights)
             elif not is_airplane:
-                cursor.execute(query)
+                cursor.execute(futureFlightsQuery)
                 # stores the results in a variable
                 futureFlights = cursor.fetchall()
                 cursor.close()
@@ -327,13 +345,13 @@ def exec_insert_new_flight():
                 cursor.execute(ins, (str(FlightNumber), DepartureDateandTime, ArrivalDateandTime, BasePrice, Status, DepartureAirportName,
                 ArrivalAirportName, IDNumber, AirlineName))
                 conn.commit()
-                cursor.execute(query)
+                cursor.execute(futureFlightsQuery)
                 # stores the results in a variable
                 futureFlights = cursor.fetchall()
                 cursor.close()
                 message = "New flight successfully added!"
                 return render_template('airline_staff_templates/airline_staff_insert.html', context=message,
-                                       headings=headings, data=flightData)
+                                       headings=headings, data=futureFlights)
     elif session.get('is_customer'):
         return render_template('customer_templates/customer_home.html')
     else:
@@ -436,15 +454,15 @@ def view_flight_customers(flightData):
         cursor = conn.cursor()
         cursor.execute(query)
         data = cursor.fetchall()
-        error = None
+        message = None
         if data:
             headings = ("Name",)
             return render_template('airline_staff_templates/airline_staff_view_flight_customers.html',
                                    headings=headings,
                                    data=data)
         else:
-            error = "No customers found for that flight"
-            return render_template('airline_staff_templates/airline_staff_view_flight_customers.html', error=error)
+            message = "No customers found for that flight"
+            return render_template('airline_staff_templates/airline_staff_view_flight_customers.html', message=message)
     elif session.get('is_customer'):
         return render_template('customer_templates/customer_home.html')
     else:
