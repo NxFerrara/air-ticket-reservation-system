@@ -335,6 +335,52 @@ def exec_insert_new_airplane():
     else:
         return render_template('home_templates/index.html')
 
+@app.route('/insert_new_airport')
+def insert_new_airport():
+    cursor = conn.cursor()
+    # executes query
+    query = 'SELECT * FROM airport'
+    cursor.execute(query)
+    # stores the results in a variable
+    data = cursor.fetchall()
+    cursor.close()
+    headings = ("Airport Name","City", "Country", "Age", "AirportType")
+    return render_template('airline_staff_templates/insert_new_airport.html', headings=headings, data=data)
+
+@app.route('/exec_insert_new_airport', methods=['GET', 'POST'])
+def exec_insert_new_airport():
+    if session.get('is_airline_staff'):
+        AirportName = request.form['AirportName']
+        City = request.form['City']
+        Country = request.form['Country']
+        AirportType = request.form['AirportType']
+        cursor = conn.cursor()
+        query = 'SELECT * FROM airport WHERE AirportName = %s'
+        cursor.execute(query, (AirportName))
+        data = cursor.fetchone()
+        if data:
+            error = "This airport already exists!"
+            query = 'SELECT *  FROM airport'
+            cursor.execute(query)
+            data = cursor.fetchall()
+            headings = ("Airport Name", "City", "Country", "AirportType")
+            return render_template('airline_staff_templates/insert_new_airport.html', headings=headings, data=data,error=error)
+        else:
+            ins = 'INSERT INTO airport VALUES(%s, %s, %s, %s)'
+            cursor.execute(ins, (AirportName, City, Country, AirportType))
+            conn.commit()
+            query = 'SELECT *  FROM airport'
+            cursor.execute(query)
+            data = cursor.fetchall()
+            headings = ("Airport Name", "City", "Country", "AirportType")
+            cursor.close()
+            message = "New airport successfully added!"
+            return render_template('airline_staff_templates/insert_new_airport.html', headings=headings, data=data, context=message)
+    elif session.get('is_customer'):
+        return render_template('customer_templates/customer_home.html')
+    else:
+        return render_template('home_templates/index.html')
+
 
 @app.route('/search_one_way')
 def search_one_way():
