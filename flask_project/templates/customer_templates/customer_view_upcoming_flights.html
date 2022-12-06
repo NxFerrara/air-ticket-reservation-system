@@ -13,26 +13,28 @@
 		<p class="context"><strong>Message:</strong> {{context}}</p>
 	{% endif %}
 </form>
-	<style type="text/css">
-		table, th, td {
-			border: 1px solid black;
-		}
-	</style>
-	<table>
-		<tr>
-			{% for header in headings %}
-			<th>{{ header }}</th>
-			{% endfor %}
-		</tr>
-		{% for row in data %}
-		<tr>
-			{% for key in row.keys() %}
-			<td>{{ row[key] }}</td>
-			{% endfor %}
-		</tr>
+<style type="text/css">
+	table, th, td {
+		border: 1px solid black;
+	}
+</style>
+{% if data %}
+<table>
+	<tr>
+		{% for header in headings %}
+		<th>{{ header }}</th>
 		{% endfor %}
-	</table>
-	<br>
+	</tr>
+	{% for row in data %}
+	<tr>
+		{% for key in row.keys() %}
+		<td>{{ row[key] }}</td>
+		{% endfor %}
+	</tr>
+	{% endfor %}
+</table>
+<br>
+{% endif %}
 <a href="/customer_home">Go back</a> &nbsp
 <a href="/customer_logout">Logout</a> &nbsp
 
