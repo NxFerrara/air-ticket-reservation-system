@@ -1,57 +1,116 @@
 <html>
 <head>
 </head>
+<style>
+html,
+body {
+  height: 100%;
+}
+body {
+  margin: 0;
+  font-family: sans-serif;
+  font-weight: 100;
+}
+.container {
+  position: absolute;
+  top: 25%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.container table {
+  color: #ddd;
+  background: #333;
+  font-size: 12pt;
+  border-collapse: collapse;
+  border-collapse: collapse;
+  overflow: hidden;
+  box-shadow: 0 0 20px rgba(0,0,0,0.2);
+}
+
+.container th,
+.container td {
+  padding: 10px;
+  background-color: rgba(220,220,220,0.5);
+  color: #FFFFFF;
+  border: 1px solid black;
+}
+
+.container th {
+  text-align: center;
+}
+
+.container thead {
+  th {
+    background-color: #55608f;
+  }
+}
+
+
+.button{
+	display:inline-block;
+	padding:0.2em 1.45em;
+	margin:1em;
+	border:0.15em solid #CCCCCC;
+	box-sizing: border-box;
+	text-decoration:none;
+	font-family:'Segoe UI','Roboto',sans-serif;
+	font-weight:400;
+	color:#000000;
+	background-color:#CCCCCC;
+	text-align:center;
+	position:relative;
+}
+.button:hover{
+	border-color:#7a7a7a;
+}
+.button:active{
+	background-color:#999999;
+}
+@media all and (max-width:30em){
+	.button{
+		display:block;
+		margin:0.2em auto;
+	}
+}
+</style>
 <body>
-<form action="/post" method="POST">
+<div class="container">
 	<h1>Welcome {{username}}</h1>
-</form>
 	{% if data %}
-	<style type="text/css">
-		table, th, td {
-			border: 1px solid black;
-		}
-	</style>
 	<table>
-		<tr>
-			{% for header in headings %}
-			<th>{{ header }}</th>
+		<thead>
+			<tr>
+				{% for header in headings %}
+				<th>{{ header }}</th>
+				{% endfor %}
+			</tr>
+		</thead>
+		<tbody>
+			{% for row in data %}
+			<tr>
+				{% for key in row.keys() %}
+				<td>{{ row[key] }}</td>
+				{% endfor %}
+			</tr>
 			{% endfor %}
-		</tr>
-		{% for row in data %}
-		<tr>
-			{% for key in row.keys() %}
-			<td>{{ row[key] }}</td>
-			{% endfor %}
-		</tr>
-		{% endfor %}
+		</tbody>
 	</table>
-	<br>
 	{% endif %}
 	{% if not data %}
 		<p class="error">There are currently no future Flights</p>
 	{% endif %}
-<style>
-.button {
-	background-color: rgba(128, 64, 255, 0.6);
-	border: 2px solid black;
-	color: white;
-	padding: 0px 5px;
-	text-align: center;
-	display: inline-block;
-	font-size: 20px;
-	margin: 5px 5px;
-	cursor: pointer;
-}
-</style>
-<button class="button" onclick="window.location.href=`{{ url_for('search_flights_airline_staff') }}`;">Search Flights</button>
-<button class="button" onclick="window.location.href=`{{ url_for('insert_new_flight') }}`;">Insert New Flight</button>
-<button class="button" onclick="window.location.href=`{{ url_for('insert_new_airplane') }}`;">Insert New Airplane</button>
-<button class="button" onclick="window.location.href=`{{ url_for('insert_new_airport') }}`;">Add New Airport</button>
-<button class="button" onclick="window.location.href=`{{ url_for('ticket_stats') }}`;">Ticket Revenue</button>
-<button class="button" onclick="window.location.href=`{{ url_for('customer_stats') }}`;">Customers</button>
-</br>
-</br>
-<button class="button" onclick="window.location.href=`{{ url_for('airline_staff_logout') }}`;">Logout</button>
+	</br>
+	<button class="button" onclick="window.location.href=`{{ url_for('search_flights_airline_staff') }}`;">Search Flights</button>
+	<button class="button" onclick="window.location.href=`{{ url_for('insert_new_flight') }}`;">Insert New Flight</button>
+	<button class="button" onclick="window.location.href=`{{ url_for('insert_new_airplane') }}`;">Insert New Airplane</button>
+	<button class="button" onclick="window.location.href=`{{ url_for('insert_new_airport') }}`;">Add New Airport</button>
+	<button class="button" onclick="window.location.href=`{{ url_for('ticket_stats') }}`;">Ticket Revenue</button>
+	<button class="button" onclick="window.location.href=`{{ url_for('customer_stats') }}`;">Customers</button>
+	</br>
+	</br>
+	<button class="button" onclick="window.location.href=`{{ url_for('airline_staff_logout') }}`;">Logout</button>
+</div>
 
 </body>
 
