@@ -34,21 +34,18 @@
 		{% for key in row.keys() %}
 		<td>{{ row[key] }}</td>
 		{% endfor %}
-		<td onclick="window.location.href=`{{ url_for('view_flight_customers', flightData=row) }}`;">
-			<u style="text-decoration-color:blue">Customers</u></td>
-		<td onclick="window.location.href=`{{ url_for('change_flight_status', flightData=row) }}`;">
-			<u style="text-decoration-color:blue">Change Status</u></td>
 	</tr>
 	{% endfor %}
 </table>
-<br>
+<p class="totalRevenue"><strong>Total Revenue:</strong> {{totalRevenue}}</p>
+<p class="totalTicketsSold"><strong>Total # of Tickets Sold:</strong> {{totalTicketsSold}}</p>
 {% endif %}
 {% if message %}
 	<p class="message"><strong>Message:</strong> {{message}}</p>
 {% endif %}
 <p class="monthRevenue"><strong>Last Month Total Revenue:</strong> {{lastMonthRevenue}}</p>
 <p class="yearRevenue"><strong>Last Year Total Revenue:</strong> {{lastYearRevenue}}</p>
-</br>
+
 <a href="/airline_staff_home">Go back</a>
 
 </body>

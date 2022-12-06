@@ -1,0 +1,38 @@
+<html>
+<head>
+</head>
+<body>
+
+<style type="text/css">
+	table, th, td {
+		border: 1px solid black;
+	}
+</style>
+{% if data %}
+<p class="message"><strong>Flights {{customerName}} ({{customerEmail}}) has taken:</strong></p>
+<table>
+	<tr>
+		{% for header in headings %}
+		<th>{{ header }}</th>
+		{% endfor %}
+	</tr>
+	{% for row in data %}
+	<tr>
+		{% for key in row.keys() %}
+		<td>{{ row[key] }}</td>
+		{% endfor %}
+	</tr>
+	{% endfor %}
+</table>
+</br>
+{% endif %}
+{% if error %}
+	<p class="error"><strong>Message:</strong> {{error}}</p>
+{% endif %}
+
+<a href="/customer_stats">Go back</a>
+
+</body>
+
+
+</html>

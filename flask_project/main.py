@@ -641,8 +641,8 @@ def ticket_stats():
         cursor.close()
         lastMonthRevenue = lastMonthResults['revenue']
         lastYearRevenue = lastYearResults['revenue']
-        lastMonthRevenue = "$0.00" if not lastMonthRevenue else "$"+str(int(lastMonthRevenue*100)/100)
-        lastYearRevenue = "$0.00" if not lastYearRevenue else "$"+str(int(lastYearRevenue*100)/100)
+        lastMonthRevenue = "$0.00" if not lastMonthRevenue else "$"+str(round(lastMonthRevenue,2))
+        lastYearRevenue = "$0.00" if not lastYearRevenue else "$"+str(round(lastYearRevenue,2))
         return render_template('airline_staff_templates/ticket_stats.html', lastMonthRevenue=lastMonthRevenue,
                                lastYearRevenue=lastYearRevenue)
     elif session.get('is_customer'):
@@ -655,8 +655,128 @@ def ticket_stats():
 def exec_ticket_stats(revenueData):
     if session.get('is_airline_staff'):
         lastMonthRevenue, lastYearRevenue = eval(revenueData)
-        return render_template('airline_staff_templates/ticket_stats.html', lastMonthRevenue=lastMonthRevenue,
-                               lastYearRevenue=lastYearRevenue)
+        airline_name = session['airline_name']
+        # grabs information from the forms
+        start_date_and_time = datetime.datetime.strptime(request.form['StartDateandTime'],
+                                                         "%Y-%m-%dT%H:%M").strftime('%Y-%m-%d %H:%M:%S')
+        end_date_and_time = request.form['EndDateandTime']
+        has_end_date = False
+        if end_date_and_time != "":
+            has_end_date = True
+            end_date_and_time = datetime.datetime.strptime(end_date_and_time,
+                                                           "%Y-%m-%dT%H:%M").strftime('%Y-%m-%d %H:%M:%S')
+        cursor = conn.cursor()
+        if has_end_date:
+            # executes query
+            query = 'SELECT YEAR(PurchaseDateandTime) as PurchaseYear, MONTH(PurchaseDateandTime) as PurchaseMonth, ' \
+                    'COUNT(TicketIDNumber) AS TicketCount, SUM(sold_price) as Revenue ' \
+                    'FROM purchase NATURAL JOIN ticket WHERE ' \
+                    'AirlineName = %s AND PurchaseDateandTime >= %s AND PurchaseDateandTime <= %s ' \
+                    'GROUP BY YEAR(PurchaseDateandTime), MONTH(PurchaseDateandTime) ' \
+                    'ORDER BY YEAR(PurchaseDateandTime), MONTH(PurchaseDateandTime);'
+            cursor.execute(query, (airline_name, start_date_and_time, end_date_and_time))
+        else:
+            # executes query
+            query = 'SELECT YEAR(PurchaseDateandTime) as PurchaseYear, MONTH(PurchaseDateandTime) as PurchaseMonth, ' \
+                    'COUNT(TicketIDNumber) AS TicketCount, SUM(sold_price) as Revenue ' \
+                    'FROM purchase NATURAL JOIN ticket WHERE ' \
+                    'AirlineName = %s AND PurchaseDateandTime >= %s' \
+                    'GROUP BY YEAR(PurchaseDateandTime), MONTH(PurchaseDateandTime) ' \
+                    'ORDER BY YEAR(PurchaseDateandTime), MONTH(PurchaseDateandTime);'
+            cursor.execute(query, (airline_name, start_date_and_time))
+        data = cursor.fetchall()
+        if data:
+            totalRevenue = 0
+            totalTicketsSold = 0
+            for row in data:
+                revenue = row['Revenue']
+                ticketsSold = row['TicketCount']
+                row['Revenue'] = "$"+str(round(revenue, 2))
+                totalRevenue += revenue
+                totalTicketsSold += ticketsSold
+            totalRevenue = "$"+str(round(totalRevenue,2))
+            headings = ("Year", "Month", "Tickets Sold", "Revenue")
+            return render_template('airline_staff_templates/ticket_stats.html', lastMonthRevenue=lastMonthRevenue,
+                                   lastYearRevenue=lastYearRevenue, totalRevenue=totalRevenue,
+                                   totalTicketsSold=totalTicketsSold, headings=headings, data=data)
+        else:
+            error = "No Tickets sold during that period"
+            return render_template('airline_staff_templates/ticket_stats.html', lastMonthRevenue=lastMonthRevenue,
+                                   lastYearRevenue=lastYearRevenue, error=error)
+    elif session.get('is_customer'):
+        return render_template('customer_templates/customer_home.html')
+    else:
+        return redirect('/')
+
+
+@app.route('/customer_stats')
+def customer_stats():
+    if session.get('is_airline_staff'):
+        airline_name = session['airline_name']
+        lastYearQuery = "SELECT Name, EmailAddress, COUNT(purchase.TicketIDNumber) as TicketCount " \
+                        "FROM customer NATURAL JOIN purchase, ticket " \
+                        "WHERE ticket.TicketIDNumber = purchase.TicketIDNumber AND AirlineName = %s " \
+                        "AND PurchaseDateandTime >= DATE(NOW() - INTERVAL 1 YEAR) GROUP BY EmailAddress;"
+        cursor = conn.cursor()
+        # executes query
+        cursor.execute(lastYearQuery, (airline_name,))
+        # stores the results in a variable
+        lastYearResults = cursor.fetchall()
+        maxIndices = []
+        maxTicketCount = 0
+        for i,row in enumerate(lastYearResults):
+            ticketCount = row['TicketCount']
+            if ticketCount > maxTicketCount:
+                maxIndices = [i]
+                maxTicketCount = ticketCount
+            elif ticketCount == maxTicketCount:
+                maxIndices.append(i)
+        lastYearResults = [lastYearResults[i] for i in maxIndices]
+        headings1 = ["Name", "Email Address", "# Flights"]
+        customerQuery = "SELECT DISTINCT Name, EmailAddress, BuildingNumber, Street, City, State, PhoneNumber, " \
+                        "PassportNumber, PassportExpiration, PassportCountry, DateofBirth " \
+                        "FROM customer NATURAL JOIN purchase, ticket " \
+                        "WHERE ticket.TicketIDNumber = purchase.TicketIDNumber AND AirlineName = %s;"
+        headings2 = ["Name", "EmailAddress", "BuildingNumber", "Street", "City", "State", "PhoneNumber",
+                     "PassportNumber", "PassportExpiration", "PassportCountry", "DateofBirth"]
+        cursor.execute(customerQuery, (airline_name,))
+        # stores the results in a variable
+        customerResults = cursor.fetchall()
+        cursor.close()
+        return render_template('airline_staff_templates/customer_stats.html', headings1=headings1,
+                               data1=lastYearResults, headings2=headings2, data2=customerResults)
+    elif session.get('is_customer'):
+        return render_template('customer_templates/customer_home.html')
+    else:
+        return redirect('/')
+
+
+@app.route('/exec_customer_stats/<customerData>', methods=['GET', 'POST'])
+def exec_customer_stats(customerData):
+    if session.get('is_airline_staff'):
+        customerData = eval(customerData)
+        customerEmail = customerData['EmailAddress']
+        customerName = customerData['Name']
+        airline_name = session['airline_name']
+        # executes query
+        flightsQuery = 'SELECT AirlineName, FlightNumber, DepartureAirportName, ArrivalAirportName, ' \
+                'DepartureDateandTime, ArrivalDateandTime, BasePrice, Status ' \
+                'FROM ticket NATURAL JOIN flight, customer, purchase ' \
+                'WHERE ticket.TicketIDNumber = purchase.TicketIDNumber ' \
+                'AND purchase.EmailAddress = customer.EmailAddress ' \
+                'AND customer.EmailAddress = %s AND AirlineName = %s;'
+        cursor = conn.cursor()
+        cursor.execute(flightsQuery, (customerEmail, airline_name))
+        flightsResults = cursor.fetchall()
+        cursor.close()
+        if flightsResults:
+            headings = ("AirlineName", "FlightNumber", "DepartureAirportName", "ArrivalAirportName",
+                        "DepartureDateandTime", "ArrivalDateandTime", "BasePrice", "Status")
+            return render_template('airline_staff_templates/customer_stats_flights.html', headings=headings,
+                                   data=flightsResults, customerEmail=customerEmail, customerName=customerName)
+        else:
+            error = "{} ({}) has taken no flights with {}".format(customerName, customerEmail, airline_name)
+            return render_template('airline_staff_templates/customer_stats_flights.html', error=error)
     elif session.get('is_customer'):
         return render_template('customer_templates/customer_home.html')
     else:
