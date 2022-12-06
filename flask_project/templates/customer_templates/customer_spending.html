@@ -18,8 +18,9 @@
 </form>
 
 <form action="/post" method="POST">
-	<h3>Tracking Spending Between {{start}} And {{end}}</h3>
+	<h3>Monthly Spending Between {{start}} And {{end}}</h3>
 </form>
+
 
 	<style type="text/css">
 		table, th, td {
@@ -41,6 +42,11 @@
 		{% endfor %}
 	</table>
 	<br>
+
+<form action="/post" method="POST">
+	<h3>Total Spending Between {{start_year}} And {{end_year}} is ${{total}}</h3>
+</form>
+
 <a href="/customer_home">Go back</a>
 <a href="/customer_logout">Logout</a>
 

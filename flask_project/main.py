@@ -341,6 +341,7 @@ def track_spending():
     print(data)
     monthly_spending = [{"January":0, "February": 0, "March":0, "April": 0, "May": 0, "June":0, "July":0, "August":0,
                         "September":0, "October":0, "November":0, "December":0}]
+    total_spending = 0
     if (data) and (valid_date):
         for item in data:
             date_time = item.get("PurchaseDateandTime")
@@ -348,28 +349,40 @@ def track_spending():
             month_string = date_time.strftime("%m")
             if month_string == "01":
                 monthly_spending[0]["January"] += money_spent
+                total_spending += money_spent
             elif month_string == "02":
                 monthly_spending[0]["February"] += money_spent
+                total_spending += money_spent
             elif month_string == "03":
                 monthly_spending[0]["March"] += money_spent
+                total_spending += money_spent
             elif month_string == "04":
                 monthly_spending[0]["April"] += money_spent
+                total_spending += money_spent
             elif month_string == "05":
                 monthly_spending[0]["May"] += money_spent
+                total_spending += money_spent
             elif month_string == "06":
                 monthly_spending[0]["June"] += money_spent
+                total_spending += money_spent
             elif month_string == "07":
                 monthly_spending[0]["July"] += money_spent
+                total_spending += money_spent
             elif month_string == "08":
                 monthly_spending[0]["August"] += money_spent
+                total_spending += money_spent
             elif month_string == "09":
                 monthly_spending[0]["September"] += money_spent
+                total_spending += money_spent
             elif month_string == "10":
                 monthly_spending[0]["October"] += money_spent
+                total_spending += money_spent
             elif month_string == "11":
                 monthly_spending[0]["November"] += money_spent
+                total_spending += money_spent
             elif month_string == "12":
                 monthly_spending[0]["December"] += money_spent
+                total_spending += money_spent
         monthly_spending[0]["January"] = round(monthly_spending[0]["January"],2)
         monthly_spending[0]["February"] = round(monthly_spending[0]["February"],2)
         monthly_spending[0]["March"] = round(monthly_spending[0]["March"],2)
@@ -382,21 +395,22 @@ def track_spending():
         monthly_spending[0]["October"] = round(monthly_spending[0]["October"],2)
         monthly_spending[0]["November"] = round(monthly_spending[0]["November"],2)
         monthly_spending[0]["December"] = round(monthly_spending[0]["December"],2)
+        total_spending = round(total_spending,2)
         cursor.close()
         headings = ("January", "February", "March", "April", "May", "June", "July","August", "September", "October",
-                    "November","December")
-        return render_template('customer_templates/customer_spending.html', email=email, headings=headings, data=monthly_spending, start = start_date, end = end_date)
+                    "November","December", )
+        return render_template('customer_templates/customer_spending.html', email=email, headings=headings, data=monthly_spending, start = start_date, end = end_date, start_year = start_date, end_year = end_date, total = total_spending)
     elif (data):
         cursor.close()
         error = "Invalid Date"
         headings = ("January", "February", "March", "April", "May", "June", "July","August", "September", "October",
                     "November","December")
-        return render_template('customer_templates/customer_spending.html', email=email, headings=headings, data=monthly_spending, error = error, start = start_date, end = end_date)
+        return render_template('customer_templates/customer_spending.html', email=email, headings=headings, data=monthly_spending, error = error, start = start_date, end = end_date,start_year = start_date, end_year = end_date, total = total_spending)
     else:
         cursor.close()
         headings = ("January", "February", "March", "April", "May", "June", "July","August", "September", "October",
                     "November","December")
-        return render_template('customer_templates/customer_spending.html', email=email, headings=headings, data=monthly_spending, start = start_date, end = end_date)
+        return render_template('customer_templates/customer_spending.html', email=email, headings=headings, data=monthly_spending, start = start_date, end = end_date, start_year = start_date, end_year = end_date, total = total_spending)
 
 
 
@@ -410,12 +424,14 @@ def customer_spending():
     default_string = default_time.strftime('%Y-%m-%d %H:%M:%S')
     end = now.strftime('%Y-%m-%d')
     start = default_time.strftime('%Y-%m-%d')
+    default_total_time = now - relativedelta(months=12)
+    default_total_string = default_total_time.strftime('%Y-%m-%d %H:%M:%S')
     query = 'SELECT sold_price, PurchaseDateandTime FROM purchase where EmailAddress = %s AND PurchaseDateandTime > %s'
     cursor.execute(query, (email,default_string))
     data = cursor.fetchall()
-    print(data)
     monthly_spending = [{"January":0, "February": 0, "March":0, "April": 0, "May": 0, "June":0, "July":0, "August":0,
                         "September":0, "October":0, "November":0, "December":0}]
+    total = 0
     if data:
         for item in data:
             date_time = item.get("PurchaseDateandTime")
@@ -457,16 +473,22 @@ def customer_spending():
         monthly_spending[0]["October"] = round(monthly_spending[0]["October"],2)
         monthly_spending[0]["November"] = round(monthly_spending[0]["November"],2)
         monthly_spending[0]["December"] = round(monthly_spending[0]["December"],2)
+        query = 'SELECT sold_price, PurchaseDateandTime FROM purchase where EmailAddress = %s AND PurchaseDateandTime > %s'
+        cursor.execute(query, (email,default_total_string))
+        data = cursor.fetchall()
+        for item in data:
+            total += round(item.get("sold_price"),2)
+        total = round(total,2)
         cursor.close()
         headings = ("January", "February", "March", "April", "May", "June", "July","August", "September", "October",
                     "November","December")
-        return render_template('customer_templates/customer_spending.html', email=email, headings=headings, data=monthly_spending, start = start, end = end)
+        return render_template('customer_templates/customer_spending.html', email=email, headings=headings, data=monthly_spending, start = start, end = end, start_year = default_total_string, end_year = end, total= total)
 
     else:
         cursor.close()
         headings = ("January", "February", "March", "April", "May", "June", "July","August", "September", "October",
                     "November","December")
-        return render_template('customer_templates/customer_spending.html', email=email, headings=headings, data=monthly_spending, start = start, end = end)
+        return render_template('customer_templates/customer_spending.html', email=email, headings=headings, data=monthly_spending, start = start, end = end,start_year = default_total_string, end_year = end, total= total)
 
 
 
@@ -623,10 +645,11 @@ def rate_and_comment_on_flight():
         flight_number = data[0].get("FlightNumber")
         query = 'SELECT * FROM rate WHERE EmailAddress = %s AND FlightNumber = %s'
         cursor.execute(query,(email,flight_number))
-        rating = cursor.fetchone()
-        if rating:
+        data3 = cursor.fetchone()
+        if data3:
             can_rate = False
     if can_rate:
+        print(data)
         email = session['email']
         flight_number = data[0].get("FlightNumber")
         Departure_Date_and_Time = data[0].get("DepartureDateandTime")
