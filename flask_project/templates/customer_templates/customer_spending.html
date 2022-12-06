@@ -4,17 +4,23 @@
 <body>
 <form action="/post" method="POST">
 	<h1>Welcome {{email}}</h1>
+
 </form>
 
-<form action="/rate_and_comment_on_flight" method="POST">
-	<input type="text" name = "Rating" placeholder= "Rating" required/> </br>
-    <input type="text" name = "Comment" placeholder= "Comment" required/> </br>
-	<input type="text" name = "TicketIDNumber" placeholder= "TicketIDNumber" required/> </br>
-	<input type="submit" value = "Rate Flight" />
+
+<form action="/track_spending" method="POST">
+	<input type="text" name = "start_date" placeholder= "Start Date, format(yyyy-mm-dd)" style="width:200px" required/> </br>
+    <input type="text" name = "end_date" placeholder= "End Date, format(yyyy-mm-dd)" style="width:200px" required/> </br>
+	<input type="submit" value = "Track Spending" />
 	{% if error %}
 		<p class="error"><strong>Error:</strong> {{error}}</p>
 	{% endif %}
 </form>
+
+<form action="/post" method="POST">
+	<h3>Tracking Spending Between {{start}} And {{end}}</h3>
+</form>
+
 	<style type="text/css">
 		table, th, td {
 			border: 1px solid black;

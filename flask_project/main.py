@@ -1,6 +1,7 @@
 # Import Flask Library
 from flask import Flask, render_template, request, session, url_for, redirect
 from datetime import datetime, timedelta
+from dateutil.relativedelta import relativedelta
 import pymysql.cursors
 import hashlib
 
@@ -311,6 +312,165 @@ def customer_home():
     headings = ("Airline Name", "Flight Number", "Departure Date and Time", "Arrival Date and Time", "Status")
     return render_template('customer_templates/customer_home.html', email=email, headings=headings, data=data)
 
+@app.route('/track_spending',methods=['GET', 'POST'])
+def track_spending():
+    email = session['email']
+    cursor=conn.cursor()
+    now = datetime.now()
+    dt_string = now.strftime('%Y-%m-%d %H:%M:%S')
+    default_time = now - relativedelta(months = 6)
+    default_string = default_time.strftime('%Y-%m-%d %H:%M:%S')
+    start_date = request.form['start_date']
+    start_list = start_date.split('-')
+    print(start_list)
+    start_list = list(map(int,start_list))
+    print(start_list)
+    end_date = request.form['end_date']
+    end_list = end_date.split('-')
+    end_list = list(map(int,end_list))
+    start_datetime = datetime(start_list[0],start_list[1],start_list[2])
+    end_datetime = datetime(end_list[0],end_list[1],end_list[2])
+    valid_date = True
+    if end_datetime > now:
+        valid_date = False
+    start_string = start_datetime.strftime('%Y-%m-%d %H:%M:%S')
+    end_string = end_datetime.strftime('%Y-%m-%d %H:%M:%S')
+    query = 'SELECT sold_price, PurchaseDateandTime FROM purchase where EmailAddress = %s AND PurchaseDateandTime > %s and PurchaseDateandTime < %s'
+    cursor.execute(query, (email,start_string, end_string))
+    data = cursor.fetchall()
+    print(data)
+    monthly_spending = [{"January":0, "February": 0, "March":0, "April": 0, "May": 0, "June":0, "July":0, "August":0,
+                        "September":0, "October":0, "November":0, "December":0}]
+    if (data) and (valid_date):
+        for item in data:
+            date_time = item.get("PurchaseDateandTime")
+            money_spent = round(item.get("sold_price"),2)
+            month_string = date_time.strftime("%m")
+            if month_string == "01":
+                monthly_spending[0]["January"] += money_spent
+            elif month_string == "02":
+                monthly_spending[0]["February"] += money_spent
+            elif month_string == "03":
+                monthly_spending[0]["March"] += money_spent
+            elif month_string == "04":
+                monthly_spending[0]["April"] += money_spent
+            elif month_string == "05":
+                monthly_spending[0]["May"] += money_spent
+            elif month_string == "06":
+                monthly_spending[0]["June"] += money_spent
+            elif month_string == "07":
+                monthly_spending[0]["July"] += money_spent
+            elif month_string == "08":
+                monthly_spending[0]["August"] += money_spent
+            elif month_string == "09":
+                monthly_spending[0]["September"] += money_spent
+            elif month_string == "10":
+                monthly_spending[0]["October"] += money_spent
+            elif month_string == "11":
+                monthly_spending[0]["November"] += money_spent
+            elif month_string == "12":
+                monthly_spending[0]["December"] += money_spent
+        monthly_spending[0]["January"] = round(monthly_spending[0]["January"],2)
+        monthly_spending[0]["February"] = round(monthly_spending[0]["February"],2)
+        monthly_spending[0]["March"] = round(monthly_spending[0]["March"],2)
+        monthly_spending[0]["April"] = round(monthly_spending[0]["April"],2)
+        monthly_spending[0]["May"] = round(monthly_spending[0]["May"],2)
+        monthly_spending[0]["June"] = round(monthly_spending[0]["June"],2)
+        monthly_spending[0]["July"] = round(monthly_spending[0]["July"],2)
+        monthly_spending[0]["August"] = round(monthly_spending[0]["August"],2)
+        monthly_spending[0]["September"] = round(monthly_spending[0]["September"],2)
+        monthly_spending[0]["October"] = round(monthly_spending[0]["October"],2)
+        monthly_spending[0]["November"] = round(monthly_spending[0]["November"],2)
+        monthly_spending[0]["December"] = round(monthly_spending[0]["December"],2)
+        cursor.close()
+        headings = ("January", "February", "March", "April", "May", "June", "July","August", "September", "October",
+                    "November","December")
+        return render_template('customer_templates/customer_spending.html', email=email, headings=headings, data=monthly_spending, start = start_date, end = end_date)
+    elif (data):
+        cursor.close()
+        error = "Invalid Date"
+        headings = ("January", "February", "March", "April", "May", "June", "July","August", "September", "October",
+                    "November","December")
+        return render_template('customer_templates/customer_spending.html', email=email, headings=headings, data=monthly_spending, error = error, start = start_date, end = end_date)
+    else:
+        cursor.close()
+        headings = ("January", "February", "March", "April", "May", "June", "July","August", "September", "October",
+                    "November","December")
+        return render_template('customer_templates/customer_spending.html', email=email, headings=headings, data=monthly_spending, start = start_date, end = end_date)
+
+
+
+@app.route('/customer_spending')
+def customer_spending():
+    email = session['email']
+    cursor=conn.cursor()
+    now = datetime.now()
+    dt_string = now.strftime('%Y-%m-%d %H:%M:%S')
+    default_time = now - relativedelta(months = 6)
+    default_string = default_time.strftime('%Y-%m-%d %H:%M:%S')
+    end = now.strftime('%Y-%m-%d')
+    start = default_time.strftime('%Y-%m-%d')
+    query = 'SELECT sold_price, PurchaseDateandTime FROM purchase where EmailAddress = %s AND PurchaseDateandTime > %s'
+    cursor.execute(query, (email,default_string))
+    data = cursor.fetchall()
+    print(data)
+    monthly_spending = [{"January":0, "February": 0, "March":0, "April": 0, "May": 0, "June":0, "July":0, "August":0,
+                        "September":0, "October":0, "November":0, "December":0}]
+    if data:
+        for item in data:
+            date_time = item.get("PurchaseDateandTime")
+            money_spent = round(item.get("sold_price"),2)
+            month_string = date_time.strftime("%m")
+            if month_string == "01":
+                monthly_spending[0]["January"] += money_spent
+            elif month_string == "02":
+                monthly_spending[0]["February"] += money_spent
+            elif month_string == "03":
+                monthly_spending[0]["March"] += money_spent
+            elif month_string == "04":
+                monthly_spending[0]["April"] += money_spent
+            elif month_string == "05":
+                monthly_spending[0]["May"] += money_spent
+            elif month_string == "06":
+                monthly_spending[0]["June"] += money_spent
+            elif month_string == "07":
+                monthly_spending[0]["July"] += money_spent
+            elif month_string == "08":
+                monthly_spending[0]["August"] += money_spent
+            elif month_string == "09":
+                monthly_spending[0]["September"] += money_spent
+            elif month_string == "10":
+                monthly_spending[0]["October"] += money_spent
+            elif month_string == "11":
+                monthly_spending[0]["November"] += money_spent
+            elif month_string == "12":
+                monthly_spending[0]["December"] += money_spent
+        monthly_spending[0]["January"] = round(monthly_spending[0]["January"],2)
+        monthly_spending[0]["February"] = round(monthly_spending[0]["February"],2)
+        monthly_spending[0]["March"] = round(monthly_spending[0]["March"],2)
+        monthly_spending[0]["April"] = round(monthly_spending[0]["April"],2)
+        monthly_spending[0]["May"] = round(monthly_spending[0]["May"],2)
+        monthly_spending[0]["June"] = round(monthly_spending[0]["June"],2)
+        monthly_spending[0]["July"] = round(monthly_spending[0]["July"],2)
+        monthly_spending[0]["August"] = round(monthly_spending[0]["August"],2)
+        monthly_spending[0]["September"] = round(monthly_spending[0]["September"],2)
+        monthly_spending[0]["October"] = round(monthly_spending[0]["October"],2)
+        monthly_spending[0]["November"] = round(monthly_spending[0]["November"],2)
+        monthly_spending[0]["December"] = round(monthly_spending[0]["December"],2)
+        cursor.close()
+        headings = ("January", "February", "March", "April", "May", "June", "July","August", "September", "October",
+                    "November","December")
+        return render_template('customer_templates/customer_spending.html', email=email, headings=headings, data=monthly_spending, start = start, end = end)
+
+    else:
+        cursor.close()
+        headings = ("January", "February", "March", "April", "May", "June", "July","August", "September", "October",
+                    "November","December")
+        return render_template('customer_templates/customer_spending.html', email=email, headings=headings, data=monthly_spending, start = start, end = end)
+
+
+
+
 
 @app.route('/delete_flight', methods=['GET', 'POST'])
 def delete_flight():
@@ -456,9 +616,16 @@ def rate_and_comment_on_flight():
     data = cursor.fetchall()
     if not data:
         can_rate = False
-    query = 'SELECT FlightNumber,DepartureDateandTime, AirlineName FROM ticket WHERE TicketIDNumber = %s'
-    cursor.execute(query,TicketIDNumber)
+    query = 'SELECT FlightNumber,DepartureDateandTime, AirlineName FROM ticket WHERE TicketIDNumber = %s AND DepartureDateandTime < %s'
+    cursor.execute(query,(TicketIDNumber,dt_string))
     data = cursor.fetchall()
+    if data:
+        flight_number = data[0].get("FlightNumber")
+        query = 'SELECT * FROM rate WHERE EmailAddress = %s AND FlightNumber = %s'
+        cursor.execute(query,(email,flight_number))
+        rating = cursor.fetchone()
+        if rating:
+            can_rate = False
     if can_rate:
         email = session['email']
         flight_number = data[0].get("FlightNumber")
@@ -535,7 +702,7 @@ def rate_and_comment_on_flight():
             for items in data:
                 ticketids.append(items['TicketIDNumber'])
             tupleticketids = tuple(ticketids)
-            query2 = 'SELECT FlightNumber, TicketIDNumber FROM ticket WHERE DepartureDateandTime >= %s AND TicketIDNumber IN {}'.format(str(tupleticketids))
+            query2 = 'SELECT FlightNumber, TicketIDNumber FROM ticket WHERE DepartureDateandTime < %s AND TicketIDNumber IN {}'.format(str(tupleticketids))
             cursor.execute(query2, dt_string)
             data1 = cursor.fetchall()
             if len(data1) == 1:
@@ -561,7 +728,7 @@ def rate_and_comment_on_flight():
                     item.update({"TicketIDNumber": tupleticketids[i]})
                     i+=1
         headings = ("Airline Name", "Flight Number", "Departure Date and Time", "Arrival Date and Time", "Status", "TicketIDNumber")
-        error = "Flight cannot be deleted"
+        error = "Flight cannot be rated"
         return render_template('customer_templates/customer_previous_flights.html', email=email, headings=headings, data=results, error = error)
 
 
