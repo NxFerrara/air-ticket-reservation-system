@@ -97,9 +97,21 @@ body {
 		</tbody>
 	</table>
 	<br>
-<a href="/search_flights">Search Flights</a>
-<a href="/airline_staff_logout">Logout</a>
-
+	{% endif %}
+	{% if not data %}
+		<p class="error">There are currently no future Flights</p>
+	{% endif %}
+	</br>
+	<button class="button" onclick="window.location.href=`{{ url_for('search_flights_airline_staff') }}`;">Search Flights</button>
+	<button class="button" onclick="window.location.href=`{{ url_for('insert_new_flight') }}`;">Insert New Flight</button>
+	<button class="button" onclick="window.location.href=`{{ url_for('insert_new_airplane') }}`;">Insert New Airplane</button>
+	<button class="button" onclick="window.location.href=`{{ url_for('insert_new_airport') }}`;">Add New Airport</button>
+	<button class="button" onclick="window.location.href=`{{ url_for('ticket_stats') }}`;">Ticket Revenue</button>
+	<button class="button" onclick="window.location.href=`{{ url_for('customer_stats') }}`;">Customers</button>
+	</br>
+	</br>
+	<button class="button" onclick="window.location.href=`{{ url_for('airline_staff_logout') }}`;">Logout</button>
+</div>
 </body>
 
 
