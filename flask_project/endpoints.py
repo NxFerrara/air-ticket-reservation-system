@@ -203,6 +203,7 @@ def airline_staff_login_auth():
         error = 'Invalid login or username'
         return render_template('airline_staff_templates/airline_staff_login.html', error=error)
 
+
 @app.route('/airline_staff_home')
 def airline_staff_home():
     if session.get('is_airline_staff'):
@@ -226,8 +227,7 @@ def airline_staff_home():
     else:
         return render_template('home_templates/unauthorized_access.html', is_customer=session.get('is_customer'),
                                is_airline_staff=session.get('is_airline_staff'))
-    
-    
+
 
 @app.route('/insert_new_flight')
 def insert_new_flight():
@@ -934,6 +934,7 @@ def search_round_trip_query():
 @app.route('/purchase_ticket/<row_data>')
 def purchase_ticket(row_data):
     return render_template('customer_templates/purchase_ticket.html')
+
 
 # Define route for customer home page
 @app.route('/customer_home')
