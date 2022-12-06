@@ -1,0 +1,47 @@
+<html>
+<head>
+</head>
+<body>
+
+<h3>Monthly Spending Between {{start}} and {{end}}</h3>
+
+<form action="/customer_track_spending_custom" method="POST">
+	<input type="text" name = "start_date" placeholder= "Start Date, format(yyyy-mm-dd)" style="width:200px"
+           required/> </br>
+    <input type="text" name = "end_date" placeholder= "End Date, format(yyyy-mm-dd)" style="width:200px"
+           required/> </br>
+	<input type="submit" value = "Track Spending" />
+	{% if error %}
+		<p class="error"><strong>Error:</strong> {{error}}</p>
+	{% endif %}
+</form>
+
+	<style type="text/css">
+		table, th, td {
+			border: 1px solid black;
+		}
+	</style>
+	<table>
+		<tr>
+			{% for header in headings %}
+			<th>{{ header }}</th>
+			{% endfor %}
+		</tr>
+		{% for row in data %}
+		<tr>
+			{% for key in row.keys() %}
+			<td>{{ row[key] }}</td>
+			{% endfor %}
+		</tr>
+		{% endfor %}
+	</table>
+<form action="/post" method="POST">
+	<h3>Total Spending Between {{start_year}} and {{end_year}} is ${{total}}</h3>
+</form>
+<a href="/customer_home">Go back</a> &nbsp
+<a href="/customer_logout">Logout</a> &nbsp
+
+</body>
+
+
+</html>

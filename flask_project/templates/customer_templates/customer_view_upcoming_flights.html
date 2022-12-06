@@ -2,9 +2,16 @@
 <head>
 </head>
 <body>
-<form action="/post" method="POST">
-	<h1>Welcome {{email}}</h1>
 
+<form action="/customer_cancel_trip" method="POST">
+	<input type="text" name = "TicketIDNumber" placeholder= "TicketIDNumber" required/> </br>
+	<input type="submit" value = "Delete Flight" />
+	{% if error %}
+		<p class="error"><strong>Error:</strong> {{error}}</p>
+	{% endif %}
+	{% if context %}
+		<p class="context"><strong>Message:</strong> {{context}}</p>
+	{% endif %}
 </form>
 	<style type="text/css">
 		table, th, td {
@@ -26,10 +33,7 @@
 		{% endfor %}
 	</table>
 	<br>
-<a href="/customer_view_previous_flights">View My Previous Flights</a> &nbsp
-<a href="/customer_view_upcoming_flights">View My Upcoming Flights</a> &nbsp
-<a href="/search_flights">Search Flights</a> &nbsp
-<a href="/customer_track_spending">Track My Spending</a> &nbsp
+<a href="/customer_home">Go back</a> &nbsp
 <a href="/customer_logout">Logout</a> &nbsp
 
 </body>

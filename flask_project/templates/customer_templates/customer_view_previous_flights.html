@@ -2,15 +2,17 @@
 <head>
 </head>
 <body>
-<form action="/post" method="POST">
-	<h1>Welcome {{email}}</h1>
-</form>
 
-<form action="/delete_flight" method="POST">
+<form action="/customer_rate_and_comment" method="POST">
+	<input type="text" name = "Rating" placeholder= "Rating" required/> </br>
+    <input type="text" name = "Comment" placeholder= "Comment" required/> </br>
 	<input type="text" name = "TicketIDNumber" placeholder= "TicketIDNumber" required/> </br>
-	<input type="submit" value = "Delete Flight" />
+	<input type="submit" value = "Submit Rating"/>
 	{% if error %}
 		<p class="error"><strong>Error:</strong> {{error}}</p>
+	{% endif %}
+	{% if context %}
+		<p class="context"><strong>Message:</strong> {{context}}</p>
 	{% endif %}
 </form>
 	<style type="text/css">
@@ -33,8 +35,8 @@
 		{% endfor %}
 	</table>
 	<br>
-<a href="/customer_home">Go back</a>
-<a href="/customer_logout">Logout</a>
+<a href="/customer_home">Go back</a> &nbsp
+<a href="/customer_logout">Logout</a> &nbsp
 
 </body>
 
