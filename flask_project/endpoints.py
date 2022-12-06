@@ -111,6 +111,10 @@ def airline_staff_register_auth():
     date_of_birth = request.form['date_of_birth']
     airline_name = request.form['airline_name']
 
+    date_of_birth = datetime.strptime(date_of_birth, "%Y-%m-%d")
+    phonenum = request.form['phone_number'].split(',')
+    email = request.form['email'].split(',')
+
     # cursor used to send queries
     cursor = conn.cursor()
     # executes query
@@ -129,6 +133,14 @@ def airline_staff_register_auth():
         ins = 'INSERT INTO airlinestaff VALUES(%s, %s, %s, %s, %s, %s)'
         cursor.execute(ins, (username, md5(password), first_name, last_name, date_of_birth, airline_name))
         conn.commit()
+        for i in email:
+            ins = 'INSERT INTO staffemailaddress VALUES(%s,%s)'
+            cursor.execute(ins, (username, i))
+            conn.commit()
+        for i in phonenum:
+            ins = 'INSERT INTO staffphonenumber VALUES(%s,%s)'
+            cursor.execute(ins, (username, i))
+            conn.commit()
         cursor.close()
         message = "Staff member successfully registered!"
         return render_template('airline_staff_templates/airline_staff_register.html', context=message)
