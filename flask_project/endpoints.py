@@ -977,8 +977,8 @@ def customer_view_previous_flights():
             if data1:
                 flight_number = data1.get("FlightNumber")
                 query3 = 'SELECT AirlineName, FlightNumber, DepartureDateandTime, ArrivalDateandTime, Status FROM ' \
-                         'flight WHERE FlightNumber = %s'
-                cursor.execute(query3, flight_number)
+                         'flight WHERE FlightNumber = %s AND DepartureDateandTime < %s'
+                cursor.execute(query3, (flight_number,dt_string))
                 results = cursor.fetchall()
                 results[0].update({"TicketIDNumber": ticket_id})
         elif len(data) > 1:
@@ -994,8 +994,8 @@ def customer_view_previous_flights():
                 ticket_id = data1[0].get("TicketIDNumber")
                 flight_number = data1[0].get("FlightNumber")
                 query3 = 'SELECT AirlineName, FlightNumber, DepartureDateandTime, ArrivalDateandTime, Status FROM ' \
-                         'flight WHERE FlightNumber = %s'
-                cursor.execute(query3, flight_number)
+                         'flight WHERE FlightNumber = %s AND DepartureDateandTime < %s'
+                cursor.execute(query3, (flight_number,dt_string))
                 results = cursor.fetchall()
                 results[0].update({"TicketIDNumber": ticket_id})
             elif len(data1) > 1:
@@ -1007,8 +1007,8 @@ def customer_view_previous_flights():
                     flight_numbers.append(item['FlightNumber'])
                 tuple_flight_numbers = tuple(flight_numbers)
                 query3 = 'SELECT AirlineName, FlightNumber, DepartureDateandTime, ArrivalDateandTime, Status FROM ' \
-                         'flight WHERE FlightNumber IN {}'.format(str(tuple_flight_numbers))
-                cursor.execute(query3)
+                         'flight WHERE DepartureDateandTime < %s AND FlightNumber IN {}'.format(str(tuple_flight_numbers))
+                cursor.execute(query3, dt_string)
                 results = cursor.fetchall()
                 i = 0
                 for item in results:
@@ -1197,8 +1197,8 @@ def customer_view_upcoming_flights():
             if data1:
                 flight_number = data1.get("FlightNumber")
                 query3 = 'SELECT AirlineName, FlightNumber, DepartureDateandTime, ArrivalDateandTime, Status FROM ' \
-                         'flight WHERE FlightNumber = %s'
-                cursor.execute(query3, flight_number)
+                         'flight WHERE FlightNumber = %s AND DepartureDateandTime >= %s'
+                cursor.execute(query3, (flight_number,dt_string))
                 results = cursor.fetchall()
                 results[0].update({"TicketIDNumber": ticket_id})
         elif len(data) > 1:
@@ -1214,8 +1214,8 @@ def customer_view_upcoming_flights():
                 ticket_id = data1[0].get("TicketIDNumber")
                 flight_number = data1[0].get("FlightNumber")
                 query3 = 'SELECT AirlineName, FlightNumber, DepartureDateandTime, ArrivalDateandTime, Status FROM ' \
-                         'flight WHERE FlightNumber = %s'
-                cursor.execute(query3, flight_number)
+                         'flight WHERE FlightNumber = %s AND DepartureDateandTime >= %s'
+                cursor.execute(query3, (flight_number, dt_string))
                 results = cursor.fetchall()
                 results[0].update({"TicketIDNumber": ticket_id})
             elif len(data1) > 1:
@@ -1227,8 +1227,8 @@ def customer_view_upcoming_flights():
                     flight_numbers.append(item['FlightNumber'])
                 tuple_flight_numbers = tuple(flight_numbers)
                 query3 = 'SELECT AirlineName, FlightNumber, DepartureDateandTime, ArrivalDateandTime, Status FROM ' \
-                         'flight WHERE FlightNumber IN {}'.format(str(tuple_flight_numbers))
-                cursor.execute(query3)
+                         'flight WHERE DepartureDateandTime >= %s AND FlightNumber IN {}'.format(str(tuple_flight_numbers))
+                cursor.execute(query3, dt_string)
                 results = cursor.fetchall()
                 i = 0
                 for item in results:
