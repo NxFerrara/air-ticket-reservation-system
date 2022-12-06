@@ -858,8 +858,7 @@ def search_one_way():
 # Define route for user to search for flights
 @app.route('/search_round_trip')
 def search_round_trip():
-    return render_template('home_templates/search_round_trip.html', is_customer=session.get('is_customer'),
-                           is_airline_staff=session.get('is_airline_staff'))
+    return render_template('home_templates/search_round_trip.html', is_customer=session.get('is_customer'))
 
 
 # Define route for querying for one way flights
@@ -888,11 +887,11 @@ def search_one_way_query():
         headings = ("Airline Name", "Flight Number", "Departure Airport",
                     "Arrival Airport", "Departure Date and Time", "Arrival Date and Time", "Purchase")
         return render_template('home_templates/search_one_way.html', is_customer=session.get('is_customer'),
-                               is_airline_staff=session.get('is_airline_staff'), headings=headings, data=data)
+                               headings=headings, data=data)
     else:
         error = "No future one way flights found for that search result"
         return render_template('home_templates/search_one_way.html', is_customer=session.get('is_customer'),
-                               is_airline_staff=session.get('is_airline_staff'), error=error)
+                               error=error)
 
 
 # Define route for querying for round trip flights
@@ -923,12 +922,11 @@ def search_round_trip_query():
         headings = ("Airline Name", "Flight Number", "Departure Airport",
                     "Arrival Airport", "Departure Date and Time", "Arrival Date and Time")
         return render_template('home_templates/search_round_trip.html', is_customer=session.get('is_customer'),
-                               is_airline_staff=session.get('is_airline_staff'), headings=headings,
-                               data1=data1, data2=data2)
+                               headings=headings, data1=data1, data2=data2)
     else:
         error = "No future round trip flights found for that search result"
         return render_template('home_templates/search_round_trip.html', is_customer=session.get('is_customer'),
-                               is_airline_staff=session.get('is_airline_staff'), error=error)
+                               error=error)
 
 
 @app.route('/purchase_ticket/<row_data>')
@@ -964,61 +962,16 @@ def customer_view_previous_flights():
         # cursor used to send queries
         cursor = conn.cursor()
         # executes query
-        query = 'SELECT TicketIDNumber FROM purchase WHERE EmailAddress = %s'
+        query = 'SELECT AirlineName, FlightNumber, DepartureDateandTime, ArrivalDateandTime, ' \
+                'Status, Class, ticket.TicketIDNumber FROM ticket NATURAL JOIN flight, purchase ' \
+                'WHERE purchase.TicketIDNumber = ticket.TicketIDNumber AND EmailAddress = %s ' \
+                'AND DepartureDateandTime < DATE(NOW())'
         cursor.execute(query, email)
         data = cursor.fetchall()
-        results = []
-        now = datetime.now()
-        dt_string = now.strftime('%Y-%m-%d %H:%M:%S')
-        if len(data) == 1:
-            ticket_id = data[0].get("TicketIDNumber")
-            query2 = 'SELECT FlightNumber FROM ticket WHERE TicketIDNumber = %s AND DepartureDateandTime < %s'
-            cursor.execute(query2, (ticket_id, dt_string))
-            data1 = cursor.fetchone()
-            if data1:
-                flight_number = data1.get("FlightNumber")
-                query3 = 'SELECT AirlineName, FlightNumber, DepartureDateandTime, ArrivalDateandTime, Status FROM ' \
-                         'flight WHERE FlightNumber = %s AND DepartureDateandTime < %s'
-                cursor.execute(query3, (flight_number,dt_string))
-                results = cursor.fetchall()
-                results[0].update({"TicketIDNumber": ticket_id})
-        elif len(data) > 1:
-            ticket_ids = []
-            for items in data:
-                ticket_ids.append(items['TicketIDNumber'])
-            tuple_ticket_ids = tuple(ticket_ids)
-            query2 = 'SELECT FlightNumber, TicketIDNumber FROM ticket WHERE DepartureDateandTime < %s AND ' \
-                     'TicketIDNumber IN {}'.format(str(tuple_ticket_ids))
-            cursor.execute(query2, dt_string)
-            data1 = cursor.fetchall()
-            if len(data1) == 1:
-                ticket_id = data1[0].get("TicketIDNumber")
-                flight_number = data1[0].get("FlightNumber")
-                query3 = 'SELECT AirlineName, FlightNumber, DepartureDateandTime, ArrivalDateandTime, Status FROM ' \
-                         'flight WHERE FlightNumber = %s AND DepartureDateandTime < %s'
-                cursor.execute(query3, (flight_number,dt_string))
-                results = cursor.fetchall()
-                results[0].update({"TicketIDNumber": ticket_id})
-            elif len(data1) > 1:
-                flight_numbers = []
-                ticket_ids = []
-                for items in data1:
-                    ticket_ids.append(items['TicketIDNumber'])
-                for item in data1:
-                    flight_numbers.append(item['FlightNumber'])
-                tuple_flight_numbers = tuple(flight_numbers)
-                query3 = 'SELECT AirlineName, FlightNumber, DepartureDateandTime, ArrivalDateandTime, Status FROM ' \
-                         'flight WHERE DepartureDateandTime < %s AND FlightNumber IN {}'.format(str(tuple_flight_numbers))
-                cursor.execute(query3, dt_string)
-                results = cursor.fetchall()
-                i = 0
-                for item in results:
-                    item.update({"TicketIDNumber": tuple_ticket_ids[i]})
-                    i += 1
         headings = ("Airline Name", "Flight Number", "Departure Date and Time", "Arrival Date and Time", "Status",
-                    "TicketIDNumber")
+                    "Class", "TicketIDNumber")
         return render_template('customer_templates/customer_view_previous_flights.html', email=email,
-                               headings=headings, data=results)
+                               headings=headings, data=data)
     else:
         return render_template('home_templates/unauthorized_access.html', is_customer=session.get('is_customer'),
                                is_airline_staff=session.get('is_airline_staff'))

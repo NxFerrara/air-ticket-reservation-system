@@ -18,10 +18,7 @@
 {% if is_customer %}
 	<a href="/customer_home">Go back</a>
 {% endif %}
-{% if is_airline_staff %}
-	<a href="/airline_staff_home">Go back</a>
-{% endif %}
-{% if not is_customer and not is_airline_staff %}
+{% if not is_customer %}
 	<a href="/">Go back</a>
 {% endif %}
 </body>
