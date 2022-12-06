@@ -21,6 +21,13 @@ conn = pymysql.connect(host='localhost',
 # Define route for index
 @app.route('/')
 def index():
+    if session.get('is_airline_staff'):
+        session.pop('username')
+        session.pop('is_airline_staff')
+        session.pop('airline_name')
+    elif session.get('is_customer'):
+        session.pop('email')
+        session.pop('is_customer')
     # cursor used to send queries
     cursor = conn.cursor()
     # executes query
@@ -845,14 +852,12 @@ def exec_customer_stats(customerData):
 # Define route for user to search for flights
 @app.route('/search_flights')
 def search_flights():
-    return render_template('home_templates/search_for_flights.html', is_customer=session.get('is_customer'),
-                           is_airline_staff=session.get('is_airline_staff'))
+    return render_template('home_templates/search_for_flights.html', is_customer=session.get('is_customer'))
 
 
 @app.route('/search_one_way')
 def search_one_way():
-    return render_template('home_templates/search_one_way.html', is_customer=session.get('is_customer'),
-                           is_airline_staff=session.get('is_airline_staff'))
+    return render_template('home_templates/search_one_way.html', is_customer=session.get('is_customer'))
 
 
 # Define route for user to search for flights
@@ -1312,6 +1317,7 @@ def customer_logout():
 def airline_staff_logout():
     session.pop('username')
     session.pop('is_airline_staff')
+    session.pop('airline_name')
     return redirect('/')
 
 
