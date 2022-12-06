@@ -1062,137 +1062,32 @@ def customer_cancel_trip():
         email = session['email']
         # grabs information from the forms
         ticket_id_number = request.form['TicketIDNumber']
-        can_delete = True
-        time_now = datetime.now()
-        date_time_string = time_now.strftime('%Y-%m-%d %H:%M:%S')
-        time_later = time_now + timedelta(24)
-        later_string = time_later.strftime('%Y-%m-%d %H:%M:%S')
         cursor = conn.cursor()
-        # executes query
-        query = 'SELECT * FROM purchase WHERE TicketIDNumber = %s'
-        cursor.execute(query, ticket_id_number)
-        # stores the results in a variable
-        data = cursor.fetchone()
-        if not data:
-            can_delete = False
+        query = 'SELECT AirlineName, FlightNumber, DepartureDateandTime, ticket.TicketIDNumber ' \
+                'FROM ticket NATURAL JOIN flight, purchase ' \
+                'WHERE purchase.TicketIDNumber = ticket.TicketIDNumber AND ticket.TicketIDNumber = %s ' \
+                'AND EmailAddress = %s AND DepartureDateandTime >= DATE(NOW() + INTERVAL 1 DAY)'
+        cursor.execute(query, (ticket_id_number, email))
+        data = cursor.fetchall()
+        message = "Successfully deleted customer ticket for the flight!"
         error = None
-        query = 'SELECT * From ticket where TicketIDNumber = %s AND DepartureDateandTime > %s'
-        cursor.execute(query, (ticket_id_number, later_string))
-        data = cursor.fetchone()
-        if not data:
-            can_delete = False
-        results = []
-        if can_delete:
-            query1 = 'DELETE FROM purchase WHERE TicketIDNumber = %s'
-            cursor.execute(query1, ticket_id_number)
+        if data:
+            query = 'DELETE FROM ticket WHERE TicketIDNumber = %s'
+            cursor.execute(query, ticket_id_number)
             conn.commit()
-            query = 'SELECT TicketIDNumber FROM purchase WHERE EmailAddress = %s'
-            cursor.execute(query,email)
-            data = cursor.fetchall()
-            if len(data) == 1:
-                ticket_id = data[0].get("TicketIDNumber")
-                query2 = 'SELECT FlightNumber FROM ticket WHERE TicketIDNumber = %s AND DepartureDateandTime >= %s'
-                cursor.execute(query2,(ticket_id, date_time_string))
-                data1 = cursor.fetchone()
-                if data1:
-                    flight_number = data1.get("FlightNumber")
-                    query3 = 'SELECT AirlineName, FlightNumber, DepartureDateandTime, ArrivalDateandTime, Status ' \
-                             'FROM flight WHERE FlightNumber = %s'
-                    cursor.execute(query3, flight_number)
-                    results = cursor.fetchall()
-                    results[0].update({"TicketIDNumber": ticket_id})
-            elif len(data) > 1:
-                ticket_ids = []
-                for items in data:
-                    ticket_ids.append(items['TicketIDNumber'])
-                tuple_ticket_ids = tuple(ticket_ids)
-                query2 = 'SELECT FlightNumber, TicketIDNumber FROM ticket WHERE DepartureDateandTime >= %s AND ' \
-                         'TicketIDNumber IN {}'.format(str(tuple_ticket_ids))
-                cursor.execute(query2, date_time_string)
-                data1 = cursor.fetchall()
-                if len(data1) == 1:
-                    ticket_id = data1[0].get("TicketIDNumber")
-                    flight_number = data1[0].get("FlightNumber")
-                    query3 = 'SELECT AirlineName, FlightNumber, DepartureDateandTime, ArrivalDateandTime, Status ' \
-                             'FROM flight WHERE FlightNumber = %s'
-                    cursor.execute(query3, flight_number)
-                    results = cursor.fetchall()
-                    results[0].update({"TicketIDNumber": ticket_id})
-                elif len(data1) > 1:
-                    flight_numbers = []
-                    ticket_ids= []
-                    for items in data1:
-                        ticket_ids.append(items['TicketIDNumber'])
-                    for item in data1:
-                        flight_numbers.append(item['FlightNumber'])
-                    tuple_flight_numbers = tuple(flight_numbers)
-                    query3 = 'SELECT AirlineName, FlightNumber, DepartureDateandTime, ArrivalDateandTime, Status ' \
-                             'FROM flight WHERE FlightNumber IN {}'.format(str(tuple_flight_numbers))
-                    cursor.execute(query3)
-                    results = cursor.fetchall()
-                    i = 0
-                    for item in results:
-                        item.update({"TicketIDNumber": tuple_ticket_ids[i]})
-                        i += 1
-            headings = ("Airline Name", "Flight Number", "Departure Date and Time", "Arrival Date and Time", "Status",
-                        "TicketIDNumber")
-            message = "Successfully cancelled trip!"
-            return render_template('customer_templates/customer_view_upcoming_flights.html', email=email,
-                                   headings=headings, data=results, context=message)
         else:
-            query = 'SELECT TicketIDNumber FROM purchase WHERE EmailAddress = %s'
-            cursor.execute(query, email)
-            data = cursor.fetchall()
-            if len(data) == 1:
-                ticket_id = data[0].get("TicketIDNumber")
-                query2 = 'SELECT FlightNumber FROM ticket WHERE TicketIDNumber = %s AND DepartureDateandTime < %s'
-                cursor.execute(query2, (ticket_id, date_time_string))
-                data1 = cursor.fetchone()
-                if data1:
-                    flight_number = data1.get("FlightNumber")
-                    query3 = 'SELECT AirlineName, FlightNumber, DepartureDateandTime, ArrivalDateandTime, Status ' \
-                             'FROM flight WHERE FlightNumber = %s'
-                    cursor.execute(query3, flight_number)
-                    results = cursor.fetchall()
-                    results[0].update({"TicketIDNumber": ticket_id})
-            elif len(data) > 1:
-                ticket_ids = []
-                for items in data:
-                    ticket_ids.append(items['TicketIDNumber'])
-                tuple_ticket_ids = tuple(ticket_ids)
-                query2 = 'SELECT FlightNumber, TicketIDNumber FROM ticket WHERE DepartureDateandTime >= %s AND ' \
-                         'TicketIDNumber IN {}'.format(str(tuple_ticket_ids))
-                cursor.execute(query2, date_time_string)
-                data1 = cursor.fetchall()
-                if len(data1) == 1:
-                    ticket_id = data1[0].get("TicketIDNumber")
-                    flight_number = data1[0].get("FlightNumber")
-                    query3 = 'SELECT AirlineName, FlightNumber, DepartureDateandTime, ArrivalDateandTime, Status ' \
-                             'FROM flight WHERE FlightNumber = %s'
-                    cursor.execute(query3, flight_number)
-                    results = cursor.fetchall()
-                    results[0].update({"TicketIDNumber": ticket_id})
-                elif len(data1) > 1:
-                    flight_numbers = []
-                    ticket_ids = []
-                    for items in data1:
-                        ticket_ids.append(items['TicketIDNumber'])
-                    for item in data1:
-                        flight_numbers.append(item['FlightNumber'])
-                    tuple_flight_numbers = tuple(flight_numbers)
-                    query3 = 'SELECT AirlineName, FlightNumber, DepartureDateandTime, ArrivalDateandTime, Status ' \
-                             'FROM flight WHERE FlightNumber IN {}'.format(str(tuple_flight_numbers))
-                    cursor.execute(query3)
-                    results = cursor.fetchall()
-                    i = 0
-                    for item in results:
-                        item.update({"TicketIDNumber": tuple_ticket_ids[i]})
-                        i += 1
-            headings = ("Airline Name", "Flight Number", "Departure Date and Time", "Arrival Date and Time", "Status",
-                        "TicketIDNumber")
-            error = "Cannot cancel trip, please check ticket ID number!"
-            return render_template('customer_templates/customer_view_upcoming_flights.html', email=email,
-                                   headings=headings, data=results, error=error)
+            message = None
+            error = "Entered an invalid ticket ID"
+        query = 'SELECT AirlineName, FlightNumber, DepartureDateandTime, ArrivalDateandTime, ' \
+                'Status, Class, ticket.TicketIDNumber FROM ticket NATURAL JOIN flight, purchase ' \
+                'WHERE purchase.TicketIDNumber = ticket.TicketIDNumber AND EmailAddress = %s ' \
+                'AND DepartureDateandTime >= DATE(NOW())'
+        cursor.execute(query, email)
+        data = cursor.fetchall()
+        headings = ("Airline Name", "Flight Number", "Departure Date and Time", "Arrival Date and Time", "Status",
+                    "Class", "TicketIDNumber")
+        return render_template('customer_templates/customer_view_upcoming_flights.html', email=email,
+                               headings=headings, data=data, error=error, context=message)
     else:
         return render_template('home_templates/unauthorized_access.html', is_customer=session.get('is_customer'),
                                is_airline_staff=session.get('is_airline_staff'))
