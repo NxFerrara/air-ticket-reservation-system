@@ -30,11 +30,28 @@
 	{% if not data %}
 		<p class="error">There are currently no future Flights</p>
 	{% endif %}
-<a href="/search_flights_airline_staff">Search Flights</a>
-<a href="/insert_new_flight">Insert New Flight</a>
-<a href="/insert_new_airplane">Insert New Airplane</a>
-<a href="/insert_new_airport"> Add New Airport</a>
-<a href="/airline_staff_logout">Logout</a>
+<style>
+.button {
+	background-color: rgba(128, 64, 255, 0.6);
+	border: 2px solid black;
+	color: white;
+	padding: 0px 5px;
+	text-align: center;
+	display: inline-block;
+	font-size: 20px;
+	margin: 5px 5px;
+	cursor: pointer;
+}
+</style>
+<button class="button" onclick="window.location.href=`{{ url_for('search_flights_airline_staff') }}`;">Search Flights</button>
+<button class="button" onclick="window.location.href=`{{ url_for('insert_new_flight') }}`;">Insert New Flight</button>
+<button class="button" onclick="window.location.href=`{{ url_for('insert_new_airplane') }}`;">Insert New Airplane</button>
+<button class="button" onclick="window.location.href=`{{ url_for('insert_new_airport') }}`;">Add New Airport</button>
+<button class="button" onclick="window.location.href=`{{ url_for('ticket_stats') }}`;">Ticket Revenue</button>
+<button class="button" onclick="window.location.href=`{{ url_for('customer_stats') }}`;">Customers</button>
+</br>
+</br>
+<button class="button" onclick="window.location.href=`{{ url_for('airline_staff_logout') }}`;">Logout</button>
 
 </body>
 

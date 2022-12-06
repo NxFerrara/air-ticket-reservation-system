@@ -1,0 +1,63 @@
+<html>
+<head>
+</head>
+<body>
+
+<style type="text/css">
+	table, th, td {
+		border: 1px solid black;
+	}
+</style>
+{% if data1 %}
+<p class="message"><strong>Most Frequent Flyer(s) within the last year:</strong></p>
+<table>
+	<tr>
+		{% for header in headings1 %}
+		<th>{{ header }}</th>
+		{% endfor %}
+	</tr>
+	{% for row in data1 %}
+	<tr>
+		{% for key in row.keys() %}
+		<td>{{ row[key] }}</td>
+		{% endfor %}
+	</tr>
+	{% endfor %}
+</table>
+{% endif %}
+{% if not data1 %}
+<p class="message"><strong>Message:</strong> No customers have taken flights within the last year</p>
+{% endif %}
+{% if data2 %}
+<p class="message"><strong>All Customers:</strong></p>
+<table>
+	<tr>
+		{% for header in headings2 %}
+		<th>{{ header }}</th>
+		{% endfor %}
+	</tr>
+	{% for row in data2 %}
+	<tr>
+		{% for key in row.keys() %}
+		<td>{{ row[key] }}</td>
+		{% endfor %}
+		<td onclick="window.location.href=`{{ url_for('exec_customer_stats', customerData=row) }}`;">
+			<u style="text-decoration-color:blue">Flights</u></td>
+	</tr>
+	{% endfor %}
+</table>
+<br>
+{% endif %}
+{% if not data2 %}
+<p class="message"><strong>Message:</strong> No customers have taken flights with this airline</p>
+{% endif %}
+{% if message %}
+	<p class="message"><strong>Message:</strong> {{message}}</p>
+{% endif %}
+
+<a href="/airline_staff_home">Go back</a>
+
+</body>
+
+
+</html>
