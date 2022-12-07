@@ -1,6 +1,6 @@
 # Import Flask Library
 from flask import Flask, render_template, request, session, url_for, redirect
-from datetime import datetime, timedelta
+import datetime
 from dateutil.relativedelta import relativedelta
 import pymysql.cursors
 import hashlib
@@ -111,7 +111,7 @@ def airline_staff_register_auth():
     date_of_birth = request.form['date_of_birth']
     airline_name = request.form['airline_name']
 
-    date_of_birth = datetime.strptime(date_of_birth, "%Y-%m-%d")
+    date_of_birth = datetime.datetime.strptime(date_of_birth, "%Y-%m-%d")
     phonenum = request.form['phone_number'].split(',')
     email = request.form['email'].split(',')
 
@@ -281,11 +281,12 @@ def exec_insert_new_flight():
         DepartureAirportName = request.form['DepartureAirportName']
         ArrivalAirportName = request.form['ArrivalAirportName']
         IDNumber = request.form['IDNumber']
+        FlightNumber = request.form['FlightNumber']
         Status = 'On-time'  # By default
         AirlineName = session['airline_name']  # By default
-        DepartureDateandTime = datetime.strptime(DepartureDateandTime, "%Y-%m-%dT%H:%M")
-        ArrivalDateandTime = datetime.strptime(ArrivalDateandTime, "%Y-%m-%dT%H:%M")
-        departure_is_after = DepartureDateandTime > datetime.today()
+        DepartureDateandTime = datetime.datetime.strptime(DepartureDateandTime, "%Y-%m-%dT%H:%M")
+        ArrivalDateandTime = datetime.datetime.strptime(ArrivalDateandTime, "%Y-%m-%dT%H:%M")
+        departure_is_after = DepartureDateandTime > datetime.datetime.today()
         arrival_is_after = ArrivalDateandTime > DepartureDateandTime
         # Query all of the future flights
         futureFlightsQuery = 'SELECT AirlineName, FlightNumber, DepartureAirportName, ArrivalAirportName, ' \
@@ -314,25 +315,9 @@ def exec_insert_new_flight():
                                    headings=headings, data=futureFlights)
         ArrivalDateandTime = ArrivalDateandTime.strftime('%Y-%m-%d %H:%M:%S')
         DepartureDateandTime = DepartureDateandTime.strftime('%Y-%m-%d %H:%M:%S')
-        # executes query
-        query = 'SELECT FlightNumber FROM flight WHERE DepartureDateandTime = %s AND AirlineName = %s'
-        cursor.execute(query, (DepartureDateandTime, AirlineName))
-        # stores the results in a variable
-        flightData = cursor.fetchall()
-        maxFlightNumber = -1
-        for item in flightData:
-            value = item['FlightNumber']
-            if int(value) > maxFlightNumber:
-                maxFlightNumber = int(value)
-        if maxFlightNumber == -1:
-            FlightNumber = 1
-        else:
-            FlightNumber = maxFlightNumber + 1
-
-        # This query checks to make sure one airplane isn't flying multiple flights at
-        # the same time within the same airline
-        query = 'SELECT * FROM flight WHERE IDNumber = %s AND DepartureDateandTime = %s AND AirlineName = %s'
-        cursor.execute(query, (IDNumber, DepartureDateandTime, AirlineName))
+        # This query checks to make sure another flight doesn't already exist
+        query = 'SELECT * FROM flight WHERE FlightNumber = %s AND DepartureDateandTime = %s AND AirlineName = %s'
+        cursor.execute(query, (FlightNumber, DepartureDateandTime, AirlineName))
         # stores the results in a variable
         data = cursor.fetchone()
         # Checking the departure and arrival airports exist and also the airplane
@@ -387,11 +372,10 @@ def exec_insert_new_flight():
                                        headings=headings, data=futureFlights)
             else:
                 ins = 'INSERT INTO flight VALUES(%s, %s, %s, %s, %s, %s, %s, %s, %s)'
-                cursor.execute(ins, (
-                str(FlightNumber), DepartureDateandTime, ArrivalDateandTime, BasePrice, Status, DepartureAirportName,
-                ArrivalAirportName, IDNumber, AirlineName))
+                cursor.execute(ins, (FlightNumber, DepartureDateandTime, ArrivalDateandTime, BasePrice,
+                                     Status, DepartureAirportName, ArrivalAirportName, IDNumber, AirlineName))
                 conn.commit()
-                cursor.execute(futureFlightsQuery)
+                cursor.execute(futureFlightsQuery, (airlineName,))
                 # stores the results in a variable
                 futureFlights = cursor.fetchall()
                 cursor.close()
@@ -412,6 +396,36 @@ def search_flights_airline_staff():
         return render_template('home_templates/unauthorized_access.html', is_customer=session.get('is_customer'),
                                is_airline_staff=session.get('is_airline_staff'))
 
+@app.route('/search_specific_flight_airline_staff_query', methods=['GET', 'POST'])
+def search_specific_flight_airline_staff_query():
+    if session.get('is_airline_staff'):
+        airline_name = session['airline_name']
+        DepartureDateandTime = request.form['DepartureDateandTime']
+        FlightNumber = request.form['FlightNumber']
+        DepartureDateandTime = datetime.datetime.strptime(DepartureDateandTime, "%Y-%m-%dT%H:%M")
+        # executes query
+        query = 'SELECT AirlineName, FlightNumber, DepartureAirportName, ' \
+                'ArrivalAirportName, DepartureDateandTime, ArrivalDateandTime, BasePrice, Status ' \
+                'FROM flight WHERE ' \
+                'AirlineName = %s AND ' \
+                'FlightNumber = %s AND ' \
+                'DepartureDateandTime = %s'
+        cursor = conn.cursor()
+        cursor.execute(query, (airline_name, FlightNumber, DepartureDateandTime))
+        data = cursor.fetchall()
+        cursor.close()
+        error = None
+        if not data:
+            error = "Found no flights with the flight number {} and departure date and time {}".format(FlightNumber,
+                                                                                                       DepartureDateandTime)
+        headings = ("Airline Name", "Flight Number", "Departure Airport",
+                    "Arrival Airport", "Departure Date and Time", "Arrival Date and Time", "Base Price", "Status")
+        return render_template('airline_staff_templates/search_flights_airline_staff.html', headings=headings,
+                               data=data, error=error)
+    else:
+        return render_template('home_templates/unauthorized_access.html', is_customer=session.get('is_customer'),
+                               is_airline_staff=session.get('is_airline_staff'))
+
 
 @app.route('/search_flights_airline_staff_query', methods=['GET', 'POST'])
 def search_flights_airline_staff_query():
@@ -421,13 +435,13 @@ def search_flights_airline_staff_query():
         source_city = request.form['Source City/Airport Name']
         destination_city = request.form['Destination City/Airport Name']
         start_departure_date_and_time = request.form['StartDepartureDateandTime']
-        start_departure_date_and_time = datetime.strptime(start_departure_date_and_time,
+        start_departure_date_and_time = datetime.datetime.strptime(start_departure_date_and_time,
                                                                    "%Y-%m-%dT%H:%M").strftime('%Y-%m-%d %H:%M:%S')
         end_departure_date_and_time = request.form['EndDepartureDateandTime']
         has_end_date = False
         if end_departure_date_and_time != "":
             has_end_date = True
-            end_departure_date_and_time = datetime.strptime(end_departure_date_and_time,
+            end_departure_date_and_time = datetime.datetime.strptime(end_departure_date_and_time,
                                                                      "%Y-%m-%dT%H:%M").strftime('%Y-%m-%d %H:%M:%S')
         cursor = conn.cursor()
         # Checking the departure and arrival airports exist
@@ -457,8 +471,8 @@ def search_flights_airline_staff_query():
                     'ArrivalAirportName = %s AND ' \
                     'DepartureDateandTime >= %s AND ' \
                     'DepartureDateAndTime <= %s'
-            cursor.execute(query, (
-            airline_name, source_city, destination_city, start_departure_date_and_time, end_departure_date_and_time))
+            cursor.execute(query, (airline_name, source_city, destination_city, start_departure_date_and_time,
+                                   end_departure_date_and_time))
         else:
             # executes query
             query = 'SELECT AirlineName, FlightNumber, DepartureAirportName, ' \
@@ -738,13 +752,13 @@ def exec_ticket_stats(revenueData):
         lastMonthRevenue, lastYearRevenue = eval(revenueData)
         airline_name = session['airline_name']
         # grabs information from the forms
-        start_date_and_time = datetime.strptime(request.form['StartDateandTime'],
+        start_date_and_time = datetime.datetime.strptime(request.form['StartDateandTime'],
                                                          "%Y-%m-%dT%H:%M").strftime('%Y-%m-%d %H:%M:%S')
         end_date_and_time = request.form['EndDateandTime']
         has_end_date = False
         if end_date_and_time != "":
             has_end_date = True
-            end_date_and_time = datetime.strptime(end_date_and_time,
+            end_date_and_time = datetime.datetime.strptime(end_date_and_time,
                                                            "%Y-%m-%dT%H:%M").strftime('%Y-%m-%d %H:%M:%S')
         cursor = conn.cursor()
         if has_end_date:
@@ -1126,7 +1140,7 @@ def customer_track_spending():
     if session.get('is_customer'):
         email = session['email']
         cursor = conn.cursor()
-        time_now = datetime.now()
+        time_now = datetime.datetime.now()
         date_time_string = time_now.strftime('%Y-%m-%d %H:%M:%S')
         default_time = time_now - relativedelta(months=6)
         default_string = default_time.strftime('%Y-%m-%d %H:%M:%S')
@@ -1214,7 +1228,7 @@ def customer_track_spending_custom():
     if session.get('is_customer'):
         email = session['email']
         cursor = conn.cursor()
-        time_now = datetime.now()
+        time_now = datetime.datetime.now()
         date_time_string = time_now.strftime('%Y-%m-%d %H:%M:%S')
         default_time = time_now - relativedelta(months=6)
         default_string = default_time.strftime('%Y-%m-%d %H:%M:%S')
@@ -1224,8 +1238,8 @@ def customer_track_spending_custom():
         end_date = request.form['end_date']
         end_list = end_date.split('-')
         end_list = list(map(int, end_list))
-        start_datetime = datetime(start_list[0], start_list[1], start_list[2])
-        end_datetime = datetime(end_list[0], end_list[1], end_list[2])
+        start_datetime = datetime.datetime(start_list[0], start_list[1], start_list[2])
+        end_datetime = datetime.datetime(end_list[0], end_list[1], end_list[2])
         valid_date = True
         if end_datetime > time_now:
             valid_date = False
