@@ -5,21 +5,13 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="d1847208-bc67-48ce-a4fa-b49f167a29e9" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/templates/customer_templates/customer_track_spending.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/templates/customer_templates/customer_view_previous_flights.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/templates/customer_templates/customer_view_upcoming_flights.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/templates/home_templates/unauthorized_access.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/.name" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.name" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/dataSources.local.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/dataSources.local.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/dataSources.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/dataSources.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/dataSources/0507cdd0-51f6-41e7-95a8-bd1352576455.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/dataSources/0507cdd0-51f6-41e7-95a8-bd1352576455.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/flask_project.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/flask_project.iml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/endpoints.py" beforeDir="false" afterPath="$PROJECT_DIR$/endpoints.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/airline_staff_templates/airline_staff_home.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/airline_staff_templates/airline_staff_home.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/customer_templates/customer_home.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/customer_templates/customer_home.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/customer_templates/purchase_ticket.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/customer_templates/customer_purchase_ticket.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/home_templates/index.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/home_templates/index.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/home_templates/login.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/home_templates/login.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/home_templates/register.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/home_templates/register.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/home_templates/search_for_flights.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/home_templates/search_for_flights.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/home_templates/search_one_way.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/home_templates/search_one_way.html" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -58,26 +50,33 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;ASKED_SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,
-    &quot;DefaultHtmlFileTemplate&quot;: &quot;HTML File&quot;,
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,
-    &quot;WebServerToolWindowFactoryState&quot;: &quot;false&quot;,
-    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
-    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
-    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
-    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
-    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "ASKED_SHARE_PROJECT_CONFIGURATION_FILES": "true",
+    "DefaultHtmlFileTemplate": "HTML File",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "SHARE_PROJECT_CONFIGURATION_FILES": "true",
+    "WebServerToolWindowFactoryState": "false",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "settings.editor.selected.configurable": "com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable",
+    "vue.rearranger.settings.migration": "true"
   },
-  &quot;keyToStringList&quot;: {
-    &quot;DatabaseDriversLRU&quot;: [
-      &quot;mysql&quot;
+  "keyToStringList": {
+    "DatabaseDriversLRU": [
+      "mysql"
+    ],
+    "com.intellij.ide.scratch.LRUPopupBuilder$1/SQL Dialect": [
+      "MariaDB"
+    ],
+    "com.intellij.ide.scratch.ScratchImplUtil$2/New Scratch File": [
+      "Python"
     ]
   }
-}</component>
-  <component name="RunManager">
+}]]></component>
+  <component name="RunManager" selected="Flask server.Flask (endpoints.py)">
     <configuration name="flask_project" type="PythonConfigurationType" factoryName="Python">
       <module name="flask_project" />
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -100,6 +99,49 @@
       <option name="INPUT_FILE" value="" />
       <method v="2" />
     </configuration>
+    <configuration name="scratch_3" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
+      <module name="flask_project" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$APPLICATION_CONFIG_DIR$/scratches" />
+      <option name="IS_MODULE_SDK" value="false" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
+      <option name="SCRIPT_NAME" value="$APPLICATION_CONFIG_DIR$/scratches/scratch_3.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
+    <configuration name="Flask (endpoints.py)" type="Python.FlaskServer" temporary="true" nameIsGenerated="true">
+      <module name="flask_project" />
+      <option name="target" value="$PROJECT_DIR$/endpoints.py" />
+      <option name="targetType" value="PATH" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
+      <option name="launchJavascriptDebuger" value="false" />
+      <method v="2" />
+    </configuration>
+    <recent_temporary>
+      <list>
+        <item itemvalue="Flask server.Flask (endpoints.py)" />
+        <item itemvalue="Python.scratch_3" />
+      </list>
+    </recent_temporary>
   </component>
   <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
   <component name="TaskManager">
@@ -117,6 +159,7 @@
       <workItem from="1670272454761" duration="299000" />
       <workItem from="1670353157826" duration="689000" />
       <workItem from="1670356143145" duration="120000" />
+      <workItem from="1670365020099" duration="6444000" />
     </task>
     <servers />
   </component>
@@ -136,6 +179,9 @@
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/main_py$flask_project.coverage" NAME="flask_project Coverage Results" MODIFIED="1670355449810" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="" />
+    <SUITE FILE_PATH="coverage/endpoints_py$scratch_3.coverage" NAME="scratch_3 Coverage Results" MODIFIED="1670370716126" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$APPLICATION_CONFIG_DIR$/scratches" />
+    <SUITE FILE_PATH="coverage/endpoints_py$flask_project.coverage" NAME="flask_project Coverage Results" MODIFIED="1670365747749" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="" />
     <SUITE FILE_PATH="coverage/flask_project$flask_project.coverage" NAME="flask_project Coverage Results" MODIFIED="1670211714614" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="" />
+    <SUITE FILE_PATH="coverage/endpoints_py$Flask__endpoints_py_.coverage" NAME="Flask (endpoints.py) Coverage Results" MODIFIED="1670370729156" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="" />
   </component>
 </project>

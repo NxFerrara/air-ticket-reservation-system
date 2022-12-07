@@ -761,7 +761,7 @@ def exec_ticket_stats(revenueData):
             query = 'SELECT YEAR(PurchaseDateandTime) as PurchaseYear, MONTH(PurchaseDateandTime) as PurchaseMonth, ' \
                     'COUNT(TicketIDNumber) AS TicketCount, SUM(sold_price) as Revenue ' \
                     'FROM purchase NATURAL JOIN ticket WHERE ' \
-                    'AirlineName = %s AND PurchaseDateandTime >= %s' \
+                    'AirlineName = %s AND PurchaseDateandTime >= %s ' \
                     'GROUP BY YEAR(PurchaseDateandTime), MONTH(PurchaseDateandTime) ' \
                     'ORDER BY YEAR(PurchaseDateandTime), MONTH(PurchaseDateandTime);'
             cursor.execute(query, (airline_name, start_date_and_time))
