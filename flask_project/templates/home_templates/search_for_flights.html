@@ -14,11 +14,51 @@
 		<input type="submit" value="Round Trip Flights">
 	</form>
 </div>
-<br>
+</br>
+<div style="display:flex;">
+	<form action="/search_specific_flight" method="POST">
+		<label for="DepartureDateandTime">Departure Date and Time:</label></br>
+  		<input type="datetime-local" id="DepartureDateandTime" name="DepartureDateandTime" required>
+		<input type="text" name = "FlightNumber" placeholder="Flight Number" required/>
+		<input type="text" name = "AirlineName" placeholder="Airline Name" required/></br>
+		<input type="submit" value="Search">
+	</form> &nbsp
+</div>
+<style type="text/css">
+	table, th, td {
+		border: 1px solid black;
+	}
+</style>
+{% if data %}
+<table>
+	<tr>
+		{% for header in headings %}
+		<th>{{ header }}</th>
+		{% endfor %}
+	</tr>
+	{% for row in data %}
+	<tr>
+		{% for key in row.keys() %}
+		<td>{{ row[key] }}</td>
+		{% endfor %}
+	</tr>
+	{% endfor %}
+</table>
+</br>
+{% endif %}
+{% if error %}
+	<p class="error"><strong>Error:</strong> {{error}}</p>
+{% endif %}
+{% if not error %}
+	</br>
+{% endif %}
 {% if is_customer %}
 	<a href="/customer_home">Go back</a>
 {% endif %}
-{% if not is_customer %}
+{% if is_airline_staff %}
+	<a href="/airline_staff_home">Go back</a>
+{% endif %}
+{% if not is_customer and not is_airline_staff %}
 	<a href="/">Go back</a>
 {% endif %}
 </body>

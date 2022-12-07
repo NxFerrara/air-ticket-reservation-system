@@ -4,13 +4,13 @@
 <body>
 <form action="/search_round_trip_query" method="POST">
 	<input type="text" name = "Source City/Airport Name" placeholder="Source City/Airport Name" style="width:200px"
-		   required/>
+		   required/></br>
 	<input type="text" name = "Destination City/Airport Name" placeholder="Destination City/Airport Name"
-		   style="width:200px" required/>
-	<input type="text" name = "Departure Date and Time" placeholder="Departure Date and Time"
-		   style="width:200px" required/>
-	<input type="text" name = "Return Date and Time" placeholder="Return Date and Time"
-		   style="width:200px" required/>
+		   style="width:200px" required/></br>
+	<label for="Departure Date and Time">Departure Date and Time:</label></br>
+	<input type="datetime-local" id="Departure Date and Time" name="Departure Date and Time" required></br>
+	<label for="Return Date and Time">Return Date and Time:</label></br>
+	<input type="datetime-local" id="Return Date and Time" name="Return Date and Time" required></br>
 	<input type="submit" value = Search />
 	{% if error %}
 		<p class="error"><strong>Error:</strong> {{error}}</p>
@@ -22,30 +22,40 @@
 		border: 1px solid black;
 	}
 </style>
-{% if data1 and data2 %}
+{% for round_trip in round_trips %}
+<p class="trips"><strong>Departure Flight:</strong></p>
 <table>
 	<tr>
 		{% for header in headings %}
 		<th>{{ header }}</th>
 		{% endfor %}
 	</tr>
-	{% for row in data1 %}
 	<tr>
-		{% for key in row.keys() %}
-		<td>{{ row[key] }}</td>
+		{% for key in round_trip[0].keys() %}
+		<td>{{ round_trip[0][key] }}</td>
 		{% endfor %}
 	</tr>
-	{% endfor %}
-	{% for row in data2 %}
+</table>
+<p class="trips"><strong>Return Flight(s):</strong></p>
+<table>
+	<tr>
+		{% for header in headings %}
+		<th>{{ header }}</th>
+		{% endfor %}
+	</tr>
+	{% for row in round_trip[1] %}
 	<tr>
 		{% for key in row.keys() %}
 		<td>{{ row[key] }}</td>
 		{% endfor %}
+		<td onclick="window.location.href=`{{ url_for('customer_purchase_ticket', departure_flight=round_trip[0], return_flight=row) if is_customer else url_for('login') }}`;">
+			<u style="text-decoration-color:blue">Purchase</u></td>
 	</tr>
 	{% endfor %}
 </table>
 <br>
-{% endif %}
+{% endfor %}
+
 <a href="/search_flights">Go back</a>
 
 </body>
