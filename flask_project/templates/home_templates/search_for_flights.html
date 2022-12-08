@@ -30,6 +30,7 @@
 	}
 </style>
 {% if data %}
+</br>
 <table>
 	<tr>
 		{% for header in headings %}
@@ -50,7 +51,6 @@
 	</tr>
 	{% endfor %}
 </table>
-</br>
 {% endif %}
 {% if error %}
 	<p class="error"><strong>Error:</strong> {{error}}</p>
