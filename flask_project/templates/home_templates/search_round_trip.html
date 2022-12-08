@@ -26,7 +26,7 @@
 <p class="trips"><strong>Departure Flight:</strong></p>
 <table>
 	<tr>
-		{% for header in headings %}
+		{% for header in headings_departure %}
 		<th>{{ header }}</th>
 		{% endfor %}
 	</tr>
@@ -39,7 +39,7 @@
 <p class="trips"><strong>Return Flight(s):</strong></p>
 <table>
 	<tr>
-		{% for header in headings %}
+		{% for header in headings_return %}
 		<th>{{ header }}</th>
 		{% endfor %}
 	</tr>
@@ -48,7 +48,11 @@
 		{% for key in row.keys() %}
 		<td>{{ row[key] }}</td>
 		{% endfor %}
-		<td onclick="window.location.href=`{{ url_for('customer_purchase_ticket', departure_flight=round_trip[0], return_flight=row) if is_customer else url_for('login') }}`;">
+		<td onclick="window.location.href=`{{ url_for('customer_purchase_ticket', departure_flight=round_trip[0], return_flight=row, trip_type=0) if is_customer else url_for('login') }}`">
+			<u style="text-decoration-color:blue">Purchase</u></td>
+		<td onclick="window.location.href=`{{ url_for('customer_purchase_ticket', departure_flight=round_trip[0], return_flight=row, trip_type=1) if is_customer else url_for('login') }}`">
+			<u style="text-decoration-color:blue">Purchase</u></td>
+		<td onclick="window.location.href=`{{ url_for('customer_purchase_ticket', departure_flight=round_trip[0], return_flight=row, trip_type=2) if is_customer else url_for('login') }}`">
 			<u style="text-decoration-color:blue">Purchase</u></td>
 	</tr>
 	{% endfor %}

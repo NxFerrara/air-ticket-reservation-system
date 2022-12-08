@@ -112,9 +112,16 @@ def airline_staff_register_auth():
     airline_name = request.form['airline_name']
 
     date_of_birth = datetime.datetime.strptime(date_of_birth, "%Y-%m-%d")
-    phonenum = request.form['phone_number'].split(',')
-    email = request.form['email'].split(',')
-
+    phonenum = [e.strip() for e in request.form['phone_number'].split(',')]
+    email = [e.strip() for e in request.form['email'].split(',')]
+    for i, e in enumerate(email):
+        if i>0 and e in email[:i]:
+            error = "There should be no duplicate emails"
+            return render_template('airline_staff_templates/airline_staff_register.html', error=error)
+    for i, e in enumerate(phonenum):
+        if i>0 and e in phonenum[:i]:
+            error = "There should be no duplicate phone numbers"
+            return render_template('airline_staff_templates/airline_staff_register.html', error=error)
     # cursor used to send queries
     cursor = conn.cursor()
     # executes query
@@ -896,7 +903,7 @@ def search_specific_flight():
     DepartureDateandTime = datetime.datetime.strptime(DepartureDateandTime, "%Y-%m-%dT%H:%M")
     # executes query
     query = 'SELECT AirlineName, FlightNumber, DepartureAirportName, ' \
-            'ArrivalAirportName, DepartureDateandTime, ArrivalDateandTime, BasePrice, Status ' \
+            'ArrivalAirportName, DepartureDateandTime, ArrivalDateandTime, Status ' \
             'FROM flight WHERE ' \
             'AirlineName = %s AND ' \
             'FlightNumber = %s AND ' \
@@ -910,7 +917,8 @@ def search_specific_flight():
         error = "Found no flights with the flight number {} and " \
                 "departure date and time {} with {}".format(FlightNumber, DepartureDateandTime, airline_name)
     headings = ("Airline Name", "Flight Number", "Departure Airport",
-                "Arrival Airport", "Departure Date and Time", "Arrival Date and Time", "Base Price", "Status")
+                "Arrival Airport", "Departure Date and Time", "Arrival Date and Time",
+                "Status", "Economy", "Business", "First")
     return render_template('home_templates/search_for_flights.html', data=data, headings=headings, error=error,
                            is_customer=session.get('is_customer'), is_airline_staff=session.get('is_airline_staff'))
 
@@ -951,8 +959,8 @@ def search_one_way_query():
     error = None
     if not data:
         error = "No future one way flights found for that search"
-    headings = ("Airline Name", "Flight Number", "Departure Airport",
-                "Arrival Airport", "Departure Date and Time", "Arrival Date and Time", "Purchase")
+    headings = ("Airline Name", "Flight Number", "Departure Airport", "Arrival Airport",
+                "Departure Date and Time", "Arrival Date and Time", "Economy", "Business", "First")
     return render_template('home_templates/search_one_way.html', is_customer=session.get('is_customer'),
                            headings=headings, data=data, error=error)
 
@@ -997,15 +1005,13 @@ def search_round_trip_query():
     error = None
     if not round_trips:
         error = "No future round trip flights found for that search result"
-    headings = ("Airline Name", "Flight Number", "Departure Airport",
-                "Arrival Airport", "Departure Date and Time", "Arrival Date and Time")
+    headings_return = ("Airline Name", "Flight Number", "Departure Airport", "Arrival Airport",
+                       "Departure Date and Time", "Arrival Date and Time", "Economy", "Business", "First")
+    headings_departure = ("Airline Name", "Flight Number", "Departure Airport", "Arrival Airport",
+                          "Departure Date and Time", "Arrival Date and Time")
     return render_template('home_templates/search_round_trip.html', is_customer=session.get('is_customer'),
-                           headings=headings, round_trips=round_trips, error=error)
-
-
-@app.route('/purchase_ticket/<row_data>')
-def purchase_ticket(row_data):
-    return render_template('customer_templates/purchase_ticket.html')
+                           headings_return=headings_return, headings_departure=headings_departure,
+                           round_trips=round_trips, error=error)
 
 
 # Define route for customer home page
@@ -1168,24 +1174,203 @@ def customer_cancel_trip():
 
 
 # Define route for customer to purchase tickets
-@app.route('/customer_purchase_ticket/<departure_flight>/<return_flight>')
-def customer_purchase_ticket(departure_flight, return_flight):
+@app.route('/customer_purchase_ticket/<trip_type>/<departure_flight>/<return_flight>', methods=['GET', 'POST'])
+def customer_purchase_ticket(trip_type, departure_flight, return_flight):
     if session.get('is_customer'):
+        trip_type = 'Economy' if trip_type == '0' else 'Business' if trip_type == '1' else 'First'
         departure_flight = eval(departure_flight)
-        return_flight = eval(return_flight)
-        return render_template('customer_templates/customer_purchase_ticket.html', departure_flight=departure_flight,
-                               return_flight=return_flight)
+        departure_flight['Class'] = trip_type
+        cursor = conn.cursor()
+        query = 'SELECT BasePrice FROM flight ' \
+                'WHERE FlightNumber = %s AND DepartureDateandTime = %s AND AirlineName = %s '
+        cursor.execute(query, (departure_flight['FlightNumber'], departure_flight['DepartureDateandTime'],
+                               departure_flight['AirlineName']))
+        data = cursor.fetchone()
+        departure_base_price = data['BasePrice']
+        departure_class_price = departure_base_price if trip_type == 'Economy' else departure_base_price*2 \
+            if trip_type == 'Business' else departure_base_price*4
+        query = 'SELECT COUNT(ticket.TicketIDNumber) as TicketCount FROM ticket NATURAL JOIN flight, purchase ' \
+                'WHERE purchase.TicketIDNumber = ticket.TicketIDNumber AND Class = %s' \
+                'AND FlightNumber = %s AND DepartureDateandTime = %s AND AirlineName = %s'
+        cursor.execute(query, (trip_type, departure_flight['FlightNumber'], departure_flight['DepartureDateandTime'],
+                               departure_flight['AirlineName']))
+        data = cursor.fetchone()
+        departure_num_tickets = data['TicketCount']
+        query = 'SELECT Numberof{}ClassSeats FROM flight NATURAL JOIN airplane WHERE FlightNumber = %s ' \
+                'AND DepartureDateandTime = %s AND AirlineName = %s'.format(trip_type)
+        cursor.execute(query, (departure_flight['FlightNumber'], departure_flight['DepartureDateandTime'],
+                               departure_flight['AirlineName']))
+        data = cursor.fetchone()
+        departure_num_class_seats = data['Numberof{}ClassSeats'.format(trip_type)]
+        departure_capacity = departure_num_tickets/departure_num_class_seats
+        departure_class_price = departure_class_price*1.25 if departure_capacity >= 0.6 else departure_class_price
+        departure_flight['price'] = departure_class_price
+        if return_flight != 'None':
+            return_flight = eval(return_flight)
+            return_flight['Class'] = trip_type
+            query = 'SELECT BasePrice FROM flight ' \
+                    'WHERE FlightNumber = %s AND DepartureDateandTime = %s AND AirlineName = %s'
+            cursor.execute(query, (return_flight['FlightNumber'], return_flight['DepartureDateandTime'],
+                                   return_flight['AirlineName']))
+            data = cursor.fetchone()
+            return_base_price = data['BasePrice']
+            return_class_price = return_base_price if trip_type == 'Economy' else return_base_price * 2 \
+                if trip_type == 'Business' else return_base_price * 4
+            query = 'SELECT COUNT(ticket.TicketIDNumber) as TicketCount FROM ticket NATURAL JOIN flight, purchase ' \
+                    'WHERE purchase.TicketIDNumber = ticket.TicketIDNumber AND Class = %s' \
+                    'AND FlightNumber = %s AND DepartureDateandTime = %s AND AirlineName = %s'
+            cursor.execute(query, (trip_type, return_flight['FlightNumber'],
+                                   return_flight['DepartureDateandTime'], return_flight['AirlineName']))
+            data = cursor.fetchone()
+            return_num_tickets = data['TicketCount']
+            query = 'SELECT Numberof{}ClassSeats FROM flight NATURAL JOIN airplane WHERE FlightNumber = %s ' \
+                    'AND DepartureDateandTime = %s AND AirlineName = %s'.format(trip_type)
+            cursor.execute(query, (return_flight['FlightNumber'], return_flight['DepartureDateandTime'],
+                                   return_flight['AirlineName']))
+            data = cursor.fetchone()
+            return_num_class_seats = data['Numberof{}ClassSeats'.format(trip_type)]
+            return_capacity = return_num_tickets / return_num_class_seats
+            return_class_price = return_class_price * 1.25 if return_capacity >= 0.6 else return_class_price
+            return_flight['price'] = return_class_price
+        error = None
+        context = None
+        if departure_num_tickets >= departure_num_class_seats and (return_flight != 'None' and
+                                                                   return_num_tickets >= return_num_class_seats):
+            error = 'Both flights are completely booked'
+        elif departure_num_tickets >= departure_num_class_seats:
+            error = 'The departure flight is completely booked'
+        elif return_flight != 'None' and return_num_tickets >= return_num_class_seats:
+            error = 'The return flight is completely booked'
+        else:
+            if departure_capacity >= 0.6 and (return_flight != 'None' and return_capacity >= 0.6):
+                context = 'Both flights are above 60% capacity (25% Price Increase)'
+            elif departure_capacity >= 0.6:
+                context = 'The departure flight is above 60% capacity (25% Price Increase)'
+            elif return_flight != 'None' and return_capacity >= 0.6:
+                context = 'The return flight is above 60% capacity (25% Price Increase)'
+        headings_departure = ("Airline Name", "Flight Number", "Departure Airport", "Arrival Airport",
+                              "Departure Date and Time", "Arrival Date and Time", "Class", "Price")
+        headings_return = ("Airline Name", "Flight Number", "Departure Airport", "Arrival Airport",
+                           "Departure Date and Time", "Arrival Date and Time", "Class", "Price")
+        total_price = return_class_price + departure_class_price if return_flight != 'None' else departure_class_price
+        cursor.close()
+        return render_template('customer_templates/customer_purchase_ticket.html', trip_type=trip_type,
+                               departure_flight=departure_flight, return_flight=return_flight,
+                               headings_departure=headings_departure, headings_return=headings_return,
+                               total_price=total_price, error=error, context=context)
     else:
         return render_template('home_templates/unauthorized_access.html', is_customer=session.get('is_customer'),
                                is_airline_staff=session.get('is_airline_staff'))
 
 @app.route('/exec_customer_purchase_ticket/<departure_flight>/<return_flight>', methods=['GET', 'POST'])
-def exec_customer_purchase_ticket():
+def exec_customer_purchase_ticket(departure_flight, return_flight):
     if session.get('is_customer'):
+        email = session['email']
+        purchase_date_and_time = datetime.datetime.today()
+        card_number = request.form['card_number']
+        card_type = request.form['Card Type']
+        name_on_card = request.form['name_on_card']
+        expiration_date = datetime.datetime.strptime(request.form['expiration_date']+'-01', '%Y-%m-%d')
         departure_flight = eval(departure_flight)
-        return_flight = eval(return_flight)
-        return render_template('customer_templates/customer_purchase_ticket.html', departure_flight=departure_flight,
-                               return_flight=return_flight)
+        cursor = conn.cursor()
+        trip_type = departure_flight['Class']
+        departure_class_price = departure_flight['price']
+        query = 'SELECT COUNT(ticket.TicketIDNumber) as TicketCount FROM ticket NATURAL JOIN flight, purchase ' \
+                'WHERE purchase.TicketIDNumber = ticket.TicketIDNumber AND Class = %s' \
+                'AND FlightNumber = %s AND DepartureDateandTime = %s AND AirlineName = %s'
+        cursor.execute(query, (trip_type, departure_flight['FlightNumber'], departure_flight['DepartureDateandTime'],
+                               departure_flight['AirlineName']))
+        data = cursor.fetchone()
+        departure_num_tickets = data['TicketCount']
+        query = 'SELECT Numberof{}ClassSeats FROM flight NATURAL JOIN airplane WHERE FlightNumber = %s ' \
+                'AND DepartureDateandTime = %s AND AirlineName = %s'.format(trip_type)
+        cursor.execute(query, (departure_flight['FlightNumber'], departure_flight['DepartureDateandTime'],
+                               departure_flight['AirlineName']))
+        data = cursor.fetchone()
+        departure_num_class_seats = data['Numberof{}ClassSeats'.format(trip_type)]
+        departure_capacity = departure_num_tickets / departure_num_class_seats
+        departure_class_price = departure_class_price * 1.25 if departure_capacity >= 0.6 else departure_class_price
+        departure_flight['price'] = departure_class_price
+        query = 'SELECT MAX(TicketIDNumber) as MaxTicketIDNumber FROM ticket'
+        cursor.execute(query)
+        data = cursor.fetchone()
+        if not data:
+            max_ticket_id = 0
+        else:
+            max_ticket_id = int(data['MaxTicketIDNumber'])
+        ticketID = max_ticket_id + 1
+        query = 'INSERT INTO ticket VALUES(%s,%s,%s,%s,%s)'
+        cursor.execute(query, (ticketID, departure_flight['FlightNumber'], departure_flight['DepartureDateandTime'],
+                               departure_flight['AirlineName'], departure_flight['Class']))
+        conn.commit()
+        query = 'INSERT INTO purchase VALUES(%s,%s,%s,%s,%s,%s,%s,%s)'
+        cursor.execute(query, (ticketID, email, purchase_date_and_time, card_number, card_type, name_on_card,
+                               expiration_date, departure_flight['price']))
+        conn.commit()
+        message = 'Successfully purchased a ticket for the one-way flight'
+        if return_flight != 'None':
+            return_flight = eval(return_flight)
+            message = 'Successfully purchased the tickets for the round trip flight'
+            return_class_price = return_flight['price']
+            query = 'SELECT COUNT(ticket.TicketIDNumber) as TicketCount FROM ticket NATURAL JOIN flight, purchase ' \
+                    'WHERE purchase.TicketIDNumber = ticket.TicketIDNumber AND Class = %s' \
+                    'AND FlightNumber = %s AND DepartureDateandTime = %s AND AirlineName = %s'
+            cursor.execute(query,
+                           (trip_type, return_flight['FlightNumber'], return_flight['DepartureDateandTime'],
+                            return_flight['AirlineName']))
+            data = cursor.fetchone()
+            return_num_tickets = data['TicketCount']
+            query = 'SELECT Numberof{}ClassSeats FROM flight NATURAL JOIN airplane WHERE FlightNumber = %s ' \
+                    'AND DepartureDateandTime = %s AND AirlineName = %s'.format(trip_type)
+            cursor.execute(query, (return_flight['FlightNumber'], return_flight['DepartureDateandTime'],
+                                   return_flight['AirlineName']))
+            data = cursor.fetchone()
+            return_num_class_seats = data['Numberof{}ClassSeats'.format(trip_type)]
+            return_capacity = return_num_tickets / return_num_class_seats
+            return_class_price = return_class_price * 1.25 if return_capacity >= 0.6 else return_class_price
+            return_flight['price'] = return_class_price
+            query = 'SELECT MAX(TicketIDNumber) as MaxTicketIDNumber FROM ticket'
+            cursor.execute(query)
+            data = cursor.fetchone()
+            if not data:
+                max_ticket_id = 0
+            else:
+                max_ticket_id = int(data['MaxTicketIDNumber'])
+            ticketID = max_ticket_id + 1
+            query = 'INSERT INTO ticket VALUES(%s,%s,%s,%s,%s)'
+            cursor.execute(query, (ticketID, return_flight['FlightNumber'], return_flight['DepartureDateandTime'],
+                                   return_flight['AirlineName'], return_flight['Class']))
+            conn.commit()
+            query = 'INSERT INTO purchase VALUES(%s,%s,%s,%s,%s,%s,%s,%s)'
+            cursor.execute(query, (ticketID, email, purchase_date_and_time, card_number, card_type, name_on_card,
+                                   expiration_date, return_flight['price']))
+            conn.commit()
+        cursor.close()
+        error = None
+        context = None
+        if departure_num_tickets >= departure_num_class_seats and (return_flight != 'None' and
+                                                                   return_num_tickets >= return_num_class_seats):
+            error = 'Both flights are completely booked'
+        elif departure_num_tickets >= departure_num_class_seats:
+            error = 'The departure flight is completely booked'
+        elif return_flight != 'None' and return_num_tickets >= return_num_class_seats:
+            error = 'The return flight is completely booked'
+        else:
+            if departure_capacity >= 0.6 and (return_flight != 'None' and return_capacity >= 0.6):
+                context = 'Both flights are above 60% capacity (25% Price Increase)'
+            elif departure_capacity >= 0.6:
+                context = 'The departure flight is above 60% capacity (25% Price Increase)'
+            elif return_flight != 'None' and return_capacity >= 0.6:
+                context = 'The return flight is above 60% capacity (25% Price Increase)'
+        headings_departure = ("Airline Name", "Flight Number", "Departure Airport", "Arrival Airport",
+                              "Departure Date and Time", "Arrival Date and Time", "Class", "Price")
+        headings_return = ("Airline Name", "Flight Number", "Departure Airport", "Arrival Airport",
+                           "Departure Date and Time", "Arrival Date and Time", "Class", "Price")
+        total_price = return_flight['price'] + departure_flight['price'] if return_flight != 'None' else departure_flight['price']
+        return render_template('customer_templates/customer_purchase_ticket.html', trip_type=trip_type,
+                               departure_flight=departure_flight, return_flight=return_flight,
+                               headings_departure=headings_departure, headings_return=headings_return,
+                               total_price=total_price, error=error, message=message, context=context)
     else:
         return render_template('home_templates/unauthorized_access.html', is_customer=session.get('is_customer'),
                                is_airline_staff=session.get('is_airline_staff'))

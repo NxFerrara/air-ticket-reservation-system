@@ -2,16 +2,63 @@
 <head>
 </head>
 <body>
-<form action="window.location.href=`{{ url_for('exec_customer_purchase_ticket', departure_flight=departure_flight, return_flight=return_flight)}}`;" method="POST">
-	<input type="text" name = "email" placeholder="email" required/> </br>
-	<input type="text" name = "card_number" placeholder="card_number" required/> </br>
+{% if not error %}
+<style type="text/css">
+	table, th, td {
+		border: 1px solid black;
+	}
+</style>
+<p class="trips"><strong>Departure Flight:</strong></p>
+<table>
+	<tr>
+		{% for header in headings_departure %}
+		<th>{{ header }}</th>
+		{% endfor %}
+	</tr>
+	<tr>
+		{% for key in departure_flight.keys() %}
+		<td>{{ '$'+departure_flight[key]|string if key == 'price' else departure_flight[key]}}</td>
+		{% endfor %}
+	</tr>
+</table>
+{% if return_flight != 'None' %}
+<br>
+<p class="trips"><strong>Return Flight:</strong></p>
+<table>
+	<tr>
+		{% for header in headings_return %}
+		<th>{{ header }}</th>
+		{% endfor %}
+	</tr>
+	<tr>
+		{% for key in return_flight.keys() %}
+		<td>{{ '$'+return_flight[key]|string if key == 'price' else return_flight[key]}}</td>
+		{% endfor %}
+	</tr>
+</table>
+{% endif %}
+<p class="price"><strong>Total Price:</strong> ${{total_price}}</p>
+{% if context %}
+<p class="context"><strong>Notice:</strong> {{context}}</p>
+{% endif %}
+{% if message %}
+<p class="message"><strong>Message:</strong> {{message}}</p>
+{% endif %}
+<form action="{{ url_for('exec_customer_purchase_ticket', departure_flight=departure_flight, return_flight=return_flight) }}" method="POST">
+	<input type="text" name = "name_on_card" placeholder="name_on_card" required/> </br>
 	<select name="Card Type" id="Card Type">
 		<option value="Credit">Credit</option>
 		<option value="Debit">Debit</option>
 	</select>
-	<input type="text" name = "name_on_card" placeholder="name_on_card" required/> </br>
-	<input type="text" name = "expiration_date" placeholder="expiration_date" required/> </br>
+	<input type="text" name = "card_number" placeholder="card_number" required/> </br>
+	<label for="expiration_date">Expiration Date:</label></br>
+	<input type="month" id="expiration_date" name="expiration_date" min="2022-12" value="2022-12" required></br>
+	<input type="submit" value = "Purchase" />
 </form>
-<a href="/search_flights">Go back</a>
+{% endif %}
+{% if error %}
+<p class="error"><strong>Error:</strong> {{error}}</p>
+{% endif %}
+<a href="/search_flights">Go Back</a>
 </body>
 </html>
