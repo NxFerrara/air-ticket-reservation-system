@@ -6,30 +6,94 @@
 </head>
 
 <body>
-	<h1>All Flights and Status</h1>
 	<style type="text/css">
-		table, th, td {
+		body, html {
+			overflow: visible
+		}
+		.button{
+			display:inline-block;
+			padding:0.2em 1.45em;
+			margin-right:1.5em;
+			border:0.15em solid #CCCCCC;
+			box-sizing: border-box;
+			text-decoration:none;
+			font-family:'Segoe UI','Roboto',sans-serif;
+			font-weight:400;
+			color:#000000;
+			background-color:#CCCCCC;
+			text-align:center;
+			position:relative;
+		}
+
+		.button:hover{
+			border-color:#7a7a7a;
+		}
+
+		.button:active{
+			background-color:#999999;
+		}
+
+		@media all and (max-width:30em){
+			.button{
+				display:block;
+				margin:0.2em auto;
+			}
+		}
+
+		.container {
+		  position: absolute;
+		  left: 50%;
+		  transform: translate(-50%, 0%);
+		}
+
+		.container table {
 			border: 1px solid black;
+		  background: #333;
+		  background-color: #55608f;
+		  font-size: 12pt;
+		  border-collapse: collapse;
+		  border-collapse: collapse;
+		  overflow: hidden;
+		  box-shadow: 0 0 20px rgba(0,0,0,0.2);
+		  width: 100%;
+		  min-width: max-content;
+		}
+
+		.container th,
+		.container td {
+		  padding: 10px;
+		  background-color: rgba(220,220,220,0.5);
+		  color: #FFFFFF;
+		  border: 1px solid black;
+		}
+
+		.container th {
+		  text-align: center;
+		  background-color: #55608f;
 		}
 	</style>
-	<table>
-		<tr>
-			{% for header in headings %}
-			<th>{{ header }}</th>
+	<div class="container">
+		<h1>All Flights and Status</h1>
+		<table>
+			<tr>
+				{% for header in headings %}
+				<th>{{ header }}</th>
+				{% endfor %}
+			</tr>
+			{% for row in data %}
+			<tr>
+				{% for key in row.keys() %}
+				<td>{{ row[key] }}</td>
+				{% endfor %}
+			</tr>
 			{% endfor %}
-		</tr>
-		{% for row in data %}
-		<tr>
-			{% for key in row.keys() %}
-			<td>{{ row[key] }}</td>
-			{% endfor %}
-		</tr>
-		{% endfor %}
-	</table>
-	<br>
-	<a href="/login">Login</a> &nbsp
-	<a href="/register">Register</a> &nbsp
-	<a href="/search_flights">Search Flights</a> &nbsp
+		</table>
+		<br>
+
+		<button class="button" onclick="window.location.href=`{{ url_for('login') }}`;">Login</button>
+		<button class="button" onclick="window.location.href=`{{ url_for('register') }}`;">Register</button>
+		<button class="button" onclick="window.location.href=`{{ url_for('search_flights') }}`;">Search Flights</button>
+	</div>
 </body>
 
 </html>

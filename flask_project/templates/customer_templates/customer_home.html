@@ -2,15 +2,74 @@
 <head>
 </head>
 <body>
-<form action="/post" method="POST">
-	<h1>Welcome {{email}}</h1>
+<style type="text/css">
+	.button{
+		display:inline-block;
+		padding:0.2em 1.45em;
 
-</form>
-	<style type="text/css">
-		table, th, td {
-			border: 1px solid black;
+		border:0.15em solid #CCCCCC;
+		box-sizing: border-box;
+		text-decoration:none;
+		font-family:'Segoe UI','Roboto',sans-serif;
+		font-weight:400;
+		color:#000000;
+		background-color:#CCCCCC;
+		text-align:center;
+		position:relative;
+	}
+
+	.button:hover{
+		border-color:#7a7a7a;
+	}
+
+	.button:active{
+		background-color:#999999;
+	}
+
+	@media all and (max-width:30em){
+		.button{
+			display:block;
+			margin:0.2em auto;
 		}
-	</style>
+	}
+
+	.container {
+	  position: absolute;
+	  left: 50%;
+	  transform: translate(-50%, 0%);
+	}
+
+	.container table {
+		border: 1px solid black;
+		margin:1em;
+		margin-left:0em;
+	  background: #333;
+	  background-color: #55608f;
+	  font-size: 12pt;
+	  border-collapse: collapse;
+	  border-collapse: collapse;
+	  overflow: hidden;
+	  box-shadow: 0 0 20px rgba(0,0,0,0.2);
+	  width: 100%;
+	  min-width: max-content;
+	}
+
+	.container th,
+	.container td {
+	  padding: 10px;
+	  background-color: rgba(220,220,220,0.5);
+	  color: #FFFFFF;
+	  border: 1px solid black;
+	}
+
+	.container th {
+	  text-align: center;
+	  background-color: #55608f;
+	}
+</style>
+<div class="container">
+	<h1>Welcome {{email}}</h1>
+	<h2>Upcoming Flights:</h2>
 	<table>
 		<tr>
 			{% for header in headings %}
@@ -25,12 +84,13 @@
 		</tr>
 		{% endfor %}
 	</table>
-	<br>
-<a href="/customer_view_previous_flights">View My Previous Flights</a> &nbsp
-<a href="/customer_view_upcoming_flights">View My Upcoming Flights</a> &nbsp
-<a href="/search_flights">Search Flights</a> &nbsp
-<a href="/customer_track_spending">Track My Spending</a> &nbsp
-<a href="/customer_logout">Logout</a> &nbsp
+	<button class="button" onclick="window.location.href=`{{ url_for('customer_view_previous_flights') }}`;">View My Previous Flights</button>
+	<button class="button" onclick="window.location.href=`{{ url_for('customer_view_upcoming_flights') }}`;">View My Upcoming Flights</button>
+	<button class="button" onclick="window.location.href=`{{ url_for('search_flights') }}`;">Search Flights</button>
+	<button class="button" onclick="window.location.href=`{{ url_for('customer_track_spending') }}`;">Track My Spending</button>
+	</br></br>
+	<button class="button" onclick="window.location.href=`{{ url_for('customer_logout') }}`;">Logout</button>
+</div>
 
 </body>
 

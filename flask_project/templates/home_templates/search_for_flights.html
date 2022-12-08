@@ -5,68 +5,183 @@
 </head>
 
 <body>
-<div style="display:flex;">
-	<form action="/search_one_way">
-		<input type="submit" value="One Way Flights">
-	</form> &nbsp
-
-	<form action="/search_round_trip">
-		<input type="submit" value="Round Trip Flights">
-	</form>
-</div>
-</br>
-<div style="display:flex;">
-	<form action="/search_specific_flight" method="POST">
-		<label for="DepartureDateandTime">Departure Date and Time:</label></br>
-  		<input type="datetime-local" id="DepartureDateandTime" name="DepartureDateandTime" required>
-		<input type="text" name = "FlightNumber" placeholder="Flight Number" required/>
-		<input type="text" name = "AirlineName" placeholder="Airline Name" required/></br>
-		<input type="submit" value="Search">
-	</form> &nbsp
-</div>
 <style type="text/css">
-	table, th, td {
+	body, html {
+		overflow: visible
+	}
+	.button{
+		display:inline-block;
+		padding:0.2em 1.45em;
+		margin-right:1.5em;
+		border:0.15em solid #CCCCCC;
+		box-sizing: border-box;
+		text-decoration:none;
+		font-family:'Segoe UI','Roboto',sans-serif;
+		font-weight:400;
+		color:#000000;
+		background-color:#CCCCCC;
+		text-align:center;
+		position:relative;
+	}
+
+	.button:hover{
+		border-color:#7a7a7a;
+	}
+
+	.button:active{
+		background-color:#999999;
+	}
+
+	@media all and (max-width:30em){
+		.button{
+			display:block;
+			margin:0.2em auto;
+		}
+	}
+
+	.container {
+	  position: absolute;
+	  left: 50%;
+	  transform: translate(-50%, 0%);
+	}
+
+	.container table {
 		border: 1px solid black;
+	  background: #333;
+	  background-color: #55608f;
+	  font-size: 12pt;
+	  border-collapse: collapse;
+	  border-collapse: collapse;
+	  overflow: hidden;
+	  box-shadow: 0 0 20px rgba(0,0,0,0.2);
+	  width: 100%;
+	  min-width: max-content;
+	}
+
+	.container th,
+	.container td {
+	  padding: 10px;
+	  background-color: rgba(220,220,220,0.5);
+	  color: #FFFFFF;
+	  border: 1px solid black;
+	}
+
+	.container th {
+	  text-align: center;
+	  background-color: #55608f;
+	}
+	.forms {
+	  display: flex;
+	}
+	.form1 {
+		display:inline-block;
+		padding:0.2em 1.45em;
+		margin:1em;
+		margin-left:0em;
+		border:0.15em solid #CCCCCC;
+		height: 45px;
+		text-decoration:none;
+		font-family:'Segoe UI','Roboto',sans-serif;
+		font-weight:400;
+		color:#000000;
+		background-color:#CCCCCC;
+		text-align:center;
+		position:relative;
+	}
+
+	.form2 {
+	 	flex-grow: 0;
+	  	display:inline-block;
+		padding:0.2em 1.45em;
+		margin:1em;
+		margin-left:0em;
+		border:0.15em solid #CCCCCC;
+		box-sizing: border-box;
+		text-decoration:none;
+		font-family:'Segoe UI','Roboto',sans-serif;
+		font-weight:400;
+		color:#000000;
+		background-color:#CCCCCC;
+		text-align:center;
+		position:relative;
+	}
+	input {
+		width: 230px;
+		padding: 8px 20px;
+		margin: 4px 0;
+		box-sizing: border-box;
+	}
+	input[type=submit] {
+		width: 140px;
+		padding: 8px 20px;
+		margin: 4px 0;
+		text-align:center;
+		box-sizing: border-box;
 	}
 </style>
-{% if data %}
-</br>
-<table>
-	<tr>
-		{% for header in headings %}
-		<th>{{ header }}</th>
-		{% endfor %}
-	</tr>
-	{% for row in data %}
-	<tr>
-		{% for key in row.keys() %}
-		<td>{{ row[key] }}</td>
-		{% endfor %}
-		<td onclick="window.location.href=`{{ url_for('customer_purchase_ticket', trip_type=0, departure_flight=row, return_flight='None') if is_customer else url_for('login') }}`">
-			<u style="text-decoration-color:blue">Purchase</u></td>
-		<td onclick="window.location.href=`{{ url_for('customer_purchase_ticket', trip_type=1, departure_flight=row, return_flight='None') if is_customer else url_for('login') }}`">
-			<u style="text-decoration-color:blue">Purchase</u></td>
-		<td onclick="window.location.href=`{{ url_for('customer_purchase_ticket', trip_type=2, departure_flight=row, return_flight='None') if is_customer else url_for('login') }}`">
-			<u style="text-decoration-color:blue">Purchase</u></td>
-	</tr>
-	{% endfor %}
-</table>
-{% endif %}
-{% if error %}
-	<p class="error"><strong>Error:</strong> {{error}}</p>
-{% endif %}
-{% if not error %}
+<div class="container">
+	<div class="forms">
+		<div class="form2">
+			<form action="/search_specific_flight" method="POST">
+				<input type="text" name = "FlightNumber" placeholder="Flight Number" required/></br></br>
+				<input type="text" name = "AirlineName" placeholder="Airline Name" required/></br></br>
+				<label for="DepartureDateandTime">Departure Date and Time:</label></br>
+				<input type="datetime-local" id="DepartureDateandTime" name="DepartureDateandTime" required>
+				</br></br>
+				<input type="submit" value="Search">
+			</form> &nbsp
+		</div>
+		<div class="form1">
+			<form action="/search_one_way">
+				<input type="submit" value="One Way Flights">
+			</form> &nbsp
+		</div>
+		<div class="form1">
+			<form action="/search_round_trip">
+				<input type="submit" value="Round Trip Flights">
+			</form>
+		</div>
+
+	</div>
+	{% if data %}
 	</br>
-{% endif %}
-{% if is_customer %}
-	<a href="/customer_home">Go back</a>
-{% endif %}
-{% if is_airline_staff %}
-	<a href="/airline_staff_home">Go back</a>
-{% endif %}
-{% if not is_customer and not is_airline_staff %}
-	<a href="/">Go back</a>
-{% endif %}
+	<table>
+		<tr>
+			{% for header in headings %}
+			<th>{{ header }}</th>
+			{% endfor %}
+		</tr>
+		{% for row in data %}
+		<tr>
+			{% for key in row.keys() %}
+			<td>{{ row[key] }}</td>
+			{% endfor %}
+			<td onclick="window.location.href=`{{ url_for('customer_purchase_ticket', trip_type=0, departure_flight=row, return_flight='None') if is_customer else url_for('login') }}`">
+				<u style="text-decoration-color:blue">Purchase</u></td>
+			<td onclick="window.location.href=`{{ url_for('customer_purchase_ticket', trip_type=1, departure_flight=row, return_flight='None') if is_customer else url_for('login') }}`">
+				<u style="text-decoration-color:blue">Purchase</u></td>
+			<td onclick="window.location.href=`{{ url_for('customer_purchase_ticket', trip_type=2, departure_flight=row, return_flight='None') if is_customer else url_for('login') }}`">
+				<u style="text-decoration-color:blue">Purchase</u></td>
+		</tr>
+		{% endfor %}
+	</table>
+	{% endif %}
+	{% if error %}
+		<p class="error"><strong>Error:</strong> {{error}}</p>
+	{% endif %}
+	{% if not error %}
+		</br>
+	{% endif %}
+	{% if is_customer %}
+		<button class="button" onclick="window.location.href=`{{ url_for('customer_home') }}`;">Go back</button>
+	{% endif %}
+	{% if is_airline_staff %}
+		<button class="button" onclick="window.location.href=`{{ url_for('airline_staff_home') }}`;">Go back</button>
+	{% endif %}
+	{% if not is_customer and not is_airline_staff %}
+		<button class="button" onclick="window.location.href=`{{ url_for('index') }}`;">Go back</button>
+	{% endif %}
+</div>
 </body>
 
 </html>

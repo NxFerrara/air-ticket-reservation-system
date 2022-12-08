@@ -2,68 +2,184 @@
 <head>
 </head>
 <body>
-<form action="/search_flights_airline_staff_query" method="POST">
-	<input type="text" name = "Source City/Airport Name" placeholder="Source City/Airport Name" style="width:200px"
-		   required/>
-	</br>
-	<input type="text" name = "Destination City/Airport Name" placeholder="Destination City/Airport Name"
-		   style="width:200px" required/>
-	</br>
-	<label for="StartDepartureDateandTime">Start Departure Date and Time:</label>
-	</br>
-  	<input type="datetime-local" id="StartDepartureDateandTime" name="StartDepartureDateandTime" required>
-	</br>
-	<label for="EndDepartureDateandTime">End Departure Date and Time:</label>
-	</br>
-  	<input type="datetime-local" id="EndDepartureDateandTime" name="EndDepartureDateandTime">
-	</br>
-	<input type="submit" value = Search />
-</form>
-
-<form action="/search_specific_flight_airline_staff_query" method="POST">
-	<label for="DepartureDateandTime">Departure Date and Time:</label></br>
-  	<input type="datetime-local" id="DepartureDateandTime" name="DepartureDateandTime" required>
-	<input type="text" name = "FlightNumber" placeholder="Flight Number" required/></br>
-	<input type="submit" value = Search />
-
-</form>
 <style type="text/css">
-	table, th, td {
+
+	.forms {
+	  display: flex;
+	}
+
+	.form1 {
+		display:inline-block;
+		padding:0.2em 1.45em;
+		margin:1em;
+		margin-left:0em;
+		border:0.15em solid #CCCCCC;
+		box-sizing: border-box;
+		text-decoration:none;
+		font-family:'Segoe UI','Roboto',sans-serif;
+		font-weight:400;
+		color:#000000;
+		background-color:#CCCCCC;
+		text-align:center;
+		position:relative;
+	}
+
+	.form2 {
+	 	flex-grow: 0;
+	  	display:inline-block;
+		padding:0.2em 1.45em;
+		margin:1em;
+		border:0.15em solid #CCCCCC;
+		box-sizing: border-box;
+		text-decoration:none;
+		font-family:'Segoe UI','Roboto',sans-serif;
+		font-weight:400;
+		color:#000000;
+		background-color:#CCCCCC;
+		text-align:center;
+		position:relative;
+	}
+
+	.button{
+		display:inline-block;
+		padding:0.2em 1.45em;
+
+		border:0.15em solid #CCCCCC;
+		box-sizing: border-box;
+		text-decoration:none;
+		font-family:'Segoe UI','Roboto',sans-serif;
+		font-weight:400;
+		color:#000000;
+		background-color:#CCCCCC;
+		text-align:center;
+		position:relative;
+	}
+
+	.button:hover{
+		border-color:#7a7a7a;
+	}
+
+	.button:active{
+		background-color:#999999;
+	}
+
+	@media all and (max-width:30em){
+		.button{
+			display:block;
+			margin:0.2em auto;
+		}
+	}
+
+	.container {
+	  position: absolute;
+	  top: 30%;
+	  left: 50%;
+	  transform: translate(-50%, -50%);
+	}
+
+	.container table {
 		border: 1px solid black;
+		margin:1em;
+		margin-left:0em;
+	  background: #333;
+	  background-color: #55608f;
+	  font-size: 12pt;
+	  border-collapse: collapse;
+	  border-collapse: collapse;
+	  overflow: hidden;
+	  box-shadow: 0 0 20px rgba(0,0,0,0.2);
+	  width: 100%;
+	  min-width: max-content;
+	}
+
+	.container th,
+	.container td {
+	  padding: 10px;
+	  background-color: rgba(220,220,220,0.5);
+	  color: #FFFFFF;
+	  border: 1px solid black;
+	}
+
+	.container th {
+	  text-align: center;
+	  background-color: #55608f;
 	}
 
 </style>
-{% if data %}
-<table>
-	<tr>
-		{% for header in headings %}
-		<th>{{ header }}</th>
+<div class="container">
+	<div class="forms">
+		<div class="form1">
+			<form action="/search_flights_airline_staff_query" method="POST">
+				</br>
+				<input type="text" name = "Source City/Airport Name" placeholder="Source City/Airport Name" style="width:200px"
+					   required/>
+				</br>
+				</br>
+				<input type="text" name = "Destination City/Airport Name" placeholder="Destination City/Airport Name"
+					   style="width:200px" required/>
+				</br>
+				</br>
+				<label for="StartDepartureDateandTime">Start Departure Date and Time:</label>
+				</br>
+				<input type="datetime-local" id="StartDepartureDateandTime" name="StartDepartureDateandTime" required>
+				</br>
+				</br>
+				<label for="EndDepartureDateandTime">End Departure Date and Time:</label>
+				</br>
+				<input type="datetime-local" id="EndDepartureDateandTime" name="EndDepartureDateandTime">
+				</br>
+				</br>
+				<input type="submit" value = Search />
+			</form>
+		</div>
+		<div class="form2">
+			<form action="/search_specific_flight_airline_staff_query" method="POST">
+				</br>
+				<input type="text" name = "FlightNumber" placeholder="Flight Number" required/></br>
+				</br>
+				<label for="DepartureDateandTime">Departure Date and Time:</label></br>
+				<input type="datetime-local" id="DepartureDateandTime" name="DepartureDateandTime" required></br>
+				</br>
+				</br>
+				</br>
+				</br>
+				</br>
+				</br>
+				<input type="submit" value = Search />
+			</form>
+		</div>
+	</div>
+	{% if data %}
+	<table>
+		<tr>
+			{% for header in headings %}
+			<th>{{ header }}</th>
+			{% endfor %}
+		</tr>
+		{% for row in data %}
+		<tr>
+			{% for key in row.keys() %}
+			<td>{{ row[key] }}</td>
+			{% endfor %}
+			<td onclick="window.location.href=`{{ url_for('view_flight_customers', flightData=row) }}`;">
+				<u style="text-decoration-color:blue">Customers</u></td>
+			<td onclick="window.location.href=`{{ url_for('change_flight_status', flightData=row) }}`;">
+				<u style="text-decoration-color:blue">Change Status</u></td>
+			<td onclick="window.location.href=`{{ url_for('view_ratings', flightData=row) }}`;">
+				<u style="text-decoration-color:blue">Ratings</u></td>
+		</tr>
 		{% endfor %}
-	</tr>
-	{% for row in data %}
-	<tr>
-		{% for key in row.keys() %}
-		<td>{{ row[key] }}</td>
-		{% endfor %}
-		<td onclick="window.location.href=`{{ url_for('view_flight_customers', flightData=row) }}`;">
-			<u style="text-decoration-color:blue">Customers</u></td>
-		<td onclick="window.location.href=`{{ url_for('change_flight_status', flightData=row) }}`;">
-			<u style="text-decoration-color:blue">Change Status</u></td>
-        <td onclick="window.location.href=`{{ url_for('view_ratings', flightData=row) }}`;">
-            <u style="text-decoration-color:blue">Ratings</u></td>
-	</tr>
-	{% endfor %}
-</table>
-<br>
-{% endif %}
-{% if error %}
-	<p class="error"><strong>Error:</strong> {{error}}</p>
-{% endif %}
-{% if message %}
-	<p class="message"><strong>Message:</strong> {{message}}</p>
-{% endif %}
-<a href="/airline_staff_home">Go back</a>
-
+	</table>
+	<br>
+	{% endif %}
+	{% if error %}
+		<p class="error"><strong>Error:</strong> {{error}}</p>
+	{% endif %}
+	{% if message %}
+		<p class="message"><strong>Message:</strong> {{message}}</p>
+	{% endif %}
+	<button class="button" onclick="window.location.href=`{{ url_for('airline_staff_home') }}`;">Go back</button>
+</div>
 </body>
 
 

@@ -2,41 +2,116 @@
 <head>
 </head>
 <body>
+<style type="text/css">
+	.button{
+		display:inline-block;
+		padding:0.2em 1.45em;
 
-<form action="/customer_cancel_trip" method="POST">
-	<input type="text" name = "TicketIDNumber" placeholder= "TicketIDNumber" required/> </br>
-	<input type="submit" value = "Delete Flight" />
+		border:0.15em solid #CCCCCC;
+		box-sizing: border-box;
+		text-decoration:none;
+		font-family:'Segoe UI','Roboto',sans-serif;
+		font-weight:400;
+		color:#000000;
+		background-color:#CCCCCC;
+		text-align:center;
+		position:relative;
+	}
+
+	.button:hover{
+		border-color:#7a7a7a;
+	}
+
+	.button:active{
+		background-color:#999999;
+	}
+
+	@media all and (max-width:30em){
+		.button{
+			display:block;
+			margin:0.2em auto;
+		}
+	}
+
+	.container {
+	  position: absolute;
+	  left: 50%;
+	  transform: translate(-50%, 0%);
+	}
+
+	.container table {
+		border: 1px solid black;
+		margin:1em;
+		margin-left:0em;
+	  background: #333;
+	  background-color: #55608f;
+	  font-size: 12pt;
+	  border-collapse: collapse;
+	  border-collapse: collapse;
+	  overflow: hidden;
+	  box-shadow: 0 0 20px rgba(0,0,0,0.2);
+	  width: 100%;
+	  min-width: max-content;
+	}
+
+	.container th,
+	.container td {
+	  padding: 10px;
+	  background-color: rgba(220,220,220,0.5);
+	  color: #FFFFFF;
+	  border: 1px solid black;
+	}
+
+	.container th {
+	  text-align: center;
+	  background-color: #55608f;
+	}
+	input {
+		width: 300px;
+		padding: 8px 20px;
+		margin: 4px 0;
+		box-sizing: border-box;
+	}
+	input[type=submit] {
+		width: 120px;
+		padding: 8px 20px;
+		margin: 4px 0;
+		box-sizing: border-box;
+	}
+</style>
+<div class="container">
+	<div class="form1">
+		<form action="/customer_cancel_trip" method="POST">
+			<input type="text" name = "TicketIDNumber" placeholder= "TicketIDNumber" required/>
+			<input type="submit" value = "Delete Flight" />
+		</form>
+	</div>
 	{% if error %}
 		<p class="error"><strong>Error:</strong> {{error}}</p>
 	{% endif %}
 	{% if context %}
 		<p class="context"><strong>Message:</strong> {{context}}</p>
 	{% endif %}
-</form>
-<style type="text/css">
-	table, th, td {
-		border: 1px solid black;
-	}
-</style>
-{% if data %}
-<table>
-	<tr>
-		{% for header in headings %}
-		<th>{{ header }}</th>
+	{% if data %}
+	<table>
+		<tr>
+			{% for header in headings %}
+			<th>{{ header }}</th>
+			{% endfor %}
+		</tr>
+		{% for row in data %}
+		<tr>
+			{% for key in row.keys() %}
+			<td>{{ row[key] }}</td>
+			{% endfor %}
+		</tr>
 		{% endfor %}
-	</tr>
-	{% for row in data %}
-	<tr>
-		{% for key in row.keys() %}
-		<td>{{ row[key] }}</td>
-		{% endfor %}
-	</tr>
-	{% endfor %}
-</table>
-<br>
-{% endif %}
-<a href="/customer_home">Go back</a> &nbsp
-<a href="/customer_logout">Logout</a> &nbsp
+	</table>
+	<br>
+	{% endif %}
+	<button class="button" onclick="window.location.href=`{{ url_for('customer_home') }}`;">Go back</button>
+</div>
+
 
 </body>
 

@@ -2,25 +2,97 @@
 <head>
 </head>
 <body>
+<style type="text/css">
+	.button{
+		display:inline-block;
+		padding:0.2em 1.45em;
 
-<h3>Monthly Spending Between {{start}} and {{end}}</h3>
+		border:0.15em solid #CCCCCC;
+		box-sizing: border-box;
+		text-decoration:none;
+		font-family:'Segoe UI','Roboto',sans-serif;
+		font-weight:400;
+		color:#000000;
+		background-color:#CCCCCC;
+		text-align:center;
+		position:relative;
+	}
 
-<form action="/customer_track_spending_custom" method="POST">
-	<input type="text" name = "start_date" placeholder= "Start Date, format(yyyy-mm-dd)" style="width:200px"
-           required/> </br>
-    <input type="text" name = "end_date" placeholder= "End Date, format(yyyy-mm-dd)" style="width:200px"
-           required/> </br>
-	<input type="submit" value = "Track Spending" />
-	{% if error %}
-		<p class="error"><strong>Error:</strong> {{error}}</p>
-	{% endif %}
-</form>
+	.button:hover{
+		border-color:#7a7a7a;
+	}
 
-	<style type="text/css">
-		table, th, td {
-			border: 1px solid black;
+	.button:active{
+		background-color:#999999;
+	}
+
+	@media all and (max-width:30em){
+		.button{
+			display:block;
+			margin:0.2em auto;
 		}
-	</style>
+	}
+
+	.container {
+	  position: absolute;
+	  left: 50%;
+	  transform: translate(-50%, 0%);
+	}
+
+	.container table {
+		border: 1px solid black;
+		margin:1em;
+		margin-left:0em;
+	  background: #333;
+	  background-color: #55608f;
+	  font-size: 12pt;
+	  border-collapse: collapse;
+	  border-collapse: collapse;
+	  overflow: hidden;
+	  box-shadow: 0 0 20px rgba(0,0,0,0.2);
+	  width: 100%;
+	  min-width: max-content;
+	}
+
+	.container th,
+	.container td {
+	  padding: 10px;
+	  background-color: rgba(220,220,220,0.5);
+	  color: #FFFFFF;
+	  border: 1px solid black;
+	}
+
+	.container th {
+	  text-align: center;
+	  background-color: #55608f;
+	}
+	input {
+		width: 230px;
+		padding: 8px 20px;
+		margin: 4px 0;
+		box-sizing: border-box;
+	}
+	input[type=submit] {
+		width: 140px;
+		padding: 8px 20px;
+		margin: 4px 0;
+		box-sizing: border-box;
+	}
+</style>
+<div class="container">
+	<h3>Monthly Spending Between {{start}} and {{end}}</h3>
+	<div class="form1">
+		<form action="/customer_track_spending_custom" method="POST">
+			<input type="text" name = "start_date" placeholder= "Start Date, format(yyyy-mm-dd)"
+				   required/> </br>
+			<input type="text" name = "end_date" placeholder= "End Date, format(yyyy-mm-dd)"
+				   required/> </br>
+			<input type="submit" value = "Track Spending" />
+			{% if error %}
+				<p class="error"><strong>Error:</strong> {{error}}</p>
+			{% endif %}
+		</form>
+	</div>
 	<table>
 		<tr>
 			{% for header in headings %}
@@ -30,17 +102,14 @@
 		{% for row in data %}
 		<tr>
 			{% for key in row.keys() %}
-			<td>{{ row[key] }}</td>
+			<td>${{ row[key] }}</td>
 			{% endfor %}
 		</tr>
 		{% endfor %}
 	</table>
-<form action="/post" method="POST">
 	<h3>Total Spending Between {{start_year}} and {{end_year}} is ${{total}}</h3>
-</form>
-<a href="/customer_home">Go back</a> &nbsp
-<a href="/customer_logout">Logout</a> &nbsp
-
+	<button class="button" onclick="window.location.href=`{{ url_for('customer_home') }}`;">Go back</button>
+</div>
 </body>
 
 

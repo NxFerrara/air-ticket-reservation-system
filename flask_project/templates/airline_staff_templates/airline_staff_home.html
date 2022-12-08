@@ -2,77 +2,68 @@
 <head>
 </head>
 <style>
-html,
-body {
-  height: 100%;
-}
-body {
-  margin: 0;
-  font-family: sans-serif;
-  font-weight: 100;
-}
-.container {
-  position: absolute;
-  top: 25%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-}
-
-.container table {
-  color: #ddd;
-  background: #333;
-  font-size: 12pt;
-  border-collapse: collapse;
-  border-collapse: collapse;
-  overflow: hidden;
-  box-shadow: 0 0 20px rgba(0,0,0,0.2);
-}
-
-.container th,
-.container td {
-  padding: 10px;
-  background-color: rgba(220,220,220,0.5);
-  color: #FFFFFF;
-  border: 1px solid black;
-}
-
-.container th {
-  text-align: center;
-}
-
-.container thead {
-  th {
-    background-color: #55608f;
-  }
-}
-
-
-.button{
-	display:inline-block;
-	padding:0.2em 1.45em;
-	margin:1em;
-	border:0.15em solid #CCCCCC;
-	box-sizing: border-box;
-	text-decoration:none;
-	font-family:'Segoe UI','Roboto',sans-serif;
-	font-weight:400;
-	color:#000000;
-	background-color:#CCCCCC;
-	text-align:center;
-	position:relative;
-}
-.button:hover{
-	border-color:#7a7a7a;
-}
-.button:active{
-	background-color:#999999;
-}
-@media all and (max-width:30em){
 	.button{
-		display:block;
-		margin:0.2em auto;
+		display:inline-block;
+		padding:0.2em 1.45em;
+		margin-right:1.5em;
+		border:0.15em solid #CCCCCC;
+		box-sizing: border-box;
+		text-decoration:none;
+		font-family:'Segoe UI','Roboto',sans-serif;
+		font-weight:400;
+		color:#000000;
+		background-color:#CCCCCC;
+		text-align:center;
+		position:relative;
 	}
-}
+
+	.button:hover{
+		border-color:#7a7a7a;
+	}
+
+	.button:active{
+		background-color:#999999;
+	}
+
+	@media all and (max-width:30em){
+		.button{
+			display:block;
+			margin:0.2em auto;
+		}
+	}
+
+	.container {
+	  position: absolute;
+	  top: 30%;
+	  left: 50%;
+	  transform: translate(-50%, -50%);
+	}
+
+	.container table {
+		border: 1px solid black;
+	  background: #333;
+	  background-color: #55608f;
+	  font-size: 12pt;
+	  border-collapse: collapse;
+	  border-collapse: collapse;
+	  overflow: hidden;
+	  box-shadow: 0 0 20px rgba(0,0,0,0.2);
+	  width: 100%;
+	  min-width: max-content;
+	}
+
+	.container th,
+	.container td {
+	  padding: 10px;
+	  background-color: rgba(220,220,220,0.5);
+	  color: #FFFFFF;
+	  border: 1px solid black;
+	}
+
+	.container th {
+	  text-align: center;
+	  background-color: #55608f;
+	}
 </style>
 <body>
 <div class="container">
@@ -108,6 +99,7 @@ body {
 	<button class="button" onclick="window.location.href=`{{ url_for('insert_new_airport') }}`;">Add New Airport</button>
 	<button class="button" onclick="window.location.href=`{{ url_for('ticket_stats') }}`;">Ticket Revenue</button>
 	<button class="button" onclick="window.location.href=`{{ url_for('customer_stats') }}`;">Customers</button>
+	</br>
 	</br>
 	</br>
 	<button class="button" onclick="window.location.href=`{{ url_for('airline_staff_logout') }}`;">Logout</button>

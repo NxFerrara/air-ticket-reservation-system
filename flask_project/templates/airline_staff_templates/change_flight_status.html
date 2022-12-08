@@ -2,47 +2,99 @@
 <head>
 </head>
 <body>
-<form action="{{ url_for('exec_change_flight_status', flightData=flightData) }}" method="POST">
-    <label for="Status">Change Status:</label>
-        <select id="Status" name="Status">
-			<option value="On-time">On-Time</option>
-			<option value="Delayed">Delayed</option>
-			<option value="Canceled">Canceled</option>
-        </select>
-	<input type="submit" value = Submit />
-	{% if error %}
-		<p class="error"><strong>Error:</strong> {{error}}</p>
-	{% endif %}
-</form>
-
 <style type="text/css">
-	table, th, td {
+	.button{
+		display:inline-block;
+		padding:0.2em 1.45em;
+		border:0.15em solid #CCCCCC;
+		box-sizing: border-box;
+		text-decoration:none;
+		font-family:'Segoe UI','Roboto',sans-serif;
+		font-weight:400;
+		color:#000000;
+		background-color:#CCCCCC;
+		text-align:center;
+		position:relative;
+	}
+
+	.button:hover{
+		border-color:#7a7a7a;
+	}
+
+	.button:active{
+		background-color:#999999;
+	}
+
+	@media all and (max-width:30em){
+		.button{
+			display:block;
+			margin:0.2em auto;
+		}
+	}
+
+	.container {
+	  position: absolute;
+	  top: 30%;
+	  left: 50%;
+	  transform: translate(-50%, -50%);
+	}
+
+	.container table {
 		border: 1px solid black;
+	  background: #333;
+	  background-color: #55608f;
+	  font-size: 12pt;
+	  border-collapse: collapse;
+	  border-collapse: collapse;
+	  overflow: hidden;
+	  box-shadow: 0 0 20px rgba(0,0,0,0.2);
+	  width: 100%;
+	  min-width: max-content;
+	}
+
+	.container th,
+	.container td {
+	  padding: 10px;
+	  background-color: rgba(220,220,220,0.5);
+	  color: #FFFFFF;
+	  border: 1px solid black;
+	}
+
+	.container th {
+	  text-align: center;
+	  background-color: #55608f;
 	}
 </style>
-{% if data %}
-<table>
-	<tr>
-		{% for header in headings %}
-		<th>{{ header }}</th>
-		{% endfor %}
-	</tr>
-	{% for row in data %}
-	<tr>
-		{% for key in row.keys() %}
-		<td>{{ row[key] }}</td>
-		{% endfor %}
-		<td onclick="window.location.href=`{{ url_for('view_flight_customers', flightData=row) }}`;">
-			<u style="text-decoration-color:blue">Customers</u></td>
-		<td onclick="window.location.href=`{{ url_for('change_flight_status', flightData=row) }}`;">
-			<u style="text-decoration-color:blue">Change Status</u></td>
-	</tr>
-	{% endfor %}
-</table>
-<br>
-{% endif %}
-<a href="/search_flights_airline_staff">Go back</a>
-
+<div class="container">
+	{% if flightData %}
+	<table>
+		<tr>
+			{% for header in headings %}
+			<th>{{ header }}</th>
+			{% endfor %}
+		</tr>
+		<tr>
+			{% for key in flightData.keys() %}
+			<td>{{ flightData[key] }}</td>
+			{% endfor %}
+		</tr>
+	</table>
+	<br>
+	{% endif %}
+	<form action="{{ url_for('exec_change_flight_status', flightData=flightData) }}" method="POST">
+		<label for="Status">Change Status:</label>
+			<select id="Status" name="Status">
+				<option value="On-time">On-Time</option>
+				<option value="Delayed">Delayed</option>
+				<option value="Canceled">Canceled</option>
+			</select>
+		<input type="submit" value = Submit />
+		{% if error %}
+			<p class="error"><strong>Error:</strong> {{error}}</p>
+		{% endif %}
+	</form>
+	<button class="button" onclick="window.location.href=`{{ url_for('search_flights_airline_staff') }}`;">Go back</button>
+</div>
 </body>
 
 

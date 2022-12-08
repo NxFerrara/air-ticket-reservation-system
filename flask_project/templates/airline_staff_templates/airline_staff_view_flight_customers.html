@@ -4,32 +4,111 @@
 <body>
 
 <style type="text/css">
-	table, th, td {
-		border: 1px solid black;
+	.button{
+		display:inline-block;
+		padding:0.2em 1.45em;
+		margin-top:1em;
+		border:0.15em solid #CCCCCC;
+		box-sizing: border-box;
+		text-decoration:none;
+		font-family:'Segoe UI','Roboto',sans-serif;
+		font-weight:400;
+		color:#000000;
+		background-color:#CCCCCC;
+		text-align:center;
+		position:relative;
 	}
-</style>
-{% if data %}
-<table>
-	<tr>
-		{% for header in headings %}
-		<th>{{ header }}</th>
-		{% endfor %}
-	</tr>
-	{% for row in data %}
-	<tr>
-		{% for key in row.keys() %}
-		<td>{{ row[key] }}</td>
-		{% endfor %}
-	</tr>
-	{% endfor %}
-</table>
-<br>
-{% endif %}
-{% if message %}
-	<p class="message"><strong>Message:</strong> {{message}}</p>
-{% endif %}
-<a href="/search_flights_airline_staff">Go back</a>
 
+	.button:hover{
+		border-color:#7a7a7a;
+	}
+
+	.button:active{
+		background-color:#999999;
+	}
+
+	@media all and (max-width:30em){
+		.button{
+			display:block;
+			margin:0.2em auto;
+		}
+	}
+
+	.container {
+	  position: absolute;
+	  top: 30%;
+	  left: 50%;
+	  transform: translate(-50%, -50%);
+	}
+
+	.container table {
+		border: 1px solid black;
+	  background: #333;
+	  background-color: #55608f;
+	  font-size: 12pt;
+	  border-collapse: collapse;
+	  border-collapse: collapse;
+	  overflow: hidden;
+	  box-shadow: 0 0 20px rgba(0,0,0,0.2);
+	  min-width: max-content;
+	}
+
+	.container th,
+	.container td {
+	  padding: 10px;
+	  background-color: rgba(220,220,220,0.5);
+	  color: #FFFFFF;
+	  border: 1px solid black;
+	}
+
+	.container th {
+	  text-align: center;
+	  background-color: #55608f;
+	}
+
+	.flight table {
+		width: 100%;
+	}
+
+</style>
+<div class="container">
+	{% if flightData %}
+	<table class="flight">
+		<tr>
+			{% for header in flightHeadings %}
+			<th>{{ header }}</th>
+			{% endfor %}
+		</tr>
+		<tr>
+			{% for key in flightData.keys() %}
+			<td>{{ flightData[key] }}</td>
+			{% endfor %}
+		</tr>
+	</table>
+	{% endif %}
+
+	{% if data %}
+	<p class="context"><strong>Flying Customers:</strong></p>
+	<table class="customer">
+		<tr>
+			{% for header in headings %}
+			<th>{{ header }}</th>
+			{% endfor %}
+		</tr>
+		{% for row in data %}
+		<tr>
+			{% for key in row.keys() %}
+			<td>{{ row[key] }}</td>
+			{% endfor %}
+		</tr>
+		{% endfor %}
+	</table>
+	{% endif %}
+	{% if message %}
+		<p class="message"><strong>Message:</strong> {{message}}</p>
+	{% endif %}
+	<button class="button" onclick="window.location.href=`{{ url_for('search_flights_airline_staff') }}`;">Go back</button>
+</div>
 </body>
 
 

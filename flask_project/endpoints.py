@@ -246,15 +246,15 @@ def airline_staff_home():
         cursor = conn.cursor()
         # executes query
         query = 'SELECT AirlineName, FlightNumber, DepartureAirportName, ArrivalAirportName, ' \
-                'DepartureDateandTime, ArrivalDateandTime, BasePrice, Status FROM flight ' \
-                'WHERE AirlineName = %s AND DepartureDateandTime >= DATE(NOW()) AND ' \
+                'DepartureDateandTime, ArrivalDateandTime, Status FROM flight ' \
+                'WHERE AirlineName = %s AND DepartureDateandTime >= NOW() AND ' \
                 'DepartureDateandTime <= DATE(NOW() + INTERVAL 30 DAY);'
         cursor.execute(query, (airlineName,))
         # stores the results in a variable
         data = cursor.fetchall()
         cursor.close()
         headings = ("Airline Name", "Flight Number", "Departure Airport", "Arrival Airport",
-                    "Departure Date and Time", "Arrival Date and Time", "Base Price", "Status")
+                    "Departure Date and Time", "Arrival Date and Time", "Status")
         return render_template('airline_staff_templates/airline_staff_home.html', username=username, headings=headings,
                                data=data)
     else:
@@ -270,7 +270,7 @@ def insert_new_flight():
         cursor = conn.cursor()
         query = 'SELECT AirlineName, FlightNumber, DepartureAirportName, ArrivalAirportName, ' \
                 'DepartureDateandTime, ArrivalDateandTime, BasePrice, Status FROM flight ' \
-                'WHERE AirlineName = %s AND DepartureDateandTime >= DATE(NOW()) AND ' \
+                'WHERE AirlineName = %s AND DepartureDateandTime >= NOW() AND ' \
                 'DepartureDateandTime <= DATE(NOW() + INTERVAL 30 DAY);'
         cursor.execute(query, (airlineName,))
         # stores the results in a variable
@@ -305,7 +305,7 @@ def exec_insert_new_flight():
         # Query all of the future flights
         futureFlightsQuery = 'SELECT AirlineName, FlightNumber, DepartureAirportName, ArrivalAirportName, ' \
                              'DepartureDateandTime, ArrivalDateandTime, BasePrice, Status FROM flight ' \
-                             'WHERE AirlineName = %s AND DepartureDateandTime >= DATE(NOW()) AND ' \
+                             'WHERE AirlineName = %s AND DepartureDateandTime >= NOW() AND ' \
                              'DepartureDateandTime <= DATE(NOW() + INTERVAL 30 DAY);'
         headings = ("Airline Name", "Flight Number", "Departure Airport", "Arrival Airport",
                     "Departure Date and Time", "Arrival Date and Time", "Base Price", "Status")
@@ -478,29 +478,29 @@ def search_flights_airline_staff_query():
         if has_end_date:
             # executes query
             query = 'SELECT AirlineName, FlightNumber, DepartureAirportName, ' \
-                    'ArrivalAirportName, DepartureDateandTime, ArrivalDateandTime, BasePrice, Status ' \
+                    'ArrivalAirportName, DepartureDateandTime, ArrivalDateandTime, Status ' \
                     'FROM flight WHERE ' \
                     'AirlineName = %s AND ' \
                     'DepartureAirportName = %s AND ' \
                     'ArrivalAirportName = %s AND ' \
-                    'DepartureDateandTime >= %s AND ' \
-                    'DepartureDateAndTime <= %s'
+                    'DepartureDateandTime >= DATE(%s) AND ' \
+                    'DepartureDateAndTime <= DATE(%s)'
             cursor.execute(query, (airline_name, source_city, destination_city, start_departure_date_and_time,
                                    end_departure_date_and_time))
         else:
             # executes query
             query = 'SELECT AirlineName, FlightNumber, DepartureAirportName, ' \
-                    'ArrivalAirportName, DepartureDateandTime, ArrivalDateandTime, BasePrice, Status ' \
+                    'ArrivalAirportName, DepartureDateandTime, ArrivalDateandTime, Status ' \
                     'FROM flight WHERE ' \
                     'AirlineName = %s AND ' \
                     'DepartureAirportName = %s AND ' \
                     'ArrivalAirportName = %s AND ' \
-                    'DepartureDateandTime >= %s'
+                    'DepartureDateandTime >= DATE(%s)'
             cursor.execute(query, (airline_name, source_city, destination_city, start_departure_date_and_time))
         data = cursor.fetchall()
         if data:
             headings = ("Airline Name", "Flight Number", "Departure Airport",
-                        "Arrival Airport", "Departure Date and Time", "Arrival Date and Time", "Base Price", "Status")
+                        "Arrival Airport", "Departure Date and Time", "Arrival Date and Time", "Status")
             return render_template('airline_staff_templates/search_flights_airline_staff.html', headings=headings,
                                    data=data)
         else:
@@ -527,14 +527,16 @@ def view_flight_customers(flightData):
                                flightData['DepartureDateandTime'].strftime('%Y-%m-%d %H:%M:%S')))
         data = cursor.fetchall()
         message = None
+        flightHeadings = ("Airline Name", "Flight Number", "Departure Airport",
+                        "Arrival Airport", "Departure Date and Time", "Arrival Date and Time", "Status")
         if data:
             headings = ("Name",)
             return render_template('airline_staff_templates/airline_staff_view_flight_customers.html',
-                                   headings=headings,
-                                   data=data)
+                                   flightHeadings=flightHeadings, flightData=flightData, headings=headings, data=data)
         else:
             message = "No customers found for that flight"
-            return render_template('airline_staff_templates/airline_staff_view_flight_customers.html', message=message)
+            return render_template('airline_staff_templates/airline_staff_view_flight_customers.html', message=message,
+                                   flightHeadings=flightHeadings, flightData=flightData)
     else:
         return render_template('home_templates/unauthorized_access.html', is_customer=session.get('is_customer'),
                                is_airline_staff=session.get('is_airline_staff'))
@@ -544,7 +546,10 @@ def view_flight_customers(flightData):
 def change_flight_status(flightData):
     if session.get('is_airline_staff'):
         flightData = eval(flightData)
-        return render_template('airline_staff_templates/change_flight_status.html', flightData=flightData)
+        headings = ("Airline Name", "Flight Number", "Departure Airport",
+                    "Arrival Airport", "Departure Date and Time", "Arrival Date and Time", "Status")
+        return render_template('airline_staff_templates/change_flight_status.html', flightData=flightData,
+                               headings=headings)
     else:
         return render_template('home_templates/unauthorized_access.html', is_customer=session.get('is_customer'),
                                is_airline_staff=session.get('is_airline_staff'))
@@ -950,9 +955,9 @@ def search_one_way_query():
             'FROM flight WHERE ' \
             'DepartureAirportName = %s AND ' \
             'ArrivalAirportName = %s AND ' \
-            'DepartureDateandTime >= %s AND ' \
+            'DepartureDateandTime >= DATE(%s - INTERVAL 1 DAY) AND ' \
             'DepartureDateandTime <= DATE(%s + INTERVAL 1 DAY) AND ' \
-            'DepartureDateAndTime >= DATE(NOW())'
+            'DepartureDateAndTime >= NOW()'
     cursor.execute(query, (source_city, destination_city, departure_date_and_time, departure_date_and_time))
     # stores the results in a variable
     data = cursor.fetchall()
@@ -983,9 +988,9 @@ def search_round_trip_query():
                       'FROM flight WHERE '\
                       'DepartureAirportName = %s AND '\
                       'ArrivalAirportName = %s AND '\
-                      'DepartureDateandTime >= %s AND ' \
-                      'DepartureDateandTime <= (%s + INTERVAL 1 DAY) AND ' \
-                      'DepartureDateAndTime >= DATE(NOW())'
+                      'DepartureDateandTime >= DATE(%s - INTERVAL 1 DAY) AND ' \
+                      'DepartureDateandTime <= DATE(%s + INTERVAL 1 DAY) AND ' \
+                      'DepartureDateAndTime >= NOW()'
     cursor.execute(departure_query, (source_city, destination_city, departure_date_and_time, departure_date_and_time))
     departure_trips = cursor.fetchall()
     round_trips = []
@@ -995,10 +1000,11 @@ def search_round_trip_query():
                        'FROM flight WHERE '\
                        'DepartureAirportName = %s AND '\
                        'ArrivalAirportName = %s AND '\
-                       'DepartureDateandTime >= %s AND '\
-                       'DepartureDateandTime <= (%s + INTERVAL 1 DAY) AND ' \
+                       'DepartureDateandTime >= DATE(%s - INTERVAL 1 DAY) AND '\
+                       'DepartureDateandTime <= DATE(%s + INTERVAL 1 DAY) AND ' \
                        'DepartureDateAndTime >= %s'
-        cursor.execute(return_query, (destination_city, source_city, return_date_and_time, return_date_and_time, trip['ArrivalDateandTime']))
+        cursor.execute(return_query, (destination_city, source_city, return_date_and_time, return_date_and_time,
+                                      trip['ArrivalDateandTime']))
         return_trips = cursor.fetchall()
         if return_trips:
             round_trips.append([trip, return_trips])
@@ -1022,12 +1028,14 @@ def customer_home():
         # cursor used to send queries
         cursor = conn.cursor()
         # executes query
-        query = 'SELECT AirlineName, FlightNumber, DepartureDateandTime, ArrivalDateandTime, Status FROM flight'
-        cursor.execute(query)
-        # stores the results in a variable
+        query = 'SELECT DISTINCT AirlineName, FlightNumber, DepartureDateandTime, ArrivalDateandTime, ' \
+                'Status FROM ticket NATURAL JOIN flight, purchase ' \
+                'WHERE purchase.TicketIDNumber = ticket.TicketIDNumber AND EmailAddress = %s ' \
+                'AND DepartureDateandTime >= NOW()'
+        cursor.execute(query, email)
         data = cursor.fetchall()
-        cursor.close()
         headings = ("Airline Name", "Flight Number", "Departure Date and Time", "Arrival Date and Time", "Status")
+        cursor.close()
         return render_template('customer_templates/customer_home.html', email=email, headings=headings, data=data)
     else:
         return render_template('home_templates/unauthorized_access.html', is_customer=session.get('is_customer'),
@@ -1047,7 +1055,7 @@ def customer_view_previous_flights():
         query = 'SELECT AirlineName, FlightNumber, DepartureDateandTime, ArrivalDateandTime, ' \
                 'Status, Class, ticket.TicketIDNumber FROM ticket NATURAL JOIN flight, purchase ' \
                 'WHERE purchase.TicketIDNumber = ticket.TicketIDNumber AND EmailAddress = %s ' \
-                'AND ArrivalDateandTime < DATE(NOW())'
+                'AND ArrivalDateandTime < NOW()'
         cursor.execute(query, email)
         data = cursor.fetchall()
         headings = ("Airline Name", "Flight Number", "Departure Date and Time", "Arrival Date and Time", "Status",
@@ -1071,7 +1079,7 @@ def customer_rate_and_comment():
         query = 'SELECT AirlineName, FlightNumber, DepartureDateandTime, ticket.TicketIDNumber ' \
                 'FROM ticket NATURAL JOIN flight, purchase ' \
                 'WHERE purchase.TicketIDNumber = ticket.TicketIDNumber AND ticket.TicketIDNumber = %s ' \
-                'AND EmailAddress = %s AND ArrivalDateandTime < DATE(NOW())'
+                'AND EmailAddress = %s AND ArrivalDateandTime < NOW()'
         cursor.execute(query, (ticket_id_number, email))
         data = cursor.fetchone()
         message = "Successfully made a rating and comment for the flight!"
@@ -1097,7 +1105,7 @@ def customer_rate_and_comment():
         query = 'SELECT AirlineName, FlightNumber, DepartureDateandTime, ArrivalDateandTime, ' \
                 'Status, Class, ticket.TicketIDNumber FROM ticket NATURAL JOIN flight, purchase ' \
                 'WHERE purchase.TicketIDNumber = ticket.TicketIDNumber AND EmailAddress = %s ' \
-                'AND ArrivalDateandTime < DATE(NOW())'
+                'AND ArrivalDateandTime < NOW()'
         cursor.execute(query, email)
         data = cursor.fetchall()
         headings = ("Airline Name", "Flight Number", "Departure Date and Time", "Arrival Date and Time", "Status",
@@ -1120,7 +1128,7 @@ def customer_view_upcoming_flights():
         query = 'SELECT AirlineName, FlightNumber, DepartureDateandTime, ArrivalDateandTime, ' \
                 'Status, Class, ticket.TicketIDNumber FROM ticket NATURAL JOIN flight, purchase ' \
                 'WHERE purchase.TicketIDNumber = ticket.TicketIDNumber AND EmailAddress = %s ' \
-                'AND DepartureDateandTime >= DATE(NOW())'
+                'AND DepartureDateandTime >= NOW()'
         cursor.execute(query, email)
         data = cursor.fetchall()
         headings = ("Airline Name", "Flight Number", "Departure Date and Time", "Arrival Date and Time", "Status",
@@ -1161,7 +1169,7 @@ def customer_cancel_trip():
         query = 'SELECT AirlineName, FlightNumber, DepartureDateandTime, ArrivalDateandTime, ' \
                 'Status, Class, ticket.TicketIDNumber FROM ticket NATURAL JOIN flight, purchase ' \
                 'WHERE purchase.TicketIDNumber = ticket.TicketIDNumber AND EmailAddress = %s ' \
-                'AND DepartureDateandTime >= DATE(NOW())'
+                'AND DepartureDateandTime >= NOW()'
         cursor.execute(query, email)
         data = cursor.fetchall()
         headings = ("Airline Name", "Flight Number", "Departure Date and Time", "Arrival Date and Time", "Status",
@@ -1249,9 +1257,9 @@ def customer_purchase_ticket(trip_type, departure_flight, return_flight):
             elif return_flight != 'None' and return_capacity >= 0.6:
                 context = 'The return flight is above 60% capacity (25% Price Increase)'
         headings_departure = ("Airline Name", "Flight Number", "Departure Airport", "Arrival Airport",
-                              "Departure Date and Time", "Arrival Date and Time", "Class", "Price")
+                              "Departure Date and Time", "Arrival Date and Time", "Status", "Class", "Price")
         headings_return = ("Airline Name", "Flight Number", "Departure Airport", "Arrival Airport",
-                           "Departure Date and Time", "Arrival Date and Time", "Class", "Price")
+                           "Departure Date and Time", "Arrival Date and Time", "Status", "Class", "Price")
         total_price = return_class_price + departure_class_price if return_flight != 'None' else departure_class_price
         cursor.close()
         return render_template('customer_templates/customer_purchase_ticket.html', trip_type=trip_type,
