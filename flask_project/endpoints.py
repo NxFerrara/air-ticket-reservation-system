@@ -111,6 +111,17 @@ def airline_staff_register_auth():
     date_of_birth = request.form['date_of_birth']
     airline_name = request.form['airline_name']
 
+    cursor = conn.cursor()
+    # executes query
+    query = 'SELECT * FROM airline WHERE AirlineName = %s'
+    cursor.execute(query, (airline_name,))
+    # stores the results in a variable
+    data = cursor.fetchall()
+    cursor.close()
+    if not data:
+        error = "The Airline {} does not exist".format(airline_name)
+        return render_template('airline_staff_templates/airline_staff_register.html', error=error)
+
     date_of_birth = datetime.datetime.strptime(date_of_birth, "%Y-%m-%d")
     phonenum = [e.strip() for e in request.form['phone_number'].split(',')]
     email = [e.strip() for e in request.form['email'].split(',')]
