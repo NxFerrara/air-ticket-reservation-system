@@ -731,7 +731,7 @@ def exec_insert_new_airport():
             ins = 'INSERT INTO airport VALUES(%s, %s, %s, %s)'
             cursor.execute(ins, (AirportName, City, Country, AirportType))
             conn.commit()
-            query = 'SELECT *  FROM airport WHERE AirportName = %s'
+            query = 'SELECT *  FROM airport'
             cursor.execute(query)
             data = cursor.fetchall()
             headings = ("Airport Name", "City", "Country", "AirportType")
