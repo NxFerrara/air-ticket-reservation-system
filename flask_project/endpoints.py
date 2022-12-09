@@ -322,6 +322,14 @@ def exec_insert_new_flight():
                     "Departure Date and Time", "Arrival Date and Time", "Base Price", "ID Number", "Status")
         # cursor used to send queries
         cursor = conn.cursor()
+        if DepartureAirportName == ArrivalAirportName:
+            cursor.execute(futureFlightsQuery, (airlineName,))
+            # stores the results in a variable
+            futureFlights = cursor.fetchall()
+            cursor.close()
+            error = "The Departure Airport must be different from the Arrival Airport"
+            return render_template('airline_staff_templates/airline_staff_insert.html', error=error,
+                                   headings=headings, data=futureFlights)
         if not departure_is_after:
             cursor.execute(futureFlightsQuery, (airlineName,))
             # stores the results in a variable
@@ -1306,7 +1314,6 @@ def exec_customer_purchase_ticket(departure_flight, return_flight):
         departure_flight = eval(departure_flight)
         cursor = conn.cursor()
         trip_type = departure_flight['Class']
-        departure_class_price = departure_flight['price']
         query = 'SELECT COUNT(ticket.TicketIDNumber) as TicketCount FROM ticket NATURAL JOIN flight, purchase ' \
                 'WHERE purchase.TicketIDNumber = ticket.TicketIDNumber AND Class = %s' \
                 'AND FlightNumber = %s AND DepartureDateandTime = %s AND AirlineName = %s'
@@ -1314,14 +1321,21 @@ def exec_customer_purchase_ticket(departure_flight, return_flight):
                                departure_flight['AirlineName']))
         data = cursor.fetchone()
         departure_num_tickets = data['TicketCount']
-        query = 'SELECT Numberof{}ClassSeats FROM flight NATURAL JOIN airplane WHERE FlightNumber = %s ' \
+        query = 'SELECT Numberof{}ClassSeats, BasePrice FROM flight NATURAL JOIN airplane WHERE FlightNumber = %s ' \
                 'AND DepartureDateandTime = %s AND AirlineName = %s'.format(trip_type)
         cursor.execute(query, (departure_flight['FlightNumber'], departure_flight['DepartureDateandTime'],
                                departure_flight['AirlineName']))
         data = cursor.fetchone()
         departure_num_class_seats = data['Numberof{}ClassSeats'.format(trip_type)]
         departure_capacity = departure_num_tickets / departure_num_class_seats
-        departure_class_price = departure_class_price * 1.25 if departure_capacity >= 0.6 else departure_class_price
+        departure_base_price = data['BasePrice']
+        departure_class_price = departure_base_price
+        if trip_type == 'Economy':
+            departure_class_price = departure_base_price * 1.25 if departure_capacity >= 0.6 else departure_base_price
+        elif trip_type == 'Business':
+            departure_class_price = 2*departure_base_price * 1.25 if departure_capacity >= 0.6 else 2*departure_base_price
+        elif trip_type == 'First':
+            departure_class_price = 4 * departure_base_price * 1.25 if departure_capacity >= 0.6 else 4 * departure_base_price
         departure_flight['price'] = departure_class_price
         query = 'SELECT MAX(TicketIDNumber) as MaxTicketIDNumber FROM ticket'
         cursor.execute(query)
@@ -1343,7 +1357,6 @@ def exec_customer_purchase_ticket(departure_flight, return_flight):
         if return_flight != 'None':
             return_flight = eval(return_flight)
             message = 'Successfully purchased the tickets for the round trip flight'
-            return_class_price = return_flight['price']
             query = 'SELECT COUNT(ticket.TicketIDNumber) as TicketCount FROM ticket NATURAL JOIN flight, purchase ' \
                     'WHERE purchase.TicketIDNumber = ticket.TicketIDNumber AND Class = %s' \
                     'AND FlightNumber = %s AND DepartureDateandTime = %s AND AirlineName = %s'
@@ -1352,14 +1365,21 @@ def exec_customer_purchase_ticket(departure_flight, return_flight):
                             return_flight['AirlineName']))
             data = cursor.fetchone()
             return_num_tickets = data['TicketCount']
-            query = 'SELECT Numberof{}ClassSeats FROM flight NATURAL JOIN airplane WHERE FlightNumber = %s ' \
+            query = 'SELECT Numberof{}ClassSeats, BasePrice FROM flight NATURAL JOIN airplane WHERE FlightNumber = %s ' \
                     'AND DepartureDateandTime = %s AND AirlineName = %s'.format(trip_type)
             cursor.execute(query, (return_flight['FlightNumber'], return_flight['DepartureDateandTime'],
                                    return_flight['AirlineName']))
             data = cursor.fetchone()
             return_num_class_seats = data['Numberof{}ClassSeats'.format(trip_type)]
             return_capacity = return_num_tickets / return_num_class_seats
-            return_class_price = return_class_price * 1.25 if return_capacity >= 0.6 else return_class_price
+            return_base_price = data['BasePrice']
+            return_class_price = return_base_price
+            if trip_type == 'Economy':
+                return_class_price = return_base_price * 1.25 if return_capacity >= 0.6 else return_base_price
+            elif trip_type == 'Business':
+                return_class_price = 2 * return_base_price * 1.25 if return_capacity >= 0.6 else 2 * return_base_price
+            elif trip_type == 'First':
+                return_class_price = 4 * return_base_price * 1.25 if return_capacity >= 0.6 else 4 * return_base_price
             return_flight['price'] = return_class_price
             query = 'SELECT MAX(TicketIDNumber) as MaxTicketIDNumber FROM ticket'
             cursor.execute(query)
@@ -1609,7 +1629,7 @@ def customer_track_spending_custom():
 def customer_logout():
     session.pop('email')
     session.pop('is_customer')
-    return redirect('/')
+    return redirect('/login')
 
 
 @app.route('/airline_staff_logout')
@@ -1617,7 +1637,7 @@ def airline_staff_logout():
     session.pop('username')
     session.pop('is_airline_staff')
     session.pop('airline_name')
-    return redirect('/')
+    return redirect('/login')
 
 
 def md5(password):
