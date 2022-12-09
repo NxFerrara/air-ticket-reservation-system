@@ -515,7 +515,7 @@ def search_flights_airline_staff_query():
 def view_flight_customers(flightData):
     if session.get('is_airline_staff'):
         flightData = eval(flightData)
-        query = 'SELECT DISTINCT Name FROM Purchase Natural Join Customer, Ticket WHERE ' \
+        query = 'SELECT DISTINCT EmailAddress FROM Purchase Natural Join Customer, Ticket WHERE ' \
                 'Ticket.TicketIDNumber = Purchase.TicketIDNumber AND Ticket.TicketIDNumber ' \
                 'IN(SELECT TicketIDNumber FROM Flight Natural Join Ticket WHERE ' \
                 'Flight.AirlineName = %s AND ' \
@@ -530,7 +530,15 @@ def view_flight_customers(flightData):
         flightHeadings = ("Airline Name", "Flight Number", "Departure Airport",
                         "Arrival Airport", "Departure Date and Time", "Arrival Date and Time", "Status")
         if data:
-            headings = ("Name",)
+            for item in data:
+                cust_email = item['EmailAddress']
+                query = 'SELECT Name FROM Customer WHERE EmailAddress = %s'
+                # cursor used to send queries
+                cursor = conn.cursor()
+                cursor.execute(query, (cust_email,))
+                cust_data = cursor.fetchone()
+                item['Name'] = cust_data['Name']
+            headings = ("Email", "Name")
             return render_template('airline_staff_templates/airline_staff_view_flight_customers.html',
                                    flightHeadings=flightHeadings, flightData=flightData, headings=headings, data=data)
         else:
