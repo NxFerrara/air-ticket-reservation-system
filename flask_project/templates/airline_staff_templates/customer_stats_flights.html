@@ -4,34 +4,94 @@
 <body>
 
 <style type="text/css">
-	table, th, td {
+	.button{
+		display:inline-block;
+		padding:0.2em 1.45em;
+		margin-right:1.5em;
+		border:0.15em solid #CCCCCC;
+		box-sizing: border-box;
+		text-decoration:none;
+		font-family:'Segoe UI','Roboto',sans-serif;
+		font-weight:400;
+		color:#000000;
+		background-color:#CCCCCC;
+		text-align:center;
+		position:relative;
+	}
+
+	.button:hover{
+		border-color:#7a7a7a;
+	}
+
+	.button:active{
+		background-color:#999999;
+	}
+
+	@media all and (max-width:30em){
+		.button{
+			display:block;
+			margin:0.2em auto;
+		}
+	}
+
+	.container {
+		position: absolute;
+		top: 5%;
+		left: 50%;
+		transform: translate(-50%, 0%);
+		min-width: max-content;
+	}
+
+	.container table {
 		border: 1px solid black;
+	  background: #333;
+	  background-color: #55608f;
+	  font-size: 12pt;
+	  border-collapse: collapse;
+	  border-collapse: collapse;
+	  overflow: hidden;
+	  box-shadow: 0 0 20px rgba(0,0,0,0.2);
+	  min-width: max-content;
+	}
+
+	.container th,
+	.container td {
+	  padding: 10px;
+	  background-color: rgba(220,220,220,0.5);
+	  color: #FFFFFF;
+	  border: 1px solid black;
+	  text-align: center;
+	}
+
+	.container th {
+	  text-align: center;
+	  background-color: #55608f;
 	}
 </style>
-{% if data %}
-<p class="message"><strong>Flights {{customerName}} ({{customerEmail}}) has taken:</strong></p>
-<table>
-	<tr>
-		{% for header in headings %}
-		<th>{{ header }}</th>
+<div class="container">
+	{% if data %}
+	<p class="message"><strong>Flights {{customerName}} ({{customerEmail}}) has taken:</strong></p>
+	<table>
+		<tr>
+			{% for header in headings %}
+			<th>{{ header }}</th>
+			{% endfor %}
+		</tr>
+		{% for row in data %}
+		<tr>
+			{% for key in row.keys() %}
+			<td>{{ row[key] }}</td>
+			{% endfor %}
+		</tr>
 		{% endfor %}
-	</tr>
-	{% for row in data %}
-	<tr>
-		{% for key in row.keys() %}
-		<td>{{ row[key] }}</td>
-		{% endfor %}
-	</tr>
-	{% endfor %}
-</table>
-</br>
-{% endif %}
-{% if error %}
-	<p class="error"><strong>Message:</strong> {{error}}</p>
-{% endif %}
-
-<a href="/customer_stats">Go back</a>
-
+	</table>
+	</br>
+	{% endif %}
+	{% if error %}
+		<p class="error"><strong>Message:</strong> {{error}}</p>
+	{% endif %}
+	<button class="button" onclick="window.location.href=`{{ url_for('customer_stats') }}`;">Go back</button>
+</div>
 </body>
 
 

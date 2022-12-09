@@ -419,7 +419,7 @@ def search_specific_flight_airline_staff_query():
         DepartureDateandTime = datetime.datetime.strptime(DepartureDateandTime, "%Y-%m-%dT%H:%M")
         # executes query
         query = 'SELECT AirlineName, FlightNumber, DepartureAirportName, ' \
-                'ArrivalAirportName, DepartureDateandTime, ArrivalDateandTime, BasePrice, Status ' \
+                'ArrivalAirportName, DepartureDateandTime, ArrivalDateandTime, Status ' \
                 'FROM flight WHERE ' \
                 'AirlineName = %s AND ' \
                 'FlightNumber = %s AND ' \
@@ -433,7 +433,7 @@ def search_specific_flight_airline_staff_query():
             error = "Found no flights with the flight number {} and departure date and time {}".format(FlightNumber,
                                                                                                        DepartureDateandTime)
         headings = ("Airline Name", "Flight Number", "Departure Airport",
-                    "Arrival Airport", "Departure Date and Time", "Arrival Date and Time", "Base Price", "Status")
+                    "Arrival Airport", "Departure Date and Time", "Arrival Date and Time", "Status")
         return render_template('airline_staff_templates/search_flights_airline_staff.html', headings=headings,
                                data=data, error=error)
     else:
@@ -590,7 +590,7 @@ def view_ratings(flightData):
     if session.get('is_airline_staff'):
         flightData = eval(flightData)
         flight_heading = ("Airline Name", "Flight Number", "Departure Airport",
-                        "Arrival Airport", "Departure Date and Time", "Arrival Date and Time", "Base Price", "Status")
+                        "Arrival Airport", "Departure Date and Time", "Arrival Date and Time", "Status")
         avg_rating_query = 'SELECT AVG(Rating) AS avg_rating FROM Flight Natural Join Rate WHERE ' \
                            'Flight.AirlineName = %s AND ' \
                            'Flight.FlightNumber = %s AND ' \
@@ -611,8 +611,8 @@ def view_ratings(flightData):
             avg_rating_data = int(avg_rating_data['avg_rating'] * 10) / 10
             headings = ('Rating','Comment')
             return render_template('airline_staff_templates/airline_staff_view_rating.html',
-                                   headings=headings,
-                                   data=rating_data,avg_rating = avg_rating_data,flight_headings =flight_heading, flight_data = flightData)
+                                   headings=headings, data=rating_data, avg_rating=avg_rating_data,
+                                   flight_headings=flight_heading, flight_data=flightData)
         else:
             message = "No ratings found for that flight"
             return render_template('airline_staff_templates/airline_staff_view_rating.html', message=message, flight_headings =flight_heading, flight_data = flightData)
@@ -951,7 +951,7 @@ def search_one_way_query():
     cursor = conn.cursor()
     # executes query
     query = 'SELECT AirlineName, FlightNumber, DepartureAirportName, ' \
-            'ArrivalAirportName, DepartureDateandTime, ArrivalDateandTime ' \
+            'ArrivalAirportName, DepartureDateandTime, ArrivalDateandTime, Status ' \
             'FROM flight WHERE ' \
             'DepartureAirportName = %s AND ' \
             'ArrivalAirportName = %s AND ' \
@@ -965,7 +965,7 @@ def search_one_way_query():
     if not data:
         error = "No future one way flights found for that search"
     headings = ("Airline Name", "Flight Number", "Departure Airport", "Arrival Airport",
-                "Departure Date and Time", "Arrival Date and Time", "Economy", "Business", "First")
+                "Departure Date and Time", "Arrival Date and Time", "Status", "Economy", "Business", "First")
     return render_template('home_templates/search_one_way.html', is_customer=session.get('is_customer'),
                            headings=headings, data=data, error=error)
 
@@ -984,7 +984,7 @@ def search_round_trip_query():
     cursor = conn.cursor()
     # executes query
     departure_query = 'SELECT AirlineName, FlightNumber, DepartureAirportName, '\
-                      'ArrivalAirportName, DepartureDateandTime, ArrivalDateandTime '\
+                      'ArrivalAirportName, DepartureDateandTime, ArrivalDateandTime, Status '\
                       'FROM flight WHERE '\
                       'DepartureAirportName = %s AND '\
                       'ArrivalAirportName = %s AND '\
@@ -996,7 +996,7 @@ def search_round_trip_query():
     round_trips = []
     for trip in departure_trips:
         return_query = 'SELECT AirlineName, FlightNumber, DepartureAirportName, '\
-                       'ArrivalAirportName, DepartureDateandTime, ArrivalDateandTime '\
+                       'ArrivalAirportName, DepartureDateandTime, ArrivalDateandTime, Status '\
                        'FROM flight WHERE '\
                        'DepartureAirportName = %s AND '\
                        'ArrivalAirportName = %s AND '\
@@ -1012,9 +1012,9 @@ def search_round_trip_query():
     if not round_trips:
         error = "No future round trip flights found for that search result"
     headings_return = ("Airline Name", "Flight Number", "Departure Airport", "Arrival Airport",
-                       "Departure Date and Time", "Arrival Date and Time", "Economy", "Business", "First")
+                       "Departure Date and Time", "Arrival Date and Time", "Status", "Economy", "Business", "First")
     headings_departure = ("Airline Name", "Flight Number", "Departure Airport", "Arrival Airport",
-                          "Departure Date and Time", "Arrival Date and Time")
+                          "Departure Date and Time", "Arrival Date and Time", "Status")
     return render_template('home_templates/search_round_trip.html', is_customer=session.get('is_customer'),
                            headings_return=headings_return, headings_departure=headings_departure,
                            round_trips=round_trips, error=error)
@@ -1371,9 +1371,9 @@ def exec_customer_purchase_ticket(departure_flight, return_flight):
             elif return_flight != 'None' and return_capacity >= 0.6:
                 context = 'The return flight is above 60% capacity (25% Price Increase)'
         headings_departure = ("Airline Name", "Flight Number", "Departure Airport", "Arrival Airport",
-                              "Departure Date and Time", "Arrival Date and Time", "Class", "Price")
+                              "Departure Date and Time", "Arrival Date and Time", "Status", "Class", "Price")
         headings_return = ("Airline Name", "Flight Number", "Departure Airport", "Arrival Airport",
-                           "Departure Date and Time", "Arrival Date and Time", "Class", "Price")
+                           "Departure Date and Time", "Arrival Date and Time", "Status", "Class", "Price")
         total_price = return_flight['price'] + departure_flight['price'] if return_flight != 'None' else departure_flight['price']
         return render_template('customer_templates/customer_purchase_ticket.html', trip_type=trip_type,
                                departure_flight=departure_flight, return_flight=return_flight,

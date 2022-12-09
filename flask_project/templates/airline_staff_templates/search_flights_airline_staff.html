@@ -72,9 +72,10 @@
 
 	.container {
 	  position: absolute;
-	  top: 30%;
+	  top: 5%;
 	  left: 50%;
-	  transform: translate(-50%, -50%);
+	  transform: translate(-50%, 0%);
+	  min-width: max-content;
 	}
 
 	.container table {
@@ -98,25 +99,38 @@
 	  background-color: rgba(220,220,220,0.5);
 	  color: #FFFFFF;
 	  border: 1px solid black;
+	  text-align: center;
 	}
 
 	.container th {
 	  text-align: center;
 	  background-color: #55608f;
 	}
-
+	input {
+		width: 230px;
+		padding: 8px 20px;
+		margin: 4px 0;
+		box-sizing: border-box;
+	}
+	input[type=submit] {
+		width: 140px;
+		padding: 8px 20px;
+		margin: 4px 0;
+		text-align:center;
+		box-sizing: border-box;
+	}
 </style>
 <div class="container">
 	<div class="forms">
 		<div class="form1">
 			<form action="/search_flights_airline_staff_query" method="POST">
 				</br>
-				<input type="text" name = "Source City/Airport Name" placeholder="Source City/Airport Name" style="width:200px"
+				<input type="text" name = "Source City/Airport Name" placeholder="Source City/Airport Name"
 					   required/>
 				</br>
 				</br>
 				<input type="text" name = "Destination City/Airport Name" placeholder="Destination City/Airport Name"
-					   style="width:200px" required/>
+					    required/>
 				</br>
 				</br>
 				<label for="StartDepartureDateandTime">Start Departure Date and Time:</label>
@@ -139,11 +153,6 @@
 				</br>
 				<label for="DepartureDateandTime">Departure Date and Time:</label></br>
 				<input type="datetime-local" id="DepartureDateandTime" name="DepartureDateandTime" required></br>
-				</br>
-				</br>
-				</br>
-				</br>
-				</br>
 				</br>
 				<input type="submit" value = Search />
 			</form>

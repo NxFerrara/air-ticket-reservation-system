@@ -38,8 +38,10 @@
 
 	.container {
 	  position: absolute;
+	  top: 5%;
 	  left: 50%;
 	  transform: translate(-50%, 0%);
+	  min-width: max-content;
 	}
 
 	.container table {
@@ -61,6 +63,7 @@
 	  background-color: rgba(220,220,220,0.5);
 	  color: #FFFFFF;
 	  border: 1px solid black;
+	  text-align: center;
 	}
 
 	.container th {
@@ -101,15 +104,27 @@
 		text-align:center;
 		position:relative;
 	}
+	input {
+		width: 220px;
+		padding: 8px 20px;
+		margin: 4px 0;
+		box-sizing: border-box;
+	}
+	input[type=submit] {
+		width: 140px;
+		padding: 8px 20px;
+		margin: 4px 0;
+		text-align:center;
+		box-sizing: border-box;
+	}
 </style>
 <div class="container">
 	<div class="form1">
 		<form action="/search_round_trip_query" method="POST">
 			</br>
-			<input type="text" name = "Source City/Airport Name" placeholder="Source City/Airport Name" style="width:200px"
+			<input type="text" name = "Source City/Airport Name" placeholder="Source City/Airport Name"
 				   required/></br></br>
-			<input type="text" name = "Destination City/Airport Name" placeholder="Destination City/Airport Name"
-				   style="width:200px" required/></br></br>
+			<input type="text" name = "Destination City/Airport Name" placeholder="Destination City/Airport Name" required/></br></br>
 			<label for="Departure Date and Time">Departure Date and Time:</label></br>
 			<input type="datetime-local" id="Departure Date and Time" name="Departure Date and Time" required></br></br>
 			<label for="Return Date and Time">Return Date and Time:</label></br>
@@ -121,6 +136,7 @@
 		<p class="error"><strong>Error:</strong> {{error}}</p>
 	{% endif %}
 	{% for round_trip in round_trips %}
+	<h2>Option #{{loop.index}}:</h2>
 	<p class="trips"><strong>Departure Flight:</strong></p>
 	<table>
 		<tr>

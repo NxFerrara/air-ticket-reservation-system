@@ -2,13 +2,124 @@
 <head>
 </head>
 <body>
-</form>
+<style type="text/css">
+	body, html {
+		overflow: visible
+	}
+	.button{
+		display:inline-block;
+		padding:0.2em 1.45em;
+		margin-right:1.5em;
+		border:0.15em solid #CCCCCC;
+		box-sizing: border-box;
+		text-decoration:none;
+		font-family:'Segoe UI','Roboto',sans-serif;
+		font-weight:400;
+		color:#000000;
+		background-color:#CCCCCC;
+		text-align:center;
+		position:relative;
+	}
 
-	<style type="text/css">
-		table, th, td {
-			border: 1px solid black;
+	.button:hover{
+		border-color:#7a7a7a;
+	}
+
+	.button:active{
+		background-color:#999999;
+	}
+
+	@media all and (max-width:30em){
+		.button{
+			display:block;
+			margin:0.2em auto;
 		}
-	</style>
+	}
+
+	.container {
+	  position: absolute;
+	  top: 5%;
+	  left: 50%;
+	  transform: translate(-50%, 0%);
+	  min-width: max-content;
+	}
+
+	.container table {
+		border: 1px solid black;
+	  background: #333;
+	  background-color: #55608f;
+	  font-size: 12pt;
+	  border-collapse: collapse;
+	  border-collapse: collapse;
+	  overflow: hidden;
+	  box-shadow: 0 0 20px rgba(0,0,0,0.2);
+	  width: 100%;
+	  min-width: max-content;
+	}
+
+	.container th,
+	.container td {
+	  padding: 10px;
+	  background-color: rgba(220,220,220,0.5);
+	  color: #FFFFFF;
+	  border: 1px solid black;
+	  text-align:center;
+	}
+
+	.container th {
+	  text-align: center;
+	  background-color: #55608f;
+	}
+	.forms {
+	  display: flex;
+	}
+	.form1 {
+		display:inline-block;
+		padding:0.2em 1.45em;
+		margin:1em;
+		margin-left:0em;
+		border:0.15em solid #CCCCCC;
+		height: 45px;
+		text-decoration:none;
+		font-family:'Segoe UI','Roboto',sans-serif;
+		font-weight:400;
+		color:#000000;
+		background-color:#CCCCCC;
+		text-align:center;
+		position:relative;
+	}
+
+	.form2 {
+	 	flex-grow: 0;
+	  	display:inline-block;
+		padding:0.2em 1.45em;
+		margin:1em;
+		margin-left:0em;
+		border:0.15em solid #CCCCCC;
+		box-sizing: border-box;
+		text-decoration:none;
+		font-family:'Segoe UI','Roboto',sans-serif;
+		font-weight:400;
+		color:#000000;
+		background-color:#CCCCCC;
+		text-align:center;
+		position:relative;
+	}
+	input {
+		width: 230px;
+		padding: 8px 20px;
+		margin: 4px 0;
+		box-sizing: border-box;
+	}
+	input[type=submit] {
+		width: 140px;
+		padding: 8px 20px;
+		margin: 4px 0;
+		text-align:center;
+		box-sizing: border-box;
+	}
+</style>
+<div class="container">
 	<table>
 		<tr>
 			{% for header in headings %}
@@ -24,24 +135,28 @@
 		{% endfor %}
 	</table>
 	<br>
-
-<form action="/exec_insert_new_airport" method="POST">
-	<label for="AirportType">Airport Type:</label>
-    <select id="AirportType" name="AirportType">
-        <option value="International">International</option>
-        <option value="Domestic">Domestic</option>
-    </select></br>
-    <input type="text" name = "AirportName" placeholder="Airport Name" required/></br>
-	<input type="text" name = "City" placeholder="City" required/></br>
-	<input type="text" name = "Country" placeholder="Country" required/></br>
-	<input type="submit" value = Add />
+	<div class="form2">
+		<form action="/exec_insert_new_airport" method="POST">
+			</br>
+			<label for="AirportType">Airport Type:</label>
+			<select id="AirportType" name="AirportType">
+				<option value="International">International</option>
+				<option value="Domestic">Domestic</option>
+			</select></br>
+			<input type="text" name = "AirportName" placeholder="Airport Name" required/></br>
+			<input type="text" name = "City" placeholder="City" required/></br>
+			<input type="text" name = "Country" placeholder="Country" required/></br>
+			<input type="submit" value = Add />
+		</form>
+	</div>
 	{% if error %}
 		<p class="error"><strong>Error:</strong> {{error}}</p>
 	{% endif %}
 	{% if context %}
 		<p class="context"><strong>Message:</strong> {{context}}</p>
 	{% endif %}
-</form>
-<a href="/airline_staff_home">Go back</a>
+	</br>
+	<button class="button" onclick="window.location.href=`{{ url_for('airline_staff_home') }}`;">Go back</button>
+</div>
 </body>
 </html>
