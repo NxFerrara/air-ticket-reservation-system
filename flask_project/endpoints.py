@@ -1047,13 +1047,14 @@ def customer_home():
         # cursor used to send queries
         cursor = conn.cursor()
         # executes query
-        query = 'SELECT DISTINCT AirlineName, FlightNumber, DepartureDateandTime, ArrivalDateandTime, ' \
-                'Status FROM ticket NATURAL JOIN flight, purchase ' \
+        query = 'SELECT DISTINCT AirlineName, FlightNumber, DepartureAirportName, ArrivalAirportName, ' \
+                'DepartureDateandTime, ArrivalDateandTime, Status FROM ticket NATURAL JOIN flight, purchase ' \
                 'WHERE purchase.TicketIDNumber = ticket.TicketIDNumber AND EmailAddress = %s ' \
                 'AND DepartureDateandTime >= NOW()'
         cursor.execute(query, email)
         data = cursor.fetchall()
-        headings = ("Airline Name", "Flight Number", "Departure Date and Time", "Arrival Date and Time", "Status")
+        headings = ("Airline Name", "Flight Number", "Departure Airport", "Arrival Airport", "Departure Date and Time",
+                    "Arrival Date and Time", "Status")
         cursor.close()
         return render_template('customer_templates/customer_home.html', email=email, headings=headings, data=data)
     else:
@@ -1071,14 +1072,15 @@ def customer_view_previous_flights():
         # executes query
         # All previous flights for which this customer bought tickets
         # AND already flew on, so they can't rate mid flight for instance
-        query = 'SELECT AirlineName, FlightNumber, DepartureDateandTime, ArrivalDateandTime, ' \
-                'Status, Class, ticket.TicketIDNumber FROM ticket NATURAL JOIN flight, purchase ' \
+        query = 'SELECT AirlineName, FlightNumber, DepartureAirportName, ArrivalAirportName, ' \
+                'DepartureDateandTime, ArrivalDateandTime, Status, Class, ticket.TicketIDNumber ' \
+                'FROM ticket NATURAL JOIN flight, purchase ' \
                 'WHERE purchase.TicketIDNumber = ticket.TicketIDNumber AND EmailAddress = %s ' \
                 'AND ArrivalDateandTime < NOW()'
         cursor.execute(query, email)
         data = cursor.fetchall()
-        headings = ("Airline Name", "Flight Number", "Departure Date and Time", "Arrival Date and Time", "Status",
-                    "Class", "TicketIDNumber")
+        headings = ("Airline Name", "Flight Number", "Departure Airport", "Arrival Airport", "Departure Date and Time",
+                    "Arrival Date and Time", "Status", "Class", "TicketIDNumber")
         return render_template('customer_templates/customer_view_previous_flights.html', email=email,
                                headings=headings, data=data)
     else:
@@ -1121,14 +1123,15 @@ def customer_rate_and_comment():
         else:
             message = None
             error = "Entered an invalid ticket ID"
-        query = 'SELECT AirlineName, FlightNumber, DepartureDateandTime, ArrivalDateandTime, ' \
-                'Status, Class, ticket.TicketIDNumber FROM ticket NATURAL JOIN flight, purchase ' \
+        query = 'SELECT AirlineName, FlightNumber, DepartureAirportName, ArrivalAirportName, ' \
+                'DepartureDateandTime, ArrivalDateandTime, Status, Class, ticket.TicketIDNumber ' \
+                'FROM ticket NATURAL JOIN flight, purchase ' \
                 'WHERE purchase.TicketIDNumber = ticket.TicketIDNumber AND EmailAddress = %s ' \
                 'AND ArrivalDateandTime < NOW()'
         cursor.execute(query, email)
         data = cursor.fetchall()
-        headings = ("Airline Name", "Flight Number", "Departure Date and Time", "Arrival Date and Time", "Status",
-                    "Class", "TicketIDNumber")
+        headings = ("Airline Name", "Flight Number", "Departure Airport", "Arrival Airport", "Departure Date and Time",
+                    "Arrival Date and Time", "Status", "Class", "TicketIDNumber")
         return render_template('customer_templates/customer_view_previous_flights.html', email=email,
                                headings=headings, data=data, error=error, context=message)
     else:
@@ -1144,14 +1147,15 @@ def customer_view_upcoming_flights():
         cursor = conn.cursor()
         # executes query
         # All future flights for which this customer bought tickets
-        query = 'SELECT AirlineName, FlightNumber, DepartureDateandTime, ArrivalDateandTime, ' \
-                'Status, Class, ticket.TicketIDNumber FROM ticket NATURAL JOIN flight, purchase ' \
+        query = 'SELECT AirlineName, FlightNumber, DepartureAirportName, ArrivalAirportName, ' \
+                'DepartureDateandTime, ArrivalDateandTime, Status, Class, ticket.TicketIDNumber ' \
+                'FROM ticket NATURAL JOIN flight, purchase ' \
                 'WHERE purchase.TicketIDNumber = ticket.TicketIDNumber AND EmailAddress = %s ' \
                 'AND DepartureDateandTime >= NOW()'
         cursor.execute(query, email)
         data = cursor.fetchall()
-        headings = ("Airline Name", "Flight Number", "Departure Date and Time", "Arrival Date and Time", "Status",
-                    "Class", "TicketIDNumber")
+        headings = ("Airline Name", "Flight Number", "Departure Airport", "Arrival Airport", "Departure Date and Time",
+                    "Arrival Date and Time", "Status", "Class", "TicketIDNumber")
         message = None
         if not data:
             message = "There are no future flights for which this customer bought tickets"
@@ -1173,7 +1177,7 @@ def customer_cancel_trip():
         query = 'SELECT AirlineName, FlightNumber, DepartureDateandTime, ticket.TicketIDNumber ' \
                 'FROM ticket NATURAL JOIN flight, purchase ' \
                 'WHERE purchase.TicketIDNumber = ticket.TicketIDNumber AND ticket.TicketIDNumber = %s ' \
-                'AND EmailAddress = %s AND DepartureDateandTime >= DATE(NOW() + INTERVAL 1 DAY)'
+                'AND EmailAddress = %s AND DepartureDateandTime >= NOW() + INTERVAL 1 DAY'
         cursor.execute(query, (ticket_id_number, email))
         data = cursor.fetchall()
         message = "Successfully deleted customer ticket for the flight!"
@@ -1184,15 +1188,16 @@ def customer_cancel_trip():
             conn.commit()
         else:
             message = None
-            error = "Entered an invalid ticket ID"
-        query = 'SELECT AirlineName, FlightNumber, DepartureDateandTime, ArrivalDateandTime, ' \
-                'Status, Class, ticket.TicketIDNumber FROM ticket NATURAL JOIN flight, purchase ' \
+            error = "Entered an invalid ticket ID or Flight is less than 24hrs from departure"
+        query = 'SELECT AirlineName, FlightNumber, DepartureAirportName, ArrivalAirportName, ' \
+                'DepartureDateandTime, ArrivalDateandTime, Status, Class, ticket.TicketIDNumber ' \
+                'FROM ticket NATURAL JOIN flight, purchase ' \
                 'WHERE purchase.TicketIDNumber = ticket.TicketIDNumber AND EmailAddress = %s ' \
                 'AND DepartureDateandTime >= NOW()'
         cursor.execute(query, email)
         data = cursor.fetchall()
-        headings = ("Airline Name", "Flight Number", "Departure Date and Time", "Arrival Date and Time", "Status",
-                    "Class", "TicketIDNumber")
+        headings = ("Airline Name", "Flight Number", "Departure Airport", "Arrival Airport", "Departure Date and Time",
+                    "Arrival Date and Time", "Status", "Class", "TicketIDNumber")
         return render_template('customer_templates/customer_view_upcoming_flights.html', email=email,
                                headings=headings, data=data, error=error, context=message)
     else:
