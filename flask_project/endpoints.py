@@ -269,7 +269,7 @@ def insert_new_flight():
         # cursor used to send queries
         cursor = conn.cursor()
         query = 'SELECT AirlineName, FlightNumber, DepartureAirportName, ArrivalAirportName, ' \
-                'DepartureDateandTime, ArrivalDateandTime, BasePrice, Status FROM flight ' \
+                'DepartureDateandTime, ArrivalDateandTime, BasePrice, IDNumber, Status FROM flight ' \
                 'WHERE AirlineName = %s AND DepartureDateandTime >= NOW() AND ' \
                 'DepartureDateandTime <= DATE(NOW() + INTERVAL 30 DAY);'
         cursor.execute(query, (airlineName,))
@@ -277,7 +277,7 @@ def insert_new_flight():
         data = cursor.fetchall()
         cursor.close()
         headings = ("Airline Name", "Flight Number", "Departure Airport", "Arrival Airport",
-                    "Departure Date and Time", "Arrival Date and Time", "Base Price", "Status")
+                    "Departure Date and Time", "Arrival Date and Time", "Base Price", "ID Number", "Status")
         return render_template('airline_staff_templates/airline_staff_insert.html', headings=headings, data=data)
     else:
         return render_template('home_templates/unauthorized_access.html', is_customer=session.get('is_customer'),
@@ -304,11 +304,11 @@ def exec_insert_new_flight():
         arrival_is_after = ArrivalDateandTime > DepartureDateandTime
         # Query all of the future flights
         futureFlightsQuery = 'SELECT AirlineName, FlightNumber, DepartureAirportName, ArrivalAirportName, ' \
-                             'DepartureDateandTime, ArrivalDateandTime, BasePrice, Status FROM flight ' \
+                             'DepartureDateandTime, ArrivalDateandTime, BasePrice, IDNumber, Status FROM flight ' \
                              'WHERE AirlineName = %s AND DepartureDateandTime >= NOW() AND ' \
                              'DepartureDateandTime <= DATE(NOW() + INTERVAL 30 DAY);'
         headings = ("Airline Name", "Flight Number", "Departure Airport", "Arrival Airport",
-                    "Departure Date and Time", "Arrival Date and Time", "Base Price", "Status")
+                    "Departure Date and Time", "Arrival Date and Time", "Base Price", "ID Number", "Status")
         # cursor used to send queries
         cursor = conn.cursor()
         if not departure_is_after:
