@@ -903,7 +903,7 @@ def exec_customer_stats(customerData):
                 'FROM ticket NATURAL JOIN flight, customer, purchase ' \
                 'WHERE ticket.TicketIDNumber = purchase.TicketIDNumber ' \
                 'AND purchase.EmailAddress = customer.EmailAddress ' \
-                'AND customer.EmailAddress = %s AND AirlineName = %s;'
+                'AND customer.EmailAddress = %s AND AirlineName = %s AND ArrivalDateandTime <= NOW();'
         cursor = conn.cursor()
         cursor.execute(flightsQuery, (customerEmail, airline_name))
         flightsResults = cursor.fetchall()
