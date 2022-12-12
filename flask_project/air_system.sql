@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Dec 05, 2022 at 07:10 AM
+-- Generation Time: Dec 12, 2022 at 07:20 AM
 -- Server version: 10.4.24-MariaDB
 -- PHP Version: 8.1.6
 
@@ -36,9 +36,7 @@ CREATE TABLE `airline` (
 --
 
 INSERT INTO `airline` (`AirlineName`) VALUES
-('American Airlines'),
-('Delta'),
-('Jet Blue');
+('United');
 
 -- --------------------------------------------------------
 
@@ -60,8 +58,7 @@ CREATE TABLE `airlinestaff` (
 --
 
 INSERT INTO `airlinestaff` (`Username`, `Password`, `FirstName`, `LastName`, `DateofBirth`, `AirlineName`) VALUES
-('jd123', 'fcea920f7412b5da7be0cf42b8c93759', 'Sally', 'Smith', '1980-11-11', 'Jet Blue'),
-('nwill123', 'c1e2f7b616ebf5db28453a876dc0fc68', 'Nick', 'Williams', '2001-10-03', 'Jet Blue');
+('admin', 'e2fc714c4727ee9395f324cd2e7f331f', 'Roe', 'Jones', '1978-05-25', 'United');
 
 -- --------------------------------------------------------
 
@@ -85,17 +82,9 @@ CREATE TABLE `airplane` (
 --
 
 INSERT INTO `airplane` (`IDNumber`, `NumberofSeats`, `ManufacturingCompany`, `Age`, `AirlineName`, `NumberofEconomyClassSeats`, `NumberofBusinessClassSeats`, `NumberofFirstClassSeats`) VALUES
-(1, 80, 'Boeing', 2, 'American Airlines', 60, 10, 10),
-(1, 80, 'Boeing', 5, 'Delta', 50, 10, 20),
-(1, 80, 'Boeing', 1, 'Jet Blue', 50, 20, 10),
-(2, 100, 'Boeing', 1, 'American Airlines', 70, 20, 10),
-(2, 125, 'Boeing', 1, 'Delta', 100, 20, 5),
-(2, 100, 'Boeing', 3, 'Jet Blue', 70, 20, 10),
-(3, 165, 'Boeing', 3, 'American Airlines', 120, 30, 15),
-(3, 110, 'Boeing', 2, 'Delta', 80, 15, 15),
-(3, 120, 'Boeing', 4, 'Jet Blue', 60, 40, 20),
-(4, 110, 'Boeing', 1, 'Jet Blue', 80, 20, 10),
-(5, 200, 'Boeing', 3, 'Jet Blue', 100, 80, 20);
+(1, 4, 'Boeing', 10, 'United', 2, 1, 1),
+(2, 4, 'Airbus', 12, 'United', 2, 1, 1),
+(3, 50, 'Boeing', 8, 'United', 30, 15, 5);
 
 -- --------------------------------------------------------
 
@@ -115,8 +104,14 @@ CREATE TABLE `airport` (
 --
 
 INSERT INTO `airport` (`AirportName`, `City`, `Country`, `AirportType`) VALUES
-('JFK', 'NYC', 'USA', 'Domestic'),
-('PVG', 'Shanghai', 'China', 'International');
+('BEI', 'Beijing', 'China', 'Both'),
+('BOS', 'Boston', 'USA', 'Both'),
+('HKA', 'Hong Kong', 'China', 'Both'),
+('JFK', 'NYC', 'USA', 'Both'),
+('LAX', 'Los Angeles', 'USA', 'Both'),
+('PVG', 'Shanghai', 'China', 'Both'),
+('SFO', 'San Francisco', 'USA', 'Both'),
+('SHEN', 'Shenzhen', 'China', 'Both');
 
 -- --------------------------------------------------------
 
@@ -144,12 +139,10 @@ CREATE TABLE `customer` (
 --
 
 INSERT INTO `customer` (`Name`, `EmailAddress`, `Password`, `BuildingNumber`, `Street`, `City`, `State`, `PhoneNumber`, `PassportNumber`, `PassportExpiration`, `PassportCountry`, `DateofBirth`) VALUES
-('Johnny Liu', 'batman@gmail.com', '81dc9bdb52d04dc20036dbd8313ed055', 145, 'Elm Street', 'New York', 'NY', '9241233478', 391238, '2027-01-08', 'USA', '2001-10-03'),
-('Jason Rodriguez', 'jasonrodriguez@gmail.com', '5d181b91eab426fbbc1949f5b70fba07', 298, 'Century Avenue', 'Pudong', 'Shanghai', '2168881234', 9281394, '2024-02-19', 'China', '1969-04-17'),
-('John Doe', 'johndoe@gmail.com', 'b61a92ef148a4a50a8861a1b3d88bff9', 123, 'Maple Street', 'Los Angeles', 'CA', '7182911230', 3004786, '2022-12-21', 'USA', '1979-11-04'),
-('Mary Jane', 'maryjane@gmail.com', '746f5f493292d03a2469b858cbb17ffa', 652, 'Oak Street', 'New York', 'NY', '9172309482', 2391039, '2023-03-12', 'USA', '1989-06-15'),
-('Max Chen', 'spiderman@gmail.com', 'fcea920f7412b5da7be0cf42b8c93759', 301, 'Elk Street', 'Brooklyn', 'NY', '9281920394', 3928192, '2025-10-15', 'USA', '1956-02-10'),
-('Sarah Thompson', 'sthompson@gmail.com', '4e07f073ccc5007f64dc82499997a68b', 341, 'Pine Street', 'Bronx', 'NY', '7182910394', 983712, '2028-10-18', 'USA', '2010-01-05');
+('Test Customer 1', 'testcustomer@nyu.edu', '81dc9bdb52d04dc20036dbd8313ed055', 1555, 'Jay St', 'Brooklyn', 'New York', '123-4321-4321', 54321, '2025-12-24', 'USA', '1999-12-19'),
+('User 1', 'user1@nyu.edu', '81dc9bdb52d04dc20036dbd8313ed055', 5405, 'Jay Street', 'Brooklyn', 'New York', '123-4322-4322', 54322, '2025-12-25', 'USA', '1999-11-19'),
+('User 2', 'user2@nyu.edu', '81dc9bdb52d04dc20036dbd8313ed055', 1702, 'Jay Street', 'Brooklyn', 'New York', '123-4323-4323', 54323, '2025-10-24', 'USA', '1999-09-19'),
+('User 3', 'user3@nyu.edu', '81dc9bdb52d04dc20036dbd8313ed055', 1890, 'Jay Street', 'Brooklyn', 'New York', '123-4324-4324', 54324, '2025-09-24', 'USA', '1999-09-19');
 
 -- --------------------------------------------------------
 
@@ -174,22 +167,15 @@ CREATE TABLE `flight` (
 --
 
 INSERT INTO `flight` (`FlightNumber`, `DepartureDateandTime`, `ArrivalDateandTime`, `BasePrice`, `Status`, `DepartureAirportName`, `ArrivalAirportName`, `IDNumber`, `AirlineName`) VALUES
-('1', '2008-11-11 13:30:00', '2008-11-11 17:00:00', 100, 'On-time', 'JFK', 'PVG', 1, 'Jet Blue'),
-('1', '2022-12-31 12:30:00', '2023-01-01 05:30:00', 300, 'On-time', 'JFK', 'PVG', 3, 'Jet Blue'),
-('10', '2023-02-17 10:30:00', '2023-02-17 15:00:00', 100, 'On-time', 'JFK', 'PVG', 2, 'American Airlines'),
-('11', '2023-02-19 04:30:00', '2023-02-19 08:00:00', 120, 'On-time', 'PVG', 'JFK', 1, 'American Airlines'),
-('12', '2023-02-24 20:30:00', '2023-02-25 01:00:00', 90, 'Delayed', 'JFK', 'PVG', 3, 'American Airlines'),
-('13', '2023-02-25 22:30:00', '2023-02-26 03:00:00', 70, 'Delayed', 'JFK', 'PVG', 2, 'Delta'),
-('14', '2023-02-25 22:30:00', '2023-02-26 03:00:00', 90, 'Delayed', 'PVG', 'JFK', 1, 'Delta'),
-('15', '2023-02-22 14:30:00', '2023-02-22 19:00:00', 180, 'On-time', 'PVG', 'JFK', 3, 'Delta'),
-('2', '2008-11-12 20:30:00', '2008-11-13 01:00:00', 200, 'Delayed', 'JFK', 'PVG', 3, 'Jet Blue'),
-('3', '2008-12-11 01:00:00', '2008-12-11 05:30:00', 120, 'On-time', 'JFK', 'PVG', 1, 'Jet Blue'),
-('4', '2009-01-20 04:00:00', '2009-01-20 09:30:00', 320, 'Delayed', 'JFK', 'PVG', 2, 'Jet Blue'),
-('5', '2009-04-22 09:00:00', '2009-04-22 12:30:00', 90, 'On-time', 'JFK', 'PVG', 3, 'Jet Blue'),
-('6', '2009-08-30 12:00:00', '2009-08-30 17:30:00', 180, 'Delayed', 'JFK', 'PVG', 2, 'Jet Blue'),
-('7', '2023-08-30 13:30:00', '2023-08-30 19:00:00', 220, 'Delayed', 'JFK', 'PVG', 1, 'Jet Blue'),
-('8', '2023-01-22 14:30:00', '2023-01-22 20:00:00', 150, 'On-time', 'JFK', 'PVG', 3, 'Delta'),
-('9', '2023-02-14 20:30:00', '2023-02-15 01:00:00', 80, 'Delayed', 'PVG', 'JFK', 2, 'Delta');
+('102', '2022-09-12 13:25:25', '2022-09-12 16:50:25', 300, 'on-time', 'SFO', 'LAX', 3, 'United'),
+('104', '2022-10-04 13:25:25', '2022-10-04 16:50:25', 300, 'on-time', 'PVG', 'BEI', 3, 'United'),
+('106', '2022-08-04 13:25:25', '2022-08-04 16:50:25', 350, 'delayed', 'SFO', 'LAX', 3, 'United'),
+('134', '2022-07-12 13:25:25', '2022-07-12 16:50:25', 300, 'delayed', 'JFK', 'BOS', 3, 'United'),
+('206', '2023-02-04 13:25:25', '2023-02-04 16:50:25', 400, 'on-time', 'SFO', 'LAX', 2, 'United'),
+('207', '2023-03-04 13:25:25', '2023-03-04 16:50:25', 300, 'on-time', 'LAX', 'SFO', 2, 'United'),
+('296', '2022-12-30 13:25:25', '2022-12-30 16:50:25', 3000, 'on-time', 'PVG', 'SFO', 1, 'United'),
+('715', '2022-09-28 10:25:25', '2022-09-28 13:50:25', 500, 'delayed', 'PVG', 'BEI', 1, 'United'),
+('839', '2021-12-26 13:25:25', '2021-12-26 16:50:25', 300, 'on-time', 'SHEN', 'BEI', 3, 'United');
 
 -- --------------------------------------------------------
 
@@ -213,13 +199,24 @@ CREATE TABLE `purchase` (
 --
 
 INSERT INTO `purchase` (`TicketIDNumber`, `EmailAddress`, `PurchaseDateandTime`, `CardNumber`, `CardType`, `NameonCard`, `ExpirationDate`, `sold_price`) VALUES
-('1356', 'johndoe@gmail.com', '2008-11-08 13:27:00', 19283912, 'credit', 'John Doe', '2011-08-09', 200.53),
-('2417', 'johndoe@gmail.com', '2008-11-09 09:56:00', 19283912, 'credit', 'John Doe', '2011-08-09', 378.19),
-('3182', 'maryjane@gmail.com', '2008-12-02 21:13:00', 21938110, 'debit', 'Mary Jane', '2014-11-26', 401.02),
-('3976', 'maryjane@gmail.com', '2008-12-03 07:30:00', 21938110, 'debit', 'Mary Jane', '2014-11-26', 403.56),
-('4019', 'jasonrodriguez@gmail.com', '2009-01-15 12:46:00', 54102918, 'credit', 'Jason Rodriguez', '2016-05-27', 550.19),
-('5108', 'jasonrodriguez@gmail.com', '2009-03-01 22:16:00', 54102918, 'credit', 'Jason Rodriguez', '2016-05-27', 165.18),
-('7129', 'johndoe@gmail.com', '2022-11-04 15:19:00', 10293145, 'debit', 'John Doe', '2026-12-12', 389.46);
+(1, 'testcustomer@nyu.edu', '2022-08-04 11:55:55', '1111-2222-3333-4444', 'Credit', 'Test Customer 1', '2023-03-01', 300),
+(2, 'user1@nyu.edu', '2022-08-03 11:55:55', '1111-2222-3333-5555', 'Credit', 'User 1', '2023-03-01', 300),
+(3, 'user2@nyu.edu', '2022-09-04 11:55:55', '1111-2222-3333-5555', 'Credit', 'User 2', '2023-03-01', 300),
+(4, 'user1@nyu.edu', '2022-08-21 11:55:55', '1111-2222-3333-5555', 'Credit', 'User 1', '2023-03-01', 300),
+(5, 'testcustomer@nyu.edu', '2022-09-28 11:55:55', '1111-2222-3333-4444', 'Credit', 'Test Customer 1', '2023-03-01', 300),
+(6, 'testcustomer@nyu.edu', '2022-08-02 11:55:55', '1111-2222-3333-4444', 'Credit', 'Test Customer 1', '2023-03-01', 350),
+(7, 'user3@nyu.edu', '2022-07-03 11:55:55', '1111-2222-3333-5555', 'Credit', 'User 3', '2023-03-01', 300),
+(8, 'user3@nyu.edu', '2021-12-03 11:55:55', '1111-2222-3333-5555', 'Credit', 'User 3', '2023-03-01', 300),
+(9, 'user3@nyu.edu', '2022-07-04 11:55:55', '1111-2222-3333-5555', 'Credit', 'User 3', '2023-03-01', 300),
+(11, 'user3@nyu.edu', '2022-05-23 11:55:55', '1111-2222-3333-5555', 'Credit', 'User 3', '2023-03-01', 300),
+(12, 'testcustomer@nyu.edu', '2022-05-02 11:55:55', '1111-2222-3333-4444', 'Credit', 'Test Customer 1', '2023-03-01', 500),
+(14, 'user3@nyu.edu', '2022-11-20 11:55:55', '1111-2222-3333-5555', 'Credit', 'User 3', '2023-03-01', 400),
+(15, 'user1@nyu.edu', '2022-11-21 11:55:55', '1111-2222-3333-5555', 'Credit', 'User 1', '2023-03-01', 400),
+(16, 'user2@nyu.edu', '2022-09-19 11:55:55', '1111-2222-3333-5555', 'Credit', 'User 2', '2023-03-01', 800),
+(17, 'user1@nyu.edu', '2022-08-11 11:55:55', '1111-2222-3333-5555', 'Credit', 'User 1', '2023-03-01', 300),
+(18, 'testcustomer@nyu.edu', '2022-09-25 11:55:55', '1111-2222-3333-4444', 'Credit', 'Test Customer 1', '2023-03-01', 300),
+(19, 'user1@nyu.edu', '2022-11-22 11:55:55', '1111-2222-3333-4444', 'Credit', 'Test Customer 1', '2023-03-01', 3000),
+(20, 'testcustomer@nyu.edu', '2022-07-12 11:55:55', '1111-2222-3333-4444', 'Credit', 'Test Customer 1', '2023-03-01', 3000);
 
 -- --------------------------------------------------------
 
@@ -235,6 +232,17 @@ CREATE TABLE `rate` (
   `AirlineName` varchar(50) NOT NULL,
   `EmailAddress` varchar(50) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+--
+-- Dumping data for table `rate`
+--
+
+INSERT INTO `rate` (`Rating`, `Comment`, `FlightNumber`, `DepartureDateandTime`, `AirlineName`, `EmailAddress`) VALUES
+(4, 'Very Comfortable', '102', '2022-09-12 13:25:25', 'United', 'testcustomer@nyu.edu'),
+(4, 'Relaxing, check-in and onboarding very professional', '102', '2022-09-12 13:25:25', 'United', 'user1@nyu.edu'),
+(3, 'Satisfied and will use the same flight again', '102', '2022-09-12 13:25:25', 'United', 'user2@nyu.edu'),
+(1, 'Customer Care services are not good', '104', '2022-10-04 13:25:25', 'United', 'testcustomer@nyu.edu'),
+(4, 'Comfortable journey and Professional', '104', '2022-10-04 13:25:25', 'United', 'user1@nyu.edu');
 
 -- --------------------------------------------------------
 
@@ -252,7 +260,7 @@ CREATE TABLE `staffemailaddress` (
 --
 
 INSERT INTO `staffemailaddress` (`Username`, `EmailAddress`) VALUES
-('jd123', 'ss123@gmail.com');
+('admin', 'staff@nyu.edu');
 
 -- --------------------------------------------------------
 
@@ -270,7 +278,8 @@ CREATE TABLE `staffphonenumber` (
 --
 
 INSERT INTO `staffphonenumber` (`Username`, `PhoneNumber`) VALUES
-('jd123', '732-890-1667');
+('admin', '111-2222-3333'),
+('admin', '444-5555-6666');
 
 -- --------------------------------------------------------
 
@@ -291,70 +300,24 @@ CREATE TABLE `ticket` (
 --
 
 INSERT INTO `ticket` (`TicketIDNumber`, `FlightNumber`, `DepartureDateandTime`, `AirlineName`, `Class`) VALUES
-('1248', '1', '2008-11-11 13:30:00', 'Jet Blue', 'Economy'),
-('1356', '1', '2008-11-11 13:30:00', 'Jet Blue', 'Economy'),
-('2198', '2', '2008-11-12 20:30:00', 'Jet Blue', 'Business'),
-('2417', '2', '2008-11-12 20:30:00', 'Jet Blue', 'Business'),
-('3182', '3', '2008-12-11 01:00:00', 'Jet Blue', 'Business'),
-('3976', '3', '2008-12-11 01:00:00', 'Jet Blue', 'Economy'),
-('4019', '4', '2009-01-20 04:00:00', 'Jet Blue', 'Economy'),
-('4192', '4', '2009-01-20 04:00:00', 'Jet Blue', 'Economy'),
-('5108', '5', '2009-04-22 09:00:00', 'Jet Blue', 'First'),
-('5768', '5', '2009-04-22 09:00:00', 'Jet Blue', 'First'),
-('6123', '6', '2009-08-30 12:00:00', 'Jet Blue', 'First'),
-('6527', '6', '2009-08-30 12:00:00', 'Jet Blue', 'First'),
-('7129', '7', '2023-08-30 13:30:00', 'Jet Blue', 'Economy'),
-('7891', '7', '2023-08-30 13:30:00', 'Jet Blue', 'Business'),
-('7892', '8', '2023-01-22 14:30:00', 'Delta', 'Economy'),
-('7893', '8', '2023-01-22 14:30:00', 'Delta', 'Economy'),
-('7894', '8', '2023-01-22 14:30:00', 'Delta', 'Economy'),
-('7895', '8', '2023-01-22 14:30:00', 'Delta', 'Economy'),
-('7896', '8', '2023-01-22 14:30:00', 'Delta', 'Economy'),
-('7897', '8', '2023-01-22 14:30:00', 'Delta', 'Economy'),
-('7898', '8', '2023-01-22 14:30:00', 'Delta', 'Economy'),
-('7899', '8', '2023-01-22 14:30:00', 'Delta', 'Economy'),
-('7900', '8', '2023-01-22 14:30:00', 'Delta', 'Economy'),
-('7901', '8', '2023-01-22 14:30:00', 'Delta', 'Economy'),
-('7902', '8', '2023-01-22 14:30:00', 'Delta', 'Economy'),
-('7903', '8', '2023-01-22 14:30:00', 'Delta', 'Economy'),
-('7904', '8', '2023-01-22 14:30:00', 'Delta', 'Economy'),
-('7905', '8', '2023-01-22 14:30:00', 'Delta', 'Economy'),
-('7906', '8', '2023-01-22 14:30:00', 'Delta', 'Economy'),
-('7907', '8', '2023-01-22 14:30:00', 'Delta', 'Economy'),
-('7908', '8', '2023-01-22 14:30:00', 'Delta', 'Economy'),
-('7909', '8', '2023-01-22 14:30:00', 'Delta', 'Economy'),
-('7910', '8', '2023-01-22 14:30:00', 'Delta', 'Economy'),
-('7911', '8', '2023-01-22 14:30:00', 'Delta', 'Economy'),
-('7912', '8', '2023-01-22 14:30:00', 'Delta', 'Economy'),
-('7913', '8', '2023-01-22 14:30:00', 'Delta', 'Business'),
-('7914', '8', '2023-01-22 14:30:00', 'Delta', 'First'),
-('7915', '9', '2023-02-14 20:30:00', 'Delta', 'Economy'),
-('7916', '9', '2023-02-14 20:30:00', 'Delta', 'Business'),
-('7917', '9', '2023-02-14 20:30:00', 'Delta', 'First'),
-('7918', '9', '2023-02-14 20:30:00', 'Delta', 'First'),
-('7919', '9', '2023-02-14 20:30:00', 'Delta', 'FIrst'),
-('7920', '9', '2023-02-14 20:30:00', 'Delta', 'First'),
-('7921', '10', '2023-02-17 10:30:00', 'American Airlines', 'Economy'),
-('7922', '10', '2023-02-17 10:30:00', 'American Airlines', 'Business'),
-('7923', '10', '2023-02-17 10:30:00', 'American Airlines', 'Business'),
-('7924', '11', '2023-02-19 04:30:00', 'American Airlines', 'Economy'),
-('7925', '11', '2023-02-19 04:30:00', 'American Airlines', 'Economy'),
-('7926', '11', '2023-02-19 04:30:00', 'American Airlines', 'Economy'),
-('7927', '11', '2023-02-19 04:30:00', 'American Airlines', 'Economy'),
-('7928', '11', '2023-02-19 04:30:00', 'American Airlines', 'First'),
-('7929', '11', '2023-02-19 04:30:00', 'American Airlines', 'First'),
-('7930', '12', '2023-02-24 20:30:00', 'American Airlines', 'Economy'),
-('7931', '12', '2023-02-24 20:30:00', 'American Airlines', 'Economy'),
-('7932', '12', '2023-02-24 20:30:00', 'American Airlines', 'Economy'),
-('7933', '12', '2023-02-24 20:30:00', 'American Airlines', 'Business'),
-('7934', '12', '2023-02-24 20:30:00', 'American Airlines', 'First'),
-('7935', '13', '2023-02-25 22:30:00', 'Delta', 'Business'),
-('7936', '13', '2023-02-25 22:30:00', 'Delta', 'Business'),
-('7937', '13', '2023-02-25 22:30:00', 'Delta', 'First'),
-('7938', '14', '2023-02-25 22:30:00', 'Delta', 'Economy'),
-('7939', '14', '2023-02-25 22:30:00', 'Delta', 'Business'),
-('7940', '14', '2023-02-25 22:30:00', 'Delta', 'First'),
-('7941', '15', '2023-02-22 14:30:00', 'Delta', 'Economy');
+(1, '102', '2022-09-12 13:25:25', 'United', 'Economy'),
+(2, '102', '2022-09-12 13:25:25', 'United', 'Economy'),
+(3, '102', '2022-09-12 13:25:25', 'United', 'Economy'),
+(4, '104', '2022-10-04 13:25:25', 'United', 'Economy'),
+(5, '104', '2022-10-04 13:25:25', 'United', 'Economy'),
+(6, '106', '2022-08-04 13:25:25', 'United', 'Economy'),
+(7, '106', '2022-08-04 13:25:25', 'United', 'Economy'),
+(8, '839', '2021-12-26 13:25:25', 'United', 'Economy'),
+(9, '102', '2022-09-12 13:25:25', 'United', 'Economy'),
+(11, '134', '2022-07-12 13:25:25', 'United', 'Economy'),
+(12, '715', '2022-09-28 10:25:25', 'United', 'Economy'),
+(14, '206', '2023-02-04 13:25:25', 'United', 'Economy'),
+(15, '206', '2023-02-04 13:25:25', 'United', 'Economy'),
+(16, '206', '2023-02-04 13:25:25', 'United', 'Business'),
+(17, '207', '2023-03-04 13:25:25', 'United', 'Economy'),
+(18, '207', '2023-03-04 13:25:25', 'United', 'Economy'),
+(19, '296', '2022-12-30 13:25:25', 'United', 'Economy'),
+(20, '296', '2022-12-30 13:25:25', 'United', 'Economy');
 
 --
 -- Indexes for dumped tables
