@@ -309,8 +309,8 @@ def exec_insert_new_flight():
         FlightNumber = request.form['FlightNumber']
         Status = 'On-time'  # By default
         AirlineName = session['airline_name']  # By default
-        DepartureDateandTime = datetime.datetime.strptime(DepartureDateandTime, "%Y-%m-%dT%H:%M")
-        ArrivalDateandTime = datetime.datetime.strptime(ArrivalDateandTime, "%Y-%m-%dT%H:%M")
+        DepartureDateandTime = datetime.datetime.strptime(DepartureDateandTime, "%Y-%m-%dT%H:%M:%S")
+        ArrivalDateandTime = datetime.datetime.strptime(ArrivalDateandTime, "%Y-%m-%dT%H:%M:%S")
         departure_is_after = DepartureDateandTime > datetime.datetime.today()
         arrival_is_after = ArrivalDateandTime > DepartureDateandTime
         # Query all of the future flights
@@ -435,7 +435,7 @@ def search_specific_flight_airline_staff_query():
         airline_name = session['airline_name']
         DepartureDateandTime = request.form['DepartureDateandTime']
         FlightNumber = request.form['FlightNumber']
-        DepartureDateandTime = datetime.datetime.strptime(DepartureDateandTime, "%Y-%m-%dT%H:%M")
+        DepartureDateandTime = datetime.datetime.strptime(DepartureDateandTime, "%Y-%m-%dT%H:%M:%S")
         # executes query
         query = 'SELECT AirlineName, FlightNumber, DepartureAirportName, ' \
                 'ArrivalAirportName, DepartureDateandTime, ArrivalDateandTime, Status ' \
@@ -469,13 +469,13 @@ def search_flights_airline_staff_query():
         destination_city = request.form['Destination City/Airport Name']
         start_departure_date_and_time = request.form['StartDepartureDateandTime']
         start_departure_date_and_time = datetime.datetime.strptime(start_departure_date_and_time,
-                                                                   "%Y-%m-%dT%H:%M").strftime('%Y-%m-%d %H:%M:%S')
+                                                                   "%Y-%m-%dT%H:%M:%S").strftime('%Y-%m-%d %H:%M:%S')
         end_departure_date_and_time = request.form['EndDepartureDateandTime']
         has_end_date = False
         if end_departure_date_and_time != "":
             has_end_date = True
             end_departure_date_and_time = datetime.datetime.strptime(end_departure_date_and_time,
-                                                                     "%Y-%m-%dT%H:%M").strftime('%Y-%m-%d %H:%M:%S')
+                                                                     "%Y-%m-%dT%H:%M:%S").strftime('%Y-%m-%d %H:%M:%S')
         cursor = conn.cursor()
         # Checking the departure and arrival airports exist
         query = 'SELECT * FROM airport WHERE AirportName = %s'
@@ -799,13 +799,13 @@ def exec_ticket_stats(revenueData):
         airline_name = session['airline_name']
         # grabs information from the forms
         start_date_and_time = datetime.datetime.strptime(request.form['StartDateandTime'],
-                                                         "%Y-%m-%dT%H:%M").strftime('%Y-%m-%d %H:%M:%S')
+                                                         "%Y-%m-%dT%H:%M:%S").strftime('%Y-%m-%d %H:%M:%S')
         end_date_and_time = request.form['EndDateandTime']
         has_end_date = False
         if end_date_and_time != "":
             has_end_date = True
             end_date_and_time = datetime.datetime.strptime(end_date_and_time,
-                                                           "%Y-%m-%dT%H:%M").strftime('%Y-%m-%d %H:%M:%S')
+                                                           "%Y-%m-%dT%H:%M:%S").strftime('%Y-%m-%d %H:%M:%S')
         cursor = conn.cursor()
         if has_end_date:
             # executes query
@@ -932,7 +932,7 @@ def search_specific_flight():
     airline_name = request.form['AirlineName']
     DepartureDateandTime = request.form['DepartureDateandTime']
     FlightNumber = request.form['FlightNumber']
-    DepartureDateandTime = datetime.datetime.strptime(DepartureDateandTime, "%Y-%m-%dT%H:%M")
+    DepartureDateandTime = datetime.datetime.strptime(DepartureDateandTime, "%Y-%m-%dT%H:%M:%S")
     # executes query
     query = 'SELECT AirlineName, FlightNumber, DepartureAirportName, ' \
             'ArrivalAirportName, DepartureDateandTime, ArrivalDateandTime, Status ' \
@@ -973,7 +973,7 @@ def search_one_way_query():
     source_city = request.form['Source City/Airport Name']
     destination_city = request.form['Destination City/Airport Name']
     departure_date_and_time = request.form['DepartureDateandTime']
-    departure_date_and_time = datetime.datetime.strptime(departure_date_and_time, "%Y-%m-%dT%H:%M")
+    departure_date_and_time = datetime.datetime.strptime(departure_date_and_time, "%Y-%m-%dT%H:%M:%S")
     # cursor used to send queries
     cursor = conn.cursor()
     # executes query
@@ -1005,8 +1005,8 @@ def search_round_trip_query():
     destination_city = request.form['Destination City/Airport Name']
     departure_date_and_time = request.form['Departure Date and Time']
     return_date_and_time = request.form['Return Date and Time']
-    departure_date_and_time = datetime.datetime.strptime(departure_date_and_time, "%Y-%m-%dT%H:%M")
-    return_date_and_time = datetime.datetime.strptime(return_date_and_time, "%Y-%m-%dT%H:%M")
+    departure_date_and_time = datetime.datetime.strptime(departure_date_and_time, "%Y-%m-%dT%H:%M:%S")
+    return_date_and_time = datetime.datetime.strptime(return_date_and_time, "%Y-%m-%dT%H:%M:%S")
     # cursor used to send queries
     cursor = conn.cursor()
     # executes query
