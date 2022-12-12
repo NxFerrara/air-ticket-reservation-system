@@ -198,10 +198,10 @@ INSERT INTO `flight` (`FlightNumber`, `DepartureDateandTime`, `ArrivalDateandTim
 --
 
 CREATE TABLE `purchase` (
-  `TicketIDNumber` varchar(50) NOT NULL,
+  `TicketIDNumber` int(11) NOT NULL,
   `EmailAddress` varchar(50) NOT NULL,
   `PurchaseDateandTime` datetime NOT NULL,
-  `CardNumber` int(11) NOT NULL,
+  `CardNumber` varchar(50) NOT NULL,
   `CardType` varchar(50) NOT NULL,
   `NameonCard` varchar(50) NOT NULL,
   `ExpirationDate` date NOT NULL,
@@ -279,7 +279,7 @@ INSERT INTO `staffphonenumber` (`Username`, `PhoneNumber`) VALUES
 --
 
 CREATE TABLE `ticket` (
-  `TicketIDNumber` varchar(50) NOT NULL,
+  `TicketIDNumber` int(11) NOT NULL,
   `FlightNumber` varchar(50) NOT NULL,
   `DepartureDateandTime` datetime NOT NULL,
   `AirlineName` varchar(50) NOT NULL,
