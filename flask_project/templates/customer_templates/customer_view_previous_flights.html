@@ -99,6 +99,9 @@
 	{% if context %}
 		<p class="context"><strong>Message:</strong> {{context}}</p>
 	{% endif %}
+	{% if not data %}
+		<p class="context"><strong>There are no previous flights taken</strong></p>
+	{% endif %}
 	{% if data %}
 	<table>
 		<tr>
