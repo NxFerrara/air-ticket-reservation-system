@@ -124,11 +124,11 @@
 		<form action="{{ url_for('exec_ticket_stats', revenueData=(lastMonthRevenue, lastYearRevenue)) }}" method="POST">
 			<label for="StartDateandTime">Start Date and Time:</label>
 			</br>
-			<input type="datetime-local" id="StartDateandTime" name="StartDateandTime" required>
+			<input type="datetime-local" step=1 id="StartDateandTime" name="StartDateandTime" required>
 			</br>
 			<label for="EndDateandTime">End Date and Time:</label>
 			</br>
-			<input type="datetime-local" id="EndDateandTime" name="EndDateandTime">
+			<input type="datetime-local" step=1 id="EndDateandTime" name="EndDateandTime">
 			</br>
 			<input type="submit" value = Search />
 			{% if error %}
