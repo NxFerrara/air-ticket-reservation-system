@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Dec 12, 2022 at 07:20 AM
+-- Generation Time: Dec 12, 2022 at 10:55 PM
 -- Server version: 10.4.24-MariaDB
 -- PHP Version: 8.1.6
 
@@ -58,7 +58,8 @@ CREATE TABLE `airlinestaff` (
 --
 
 INSERT INTO `airlinestaff` (`Username`, `Password`, `FirstName`, `LastName`, `DateofBirth`, `AirlineName`) VALUES
-('admin', 'e2fc714c4727ee9395f324cd2e7f331f', 'Roe', 'Jones', '1978-05-25', 'United');
+('admin', 'e2fc714c4727ee9395f324cd2e7f331f', 'Roe', 'Jones', '1978-05-25', 'United'),
+('jd123', '81dc9bdb52d04dc20036dbd8313ed055', 'Joe', 'Dan', '2022-11-16', 'United');
 
 -- --------------------------------------------------------
 
@@ -84,7 +85,8 @@ CREATE TABLE `airplane` (
 INSERT INTO `airplane` (`IDNumber`, `NumberofSeats`, `ManufacturingCompany`, `Age`, `AirlineName`, `NumberofEconomyClassSeats`, `NumberofBusinessClassSeats`, `NumberofFirstClassSeats`) VALUES
 (1, 4, 'Boeing', 10, 'United', 2, 1, 1),
 (2, 4, 'Airbus', 12, 'United', 2, 1, 1),
-(3, 50, 'Boeing', 8, 'United', 30, 15, 5);
+(3, 50, 'Boeing', 8, 'United', 30, 15, 5),
+(5, 4, 'Boeing', 5, 'United', 2, 1, 1);
 
 -- --------------------------------------------------------
 
@@ -109,6 +111,7 @@ INSERT INTO `airport` (`AirportName`, `City`, `Country`, `AirportType`) VALUES
 ('HKA', 'Hong Kong', 'China', 'Both'),
 ('JFK', 'NYC', 'USA', 'Both'),
 ('LAX', 'Los Angeles', 'USA', 'Both'),
+('ORD', 'Orlando', 'USA', 'Both'),
 ('PVG', 'Shanghai', 'China', 'Both'),
 ('SFO', 'San Francisco', 'USA', 'Both'),
 ('SHEN', 'Shenzhen', 'China', 'Both');
@@ -173,7 +176,8 @@ INSERT INTO `flight` (`FlightNumber`, `DepartureDateandTime`, `ArrivalDateandTim
 ('134', '2022-07-12 13:25:25', '2022-07-12 16:50:25', 300, 'delayed', 'JFK', 'BOS', 3, 'United'),
 ('206', '2023-02-04 13:25:25', '2023-02-04 16:50:25', 400, 'on-time', 'SFO', 'LAX', 2, 'United'),
 ('207', '2023-03-04 13:25:25', '2023-03-04 16:50:25', 300, 'on-time', 'LAX', 'SFO', 2, 'United'),
-('296', '2022-12-30 13:25:25', '2022-12-30 16:50:25', 3000, 'on-time', 'PVG', 'SFO', 1, 'United'),
+('296', '2022-12-30 13:25:25', '2022-12-30 16:50:25', 3000, 'Delayed', 'PVG', 'SFO', 1, 'United'),
+('532', '2022-12-18 10:30:55', '2022-12-18 14:30:55', 700, 'On-time', 'SFO', 'ORD', 5, 'United'),
 ('715', '2022-09-28 10:25:25', '2022-09-28 13:50:25', 500, 'delayed', 'PVG', 'BEI', 1, 'United'),
 ('839', '2021-12-26 13:25:25', '2021-12-26 16:50:25', 300, 'on-time', 'SHEN', 'BEI', 3, 'United');
 
@@ -260,7 +264,8 @@ CREATE TABLE `staffemailaddress` (
 --
 
 INSERT INTO `staffemailaddress` (`Username`, `EmailAddress`) VALUES
-('admin', 'staff@nyu.edu');
+('admin', 'staff@nyu.edu'),
+('jd123', 'hellow@gmail.com');
 
 -- --------------------------------------------------------
 
@@ -279,7 +284,8 @@ CREATE TABLE `staffphonenumber` (
 
 INSERT INTO `staffphonenumber` (`Username`, `PhoneNumber`) VALUES
 ('admin', '111-2222-3333'),
-('admin', '444-5555-6666');
+('admin', '444-5555-6666'),
+('jd123', '12345678');
 
 -- --------------------------------------------------------
 
