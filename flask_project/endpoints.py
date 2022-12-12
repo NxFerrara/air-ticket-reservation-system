@@ -1340,7 +1340,7 @@ def exec_customer_purchase_ticket(departure_flight, return_flight):
         query = 'SELECT MAX(TicketIDNumber) as MaxTicketIDNumber FROM ticket'
         cursor.execute(query)
         data = cursor.fetchone()
-        if not data:
+        if not data['MaxTicketIDNumber']:
             max_ticket_id = 0
         else:
             max_ticket_id = int(data['MaxTicketIDNumber'])
@@ -1384,7 +1384,7 @@ def exec_customer_purchase_ticket(departure_flight, return_flight):
             query = 'SELECT MAX(TicketIDNumber) as MaxTicketIDNumber FROM ticket'
             cursor.execute(query)
             data = cursor.fetchone()
-            if not data:
+            if not data['MaxTicketIDNumber']:
                 max_ticket_id = 0
             else:
                 max_ticket_id = int(data['MaxTicketIDNumber'])
