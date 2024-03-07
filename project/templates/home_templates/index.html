@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+</head>
+
+<body>
+	<a href="/login">Login</a>
+	<a href="/register">Register</a>
+	<a href="/search_flights">Search Flights</a>
+	<br>
+	<br>
+
+	<style type="text/css">
+		table, th, td {
+			border: 1px solid black;
+		}
+	</style>
+	<table>
+		<tr>
+			{% for header in headings %}
+			<th>{{ header }}</th>
+			{% endfor %}
+		</tr>
+		{% for row in data %}
+		<tr>
+			{% for key in row.keys() %}
+			<td>{{ row[key] }}</td>
+			{% endfor %}
+		</tr>
+		{% endfor %}
+	</table>
+</body>
+
+</html>
